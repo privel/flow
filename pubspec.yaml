@@ -1,0 +1,75 @@
+name: flow
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.1
+
+dependencies:
+  go_router: ^15.1.1
+  responsive_framework: ^1.5.1
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.3
+  google_sign_in: ^6.3.0
+  flutter_side_menu: ^0.5.41  
+  provider: ^6.1.5
+  shared_preferences: ^2.5.3
+  iconly: ^1.0.1
+  
+  
+  flutter:
+    sdk: flutter
+    
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/image/
+    - assets/image/logo/
+    - assets/image/logo/logoff.png
+    - assets/fonts/San Francisco Pro Text/
+    
+
+  fonts:
+    - family: SFProText
+      fonts:
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-Light.ttf
+          weight: 300
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-RegularItalic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-Semibold.ttf
+          weight: 600
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-SemiboldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-Heavy.ttf
+          weight: 800
+        - asset: assets/fonts/San Francisco Pro Text/SFProText-HeavyItalic.ttf
+          weight: 800
+          style: italic
+    
+
+

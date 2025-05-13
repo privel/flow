@@ -1,0 +1,2 @@
+/home/vspxd/code/flow/android/app/.cxx/Debug/2k151g1t/x86/CMakeFiles/edit_cache.dir
+/home/vspxd/code/flow/android/app/.cxx/Debug/2k151g1t/x86/CMakeFiles/rebuild_cache.dir
