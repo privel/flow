@@ -20,7 +20,8 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  Picker pick = Picker();
+  final picker = Picker();
+
   Uint8List? imageBytes;
   final ScrollController _scrollController = ScrollController();
 
@@ -174,18 +175,24 @@ class _AccountPageState extends State<AccountPage> {
                                       ),
                                     ),
                                   ],
-                                ).then((value) {
+                                ).then((value) async {
                                   if (value == 'edit') {
-                                    // TODO: логика изменения
+                                    final pickedBytes =
+                                        await picker.pickImageBytes(context);
+                                    if (pickedBytes != null) {
+                                      await auth.updateUserPhoto(
+                                          pickedBytes); // 🔧 реализуем ниже
+                                    }
                                   } else if (value == 'remove') {
-                                    // TODO: логика удаления
+                                    await auth.removeUserPhoto();
                                   }
                                 });
                               },
                               child: auth.user?.photoURL != null
                                   ? CircleAvatar(
                                       backgroundImage:
-                                          NetworkImage(auth.user!.photoURL!),
+                                          NetworkImage(auth.user!.photoURL!, ),
+                                          radius: isMobile ? 70 : 100,
                                     )
                                   : CircleAvatar(
                                       backgroundColor: Colors.grey,

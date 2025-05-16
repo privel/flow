@@ -4,24 +4,30 @@ import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/core/utils/provider/local_provider.dart';
 import 'package:flow/core/utils/provider/theme_provider.dart';
 import 'package:flow/core/utils/router/router.dart';
+import 'package:flow/core/utils/supabase_service.dart';
 import 'package:flow/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
-
 
 //App Check Android:  keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await SupabaseService.init();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   await FirebaseAppCheck.instance.activate(
-    androidProvider: AndroidProvider.debug, // или  для билд версии playIntegrity
-    webProvider: ReCaptchaV3Provider('6LcOWT0rAAAAAAsJEvF4SCJBIfymCREZSRABCwdB'),
+  await FirebaseAppCheck.instance.activate(
+    androidProvider:
+        AndroidProvider.debug, // или  для билд версии playIntegrity
+    webProvider:
+        ReCaptchaV3Provider('6LcOWT0rAAAAAAsJEvF4SCJBIfymCREZSRABCwdB'),
   );
+
   final authProvider = AuthProvider();
 
   final themeProvider = ThemeProvider();
