@@ -59,20 +59,33 @@ class MessageLookup extends MessageLookupByLibrary {
     "RegisterHintPassCheck": MessageLookupByLibrary.simpleMessage(
       "Passwords don\'t match",
     ),
+    "accountPage": MessageLookupByLibrary.simpleMessage("Account"),
+    "appInformation": MessageLookupByLibrary.simpleMessage("APP INFORMATION"),
+    "appVersion": MessageLookupByLibrary.simpleMessage("App version:"),
+    "build": MessageLookupByLibrary.simpleMessage("Build:"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
       "Please confirm your email address.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Confirm"),
+    "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Language Settings",
     ),
+    "logOut": MessageLookupByLibrary.simpleMessage("Log out"),
     "resend": MessageLookupByLibrary.simpleMessage("Resend"),
     "resendtext": m0,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Reset password"),
+    "save": MessageLookupByLibrary.simpleMessage("Save"),
+    "selectLanguage": MessageLookupByLibrary.simpleMessage("SELECT LANGUAGE"),
     "sentIn": m1,
+    "settingAndTools": MessageLookupByLibrary.simpleMessage(
+      "SETTING AND TOOLS",
+    ),
+    "successfulExit": MessageLookupByLibrary.simpleMessage("Successful exit"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "The email has been sent! Check your email.",
     ),
+    "theme": MessageLookupByLibrary.simpleMessage("Theme"),
   };
 }

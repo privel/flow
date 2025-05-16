@@ -23,7 +23,6 @@
   "ReSendLetter": "Отправить повторно",
   "resendtext": "{resendText}",
   "ReSend": "Отправить повторно",
-
   "confirmTitle": "Подтверждение",
   "confirmMessage": "Пожалуйста, подтвердите адрес электронной почты.",
   "checkAgain": "Проверить снова",
@@ -33,5 +32,16 @@
     "placeholders": {
       "seconds": {}
     }
-  }
+  },
+  "selectLanguage": "ВЫБОР ЯЗЫКА",
+  "accountPage": "Аккаунт",
+  "settingAndTools": "НАСТРОЙКИ И ИНСТРУМЕНТЫ",
+  "theme": "Тема",
+  "language": "Язык",
+  "successfulExit": "Успешный выход",
+  "appInformation": "ИНФОРМАЦИЯ О ПРИЛОЖЕНИИ",
+  "appVersion": "Версия приложения:",
+  "build": "Сборка:",
+  "logOut": "Выйти",
+  "save": "Сохранить"
 }

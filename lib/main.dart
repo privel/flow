@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/core/utils/provider/local_provider.dart';
@@ -8,11 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'app.dart';
 
+
+//App Check Android:  keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+   await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug, // или  для билд версии playIntegrity
+    webProvider: ReCaptchaV3Provider('6LcOWT0rAAAAAAsJEvF4SCJBIfymCREZSRABCwdB'),
   );
   final authProvider = AuthProvider();
 

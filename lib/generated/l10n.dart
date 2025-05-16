@@ -299,6 +299,81 @@ class S {
       args: [seconds],
     );
   }
+
+  /// `SELECT LANGUAGE`
+  String get selectLanguage {
+    return Intl.message(
+      'SELECT LANGUAGE',
+      name: 'selectLanguage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Account`
+  String get accountPage {
+    return Intl.message('Account', name: 'accountPage', desc: '', args: []);
+  }
+
+  /// `SETTING AND TOOLS`
+  String get settingAndTools {
+    return Intl.message(
+      'SETTING AND TOOLS',
+      name: 'settingAndTools',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Theme`
+  String get theme {
+    return Intl.message('Theme', name: 'theme', desc: '', args: []);
+  }
+
+  /// `Language`
+  String get language {
+    return Intl.message('Language', name: 'language', desc: '', args: []);
+  }
+
+  /// `Successful exit`
+  String get successfulExit {
+    return Intl.message(
+      'Successful exit',
+      name: 'successfulExit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `APP INFORMATION`
+  String get appInformation {
+    return Intl.message(
+      'APP INFORMATION',
+      name: 'appInformation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `App version:`
+  String get appVersion {
+    return Intl.message('App version:', name: 'appVersion', desc: '', args: []);
+  }
+
+  /// `Build:`
+  String get build {
+    return Intl.message('Build:', name: 'build', desc: '', args: []);
+  }
+
+  /// `Log out`
+  String get logOut {
+    return Intl.message('Log out', name: 'logOut', desc: '', args: []);
+  }
+
+  /// `Save`
+  String get save {
+    return Intl.message('Save', name: 'save', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

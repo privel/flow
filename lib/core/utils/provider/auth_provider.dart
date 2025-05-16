@@ -3,6 +3,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -44,6 +46,34 @@ Future<String?> uploadProfileImage(Uint8List imageBytes, String uid) async {
     return null;
   }
 }
+
+Future<void> updateDisplayName(String newName) async {
+  try {
+    _setError(null);
+    final user = _auth.currentUser;
+
+    if (user != null) {
+      // 1. Обновить в Firebase Auth
+      await user.updateDisplayName(newName);
+      await user.reload();
+      _user = _auth.currentUser;
+
+      // 2. Обновить в Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'displayName': newName,
+        'email': user.email,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true)); // ⚠️ merge: true — чтобы не стереть другие поля
+
+      notifyListeners();
+    } else {
+      _setError("User is not signed in.");
+    }
+  } catch (e) {
+    _setError("Display name update error: ${e.toString()}");
+  }
+}
+
 
 
 

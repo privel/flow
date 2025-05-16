@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -31,6 +32,16 @@ class _AccountPageState extends State<AccountPage> {
 
   void showBottomModalAccountEdit(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final size = MediaQuery.of(context).size;
+    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final initialName = (auth.user?.displayName?.trim().isNotEmpty ?? false)
+        ? auth.user!.displayName!
+        : 'No Name';
+
+    final TextEditingController nameController =
+        TextEditingController(text: initialName);
 
     //Theme.of(context).extension<AppColorsExtension>()?.mainText
 
@@ -39,82 +50,210 @@ class _AccountPageState extends State<AccountPage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: isDark ? Color(0xFF2A2A2A) : const Color(0xFFD3D3D3),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: DraggableScrollableSheet(
-            expand: false,
-            initialChildSize: 0.7,
-            minChildSize: 0.4,
-            maxChildSize: 0.7,
-            builder: (context, scrollController) {
-              return SingleChildScrollView(
-                controller: scrollController,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      // 🔝 Верхние кнопки
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.close,
-                                color: Theme.of(context)
-                                    .extension<AppColorsExtension>()
-                                    ?.mainText),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                          // const Text(
-                          //   "Изменить фото",
-                          //   style: TextStyle(
-                          //       color: Colors.white,
-                          //       fontSize: 18,
-                          //       fontWeight: FontWeight.bold),
-                          // ),
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                            },
-                            child: Text("Save",
-                                style: TextStyle(
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFD3D3D3),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.5,
+              minChildSize: 0.3,
+              maxChildSize: 0.7,
+              builder: (context, scrollController) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // 🔝 Верхние кнопки
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.close,
                                   color: Theme.of(context)
                                       .extension<AppColorsExtension>()
-                                      ?.mainText,
-                                )),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Text("User name"),
+                                      ?.mainText),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final newName = nameController.text.trim();
+                                final currentName =
+                                    auth.user?.displayName?.trim();
 
-                      const SizedBox(height: 24),
+                                // Обновляем только если имя изменилось и не пустое
+                                if (newName.isNotEmpty &&
+                                    newName != currentName) {
+                                  await auth.updateDisplayName(
+                                      newName); // 🔧 сохраняем в Firebase Auth + Firestore
+                                }
 
-                      ElevatedButton(
-                        onPressed: () async {
-                          final picked = await pick.pickImageBytes();
-                          if (picked != null) {
-                            setState(() {
-                              imageBytes = picked;
-                            });
-                          }
-                        },
-                        child: const Text("Выбрать изображение"),
-                      ),
-
-                      if (imageBytes != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Image.memory(imageBytes!, height: 200),
+                                Navigator.pop(context); // Закрываем модалку
+                              },
+                              child: Text(
+                                S.of(context).save,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                    ],
+                        SizedBox(height: size.height * 0.03),
+
+                        Consumer<AuthProvider>(
+                          builder: (context, auth, _) {
+                            final photoUrl = auth.user?.photoURL;
+                            return GestureDetector(
+                              onTap: () {
+                                if (photoUrl != null) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) {
+                                      return Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: InteractiveViewer(
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: Image.network(
+                                              photoUrl,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                              },
+                              onLongPressStart: (details) {
+                                final tapPosition = details.globalPosition;
+
+                                showMenu(
+                                  context: context,
+                                  position: RelativeRect.fromLTRB(
+                                    tapPosition.dx,
+                                    tapPosition.dy,
+                                    tapPosition.dx,
+                                    tapPosition.dy,
+                                  ),
+                                  items: [
+                                    PopupMenuItem(
+                                      value: 'edit',
+                                      child: Text(
+                                        'Изменить фото',
+                                        style:
+                                            AccountLayout.CardSubTitle.copyWith(
+                                          color: Theme.of(context)
+                                              .extension<AppColorsExtension>()
+                                              ?.mainText,
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'remove',
+                                      child: Text(
+                                        'Удалить фото',
+                                        style:
+                                            AccountLayout.CardSubTitle.copyWith(
+                                          color: Theme.of(context)
+                                              .extension<AppColorsExtension>()
+                                              ?.mainText,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ).then((value) {
+                                  if (value == 'edit') {
+                                    // TODO: логика изменения
+                                  } else if (value == 'remove') {
+                                    // TODO: логика удаления
+                                  }
+                                });
+                              },
+                              child: auth.user?.photoURL != null
+                                  ? CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(auth.user!.photoURL!),
+                                    )
+                                  : CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      radius: isMobile ? 70 : 100,
+                                      child: Icon(
+                                        IconlyLight.profile,
+                                        color: Colors.white,
+                                        size: isMobile ? 70 : 80,
+                                      ),
+                                    ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 30),
+
+                        SizedBox(
+                          width: 300,
+                          height: 50,
+                          child: TextField(
+                            controller: nameController,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            cursorColor: isDark ? Colors.white : Colors.black,
+                            decoration: InputDecoration(
+                              hintText: initialName,
+                              filled: true,
+                              fillColor: Colors.transparent,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: isDark ? Colors.grey : Colors.black54,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(16),
+                                borderSide: BorderSide(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  width: 2, // Можно толще
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // ElevatedButton(
+                        //   onPressed: () async {
+                        //     final picked = await pick.pickImageBytes();
+                        //     if (picked != null) {
+                        //       setState(() {
+                        //         imageBytes = picked;
+                        //       });
+                        //     }
+                        //   },
+                        //   child: const Text("Выбрать изображение"),
+                        // ),
+
+                        // if (imageBytes != null)
+                        //   Padding(
+                        //     padding: const EdgeInsets.only(top: 20),
+                        //     child: Image.memory(imageBytes!, height: 200),
+                        //   ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         );
       },
@@ -332,7 +471,7 @@ class _AccountPageState extends State<AccountPage> {
 
                   const SizedBox(height: 24),
                   Text(
-                    "SELECT LANGUAGE",
+                    S.of(context).selectLanguage,
                     style: TextStyle(
                       color: Theme.of(context)
                           .extension<AppColorsExtension>()
@@ -412,7 +551,7 @@ class _AccountPageState extends State<AccountPage> {
               isDark ? const Color(0xFF1F1F1F) : const Color(0xFFD3D3D3),
           statusBarIconBrightness: Brightness.light,
         ),
-        title: Text("Account",
+        title: Text(S.of(context).accountPage,
             style: AccountLayout.AppBarTitle.copyWith(
               color: isDark ? Colors.white : const Color(0xFF1F1F1F),
             )),
@@ -436,8 +575,8 @@ class _AccountPageState extends State<AccountPage> {
                       )
                     : const CircleAvatar(
                         backgroundColor: Colors.grey,
-                        child: Icon(Icons.person, color: Colors.white),
                         radius: 25,
+                        child: Icon(IconlyLight.profile, color: Colors.white),
                       ),
                 title: Text(
                   auth.user?.displayName?.isNotEmpty == true
@@ -475,7 +614,7 @@ class _AccountPageState extends State<AccountPage> {
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.06),
             Text(
-              "SETTING AND TOOLS",
+              S.of(context).settingAndTools,
               style: AccountLayout.TextH2,
             ),
             AutoExpandableCard(
@@ -494,7 +633,7 @@ class _AccountPageState extends State<AccountPage> {
                             : Colors.black54,
                       ),
                       const SizedBox(width: 8),
-                      const Text("Theme"),
+                      Text(S.of(context).theme),
                     ],
                   ),
                 ),
@@ -517,7 +656,7 @@ class _AccountPageState extends State<AccountPage> {
                             : Colors.black54,
                       ),
                       const SizedBox(width: 8),
-                      const Text("Language"),
+                      Text(S.of(context).language),
                     ],
                   ),
                 ),
@@ -529,7 +668,7 @@ class _AccountPageState extends State<AccountPage> {
                 GestureDetector(
                   onTap: () {
                     auth.logout();
-                    SnackBarHelper.show(context, "Successful exit");
+                    SnackBarHelper.show(context, S.of(context).successfulExit);
                   },
                   child: Row(
                     children: [
@@ -540,7 +679,7 @@ class _AccountPageState extends State<AccountPage> {
                             : Colors.black54,
                       ),
                       const SizedBox(width: 8),
-                      const Text("Log out"),
+                      Text(S.of(context).logOut),
                     ],
                   ),
                 ),
@@ -548,7 +687,7 @@ class _AccountPageState extends State<AccountPage> {
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.05),
             Text(
-              "APP INFORMATION",
+              S.of(context).appInformation,
               style: AccountLayout.TextH2,
             ),
             AutoExpandableCard(
@@ -557,8 +696,8 @@ class _AccountPageState extends State<AccountPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "App version:",
+                    Text(
+                      S.of(context).appVersion,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -580,8 +719,8 @@ class _AccountPageState extends State<AccountPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      "Build:",
+                    Text(
+                      S.of(context).build,
                     ),
                     const SizedBox(width: 8),
                     Text(
