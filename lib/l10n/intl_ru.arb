@@ -1,0 +1,37 @@
+{
+  "languageSetting": "Языковые настройки",
+  "LoginWelcomeText": "С возвращением!",
+  "LoginWelcomeSubText": "пожалуйста, войдите в свою учетную запись",
+  "LoginHintEmailText": "Почта",
+  "LoginBtnForgotPassword": "Забыли пароль?",
+  "LoginBtnHintLoading": "Загрузка...",
+  "LoginBtnHintSignIn": "Войти",
+  "LoginTextDontAccount": "У Вас нет Учетной Записи? ",
+  "LoginBtnHintSignUp": "Зарегистрироваться",
+  "RegisterHintPassCheck": "Пароли не совпадают",
+  "RegCreateAcnText": "Создать Аккаунт",
+  "RegHintEmail": "Почта",
+  "RegHintPassword": "Пароль",
+  "RegHintConfirmPassword": "Подтвердить Пароль",
+  "RegBtnHintLoading": "Загрузка...",
+  "RegBtnHintRegister": "Зарегистрироваться",
+  "RegTextDoUHaveAccount": "У Вас Есть Учетная Запись? ",
+  "RegBtnLoginText": "Войти",
+  "ForgotenterTheEmailAddressToWhichYouWillReceiveThe": "Введите адрес электронной почты, на который вы получите ссылку для сброса пароля.:",
+  "theEmailHasBeenSentCheckYourEmail": "Письмо отправлено! Проверьте свой электронный адрес.",
+  "resetPassword": "Сброс пароля",
+  "ReSendLetter": "Отправить повторно",
+  "resendtext": "{resendText}",
+  "ReSend": "Отправить повторно",
+
+  "confirmTitle": "Подтверждение",
+  "confirmMessage": "Пожалуйста, подтвердите адрес электронной почты.",
+  "checkAgain": "Проверить снова",
+  "resend": "Отправить повторно",
+  "sentIn": "Отправлено ({seconds} сек)",
+  "@sentIn": {
+    "placeholders": {
+      "seconds": {}
+    }
+  }
+}

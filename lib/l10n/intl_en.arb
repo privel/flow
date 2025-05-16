@@ -1,0 +1,35 @@
+{
+  "languageSetting": "Language Settings",
+  "LoginWelcomeText": "Welcome back!",
+  "LoginWelcomeSubText": "please sign in to your account",
+  "LoginHintEmailText": "Email",
+  "LoginBtnForgotPassword": "Forgot Password?",
+  "LoginBtnHintLoading": "Loading...",
+  "LoginBtnHintSignIn": "Sign In",
+  "LoginTextDontAccount": "Don’t Have An Account? ",
+  "LoginBtnHintSignUp": "Sign Up",
+  "RegisterHintPassCheck": "Passwords don't match",
+  "RegCreateAcnText": "Create Account",
+  "RegHintEmail": "Email",
+  "RegHintPassword": "Password",
+  "RegHintConfirmPassword": "Confirm Password",
+  "RegBtnHintLoading": "Loading...",
+  "RegBtnHintRegister": "Register",
+  "RegTextDoUHaveAccount": "Do You Have An Account? ",
+  "RegBtnLoginText": "Sign In",
+  "ForgotenterTheEmailAddressToWhichYouWillReceiveThe": "Enter the email address to which you will receive the password reset link.:",
+  "theEmailHasBeenSentCheckYourEmail": "The email has been sent! Check your email.",
+  "resetPassword": "Reset password",
+  
+  "resendtext": "{resendText}",
+  "confirmTitle": "Confirm",
+  "confirmMessage": "Please confirm your email address.",
+  "checkAgain": "Check again",
+  "resend": "Resend",
+  "sentIn": "Sent ({seconds} sec)",
+  "@sentIn": {
+    "placeholders": {
+      "seconds": {}
+    }
+  }
+}

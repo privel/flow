@@ -72,6 +72,7 @@ import 'package:flow/presentation/widgets/side_bar/side_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iconly/iconly.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 class ResponsiveLayout extends StatelessWidget {
@@ -79,7 +80,7 @@ class ResponsiveLayout extends StatelessWidget {
 
   const ResponsiveLayout({super.key, required this.child});
 
-  static final tabs = ['/', '/profile', '/settings'];
+  static final tabs = ['/', '/profile', '/account'];
 
   @override
   Widget build(BuildContext context) {
@@ -122,14 +123,16 @@ class ResponsiveLayout extends StatelessWidget {
                 splashColor: Colors.transparent,
               ),
               child: BottomNavigationBar(
-                backgroundColor: const Color(0xFF1A1A1A),
+                // backgroundColor: const Color(0xFF1A1A1A),
                 currentIndex: selectedIndex,
                 selectedItemColor: const Color(0xFF4CAF50),
                 unselectedItemColor: Colors.grey[500],
                 type: BottomNavigationBarType.fixed,
                 showUnselectedLabels: false,
-                selectedLabelStyle:
-                    const TextStyle(fontWeight: FontWeight.bold),
+                selectedLabelStyle: const TextStyle(
+                  fontFamily: 'SFProText',
+                  fontWeight: FontWeight.w600,
+                ),
                 onTap: (index) {
                   if (index != selectedIndex) {
                     context.go(tabs[index]);
@@ -137,16 +140,17 @@ class ResponsiveLayout extends StatelessWidget {
                 },
                 items: const [
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
+                    icon: Icon(IconlyLight.home),
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
+                    icon: Icon(Icons.voice_over_off),
                     label: 'Profile',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.settings),
-                    label: 'Settings',
+                    icon: Icon(IconlyLight.profile),
+                    label: 'Account',
+
                   ),
                 ],
               ),

@@ -1,4 +1,5 @@
-import 'package:flow/core/utils/provider/auth_provider/auth_provider.dart';
+import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/pages/auth_page/register_page/register_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage>
     final confirm = _confirmController.text.trim();
 
     if (_showConfirm && password != confirm) {
-      setState(() => _errorText = "Passwords don't match");
+      setState(() => _errorText = S.of(context).RegisterHintPassCheck);
       return;
     }
 
@@ -59,6 +60,7 @@ class _RegisterPageState extends State<RegisterPage>
     if (auth.errorMessage != null) {
       setState(() => _errorText = auth.errorMessage);
     } else {
+      // ignore: use_build_context_synchronously
       context.go('/auth/verify-email');
     }
   }
@@ -67,18 +69,21 @@ class _RegisterPageState extends State<RegisterPage>
       {bool obscure = false,
       required TextEditingController controller,
       Widget? suffixIcon}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
       width: 300,
       height: 50,
       child: TextField(
         controller: controller,
         obscureText: obscure,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: isDark ? Colors.white : Colors.black),
         decoration: InputDecoration(
           hintText: label,
           hintStyle: RegisterLayout.hintTextStyle,
           filled: true,
-          fillColor: const Color(0xFF2C2C2C),
+          // fillColor: const Color(0xFF2C2C2C),
+          fillColor: Theme.of(context).colorScheme.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide.none,
@@ -88,29 +93,6 @@ class _RegisterPageState extends State<RegisterPage>
       ),
     );
   }
-
-  //   Widget _inputField(String label,
-  //     {bool obscure = false, TextEditingController? controller}) {
-  //   return SizedBox(
-  //     width: 300,
-  //     height: 50,
-  //     child: TextField(
-  //       controller: controller,
-  //       obscureText: obscure,
-  //       style: const TextStyle(color: Colors.white),
-  //       decoration: InputDecoration(
-  //         hintText: label,
-  //         hintStyle: RegisterLayout.hintTextStyle,
-  //         filled: true,
-  //         fillColor: const Color(0xFF2C2C2C),
-  //         border: OutlineInputBorder(
-  //           borderRadius: BorderRadius.circular(16),
-  //           borderSide: BorderSide.none,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -139,14 +121,14 @@ class _RegisterPageState extends State<RegisterPage>
                           padding: EdgeInsets.only(top: size.height * 0.14),
                           child: Column(
                             children: [
-                              Text("Create Account",
+                              Text(S.of(context).RegCreateAcnText,
                                   style: RegisterLayout.mainTextStyle),
                               SizedBox(height: size.height * 0.19),
-                              _inputField("Email",
+                              _inputField(S.of(context).RegHintEmail,
                                   controller: _emailController),
                               const SizedBox(height: 16),
                               _inputField(
-                                "Password",
+                                S.of(context).RegHintPassword,
                                 controller: _passwordController,
                                 obscure: _obscurePassword,
                                 suffixIcon: IconButton(
@@ -154,7 +136,8 @@ class _RegisterPageState extends State<RegisterPage>
                                     _obscurePassword
                                         ? IconlyBold.show
                                         : IconlyLight.show,
-                                    color: Colors.white54,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
                                   ),
                                   onPressed: () => setState(() =>
                                       _obscurePassword = !_obscurePassword),
@@ -167,7 +150,10 @@ class _RegisterPageState extends State<RegisterPage>
                                     ? Column(
                                         children: [
                                           const SizedBox(height: 16),
-                                          _inputField("Confirm Password",
+                                          _inputField(
+                                              S
+                                                  .of(context)
+                                                  .RegHintConfirmPassword,
                                               controller: _confirmController,
                                               obscure: _obscureConfirm,
                                               suffixIcon: IconButton(
@@ -175,7 +161,9 @@ class _RegisterPageState extends State<RegisterPage>
                                                   _obscureConfirm
                                                       ? IconlyBold.show
                                                       : IconlyLight.show,
-                                                  color: Colors.white54,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondary,
                                                 ),
                                                 onPressed: () => setState(() =>
                                                     _obscureConfirm =
@@ -208,8 +196,9 @@ class _RegisterPageState extends State<RegisterPage>
                                         borderRadius:
                                             BorderRadius.circular(12)),
                                   ),
-                                  child: Text(
-                                      _isLoading ? "Loading..." : "Register"),
+                                  child: Text(_isLoading
+                                      ? S.of(context).RegBtnHintLoading
+                                      : S.of(context).RegBtnHintRegister),
                                 ),
                               ),
                             ],
@@ -220,12 +209,15 @@ class _RegisterPageState extends State<RegisterPage>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text("Do You Have An Account? ",
-                                  style: TextStyle(color: Colors.white60)),
+                              Text(S.of(context).RegTextDoUHaveAccount,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary)),
                               GestureDetector(
                                 onTap: () => context.go('/auth/login'),
-                                child: const Text("Sign In",
-                                    style: TextStyle(
+                                child: Text(S.of(context).RegBtnLoginText,
+                                    style: const TextStyle(
                                         color: Colors.greenAccent,
                                         fontWeight: FontWeight.w500)),
                               ),
@@ -245,6 +237,7 @@ class _RegisterPageState extends State<RegisterPage>
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget WebLayout() {
     final auth = Provider.of<AuthProvider>(context);
     final isMobile = ResponsiveBreakpoints.of(context).isMobile;
@@ -262,15 +255,15 @@ class _RegisterPageState extends State<RegisterPage>
         ),
         child: Column(
           children: [
-            const Text("Create Account",
-                style: TextStyle(
+            Text(S.of(context).RegCreateAcnText,
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 32),
-            _inputField("Email", controller: _emailController),
+            _inputField(S.of(context).RegHintEmail, controller: _emailController),
             const SizedBox(height: 16),
-            _inputField("Password",
+            _inputField(S.of(context).RegHintPassword,
                 controller: _passwordController,
                 obscure: _obscurePassword,
                 suffixIcon: IconButton(
@@ -288,7 +281,7 @@ class _RegisterPageState extends State<RegisterPage>
                   ? Column(
                       children: [
                         const SizedBox(height: 16),
-                        _inputField("Confirm Password",
+                        _inputField(S.of(context).RegHintConfirmPassword,
                             controller: _confirmController,
                             obscure: _obscureConfirm,
                             suffixIcon: IconButton(
@@ -326,19 +319,19 @@ class _RegisterPageState extends State<RegisterPage>
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text(_isLoading ? "Loading..." : "Register"),
+                child: Text(_isLoading ? S.of(context).RegBtnHintLoading : S.of(context).RegBtnHintRegister),
               ),
             ),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Already have an account? ",
-                    style: TextStyle(color: Colors.white60)),
+                 Text(S.of(context).RegTextDoUHaveAccount,
+                    style: const TextStyle(color: Colors.white60)),
                 GestureDetector(
                   onTap: () => context.go('/auth/login'),
-                  child: const Text("Sign In",
-                      style: TextStyle(
+                  child: Text(S.of(context).RegBtnLoginText,
+                      style: const TextStyle(
                           color: Colors.greenAccent,
                           fontWeight: FontWeight.w500)),
                 )

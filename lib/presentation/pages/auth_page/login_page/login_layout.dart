@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flow/core/theme/app_ext.dart';
 
 class LoginLayout {
-  //Welcome back style
-  static TextStyle mainTextStyle = const TextStyle(
-    fontFamily: 'SFProText',
-    fontWeight: FontWeight.w600,
-    fontSize: 24,
-  );
+  final BuildContext context;
 
-  static TextStyle subTextStyle = const TextStyle(
-    fontFamily: 'SFProText',
-    fontWeight: FontWeight.w100,
-    color: Colors.white54,
-    fontSize: 15,
-  );
+  LoginLayout(this.context);
 
+  TextStyle get mainTextStyle => const TextStyle(
+        fontFamily: 'SFProText',
+        fontWeight: FontWeight.w600,
+        fontSize: 24,
+      );
 
-  static TextStyle hintTextStyle = const TextStyle(
-    fontFamily: 'SFProText',
-    fontWeight: FontWeight.w100,
-    color: Colors.grey,
-    fontSize: 14,
-  );
+  TextStyle get subTextStyle => TextStyle(
+        fontFamily: 'SFProText',
+        fontWeight: FontWeight.w100,
+        color: Theme.of(context).extension<AppColorsExtension>()?.subText,
+        fontSize: 15,
+      );
 
+  TextStyle get hintTextStyle => const TextStyle(
+        fontFamily: 'SFProText',
+        fontWeight: FontWeight.w100,
+        color: Colors.grey,
+        fontSize: 14,
+      );
 }

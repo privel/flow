@@ -1,11 +1,12 @@
 import 'package:flow/core/utils/on_boarding_service/on_boarding.dart';
-import 'package:flow/core/utils/provider/auth_provider/auth_provider.dart';
+import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/core/utils/router/router_transitions.dart';
 import 'package:flow/presentation/pages/auth_page/forgot_page/forgot.dart';
 import 'package:flow/presentation/pages/auth_page/login_page/login.dart';
 import 'package:flow/presentation/pages/auth_page/register_page/register.dart';
 import 'package:flow/presentation/pages/auth_page/verif_page/verification.dart';
 import 'package:flow/presentation/pages/home_page/home.dart';
+import 'package:flow/presentation/pages/account_page/account.dart';
 import 'package:flow/presentation/pages/welcome_page/welcome.dart';
 import 'package:flow/presentation/widgets/header/responsive_layout.dart';
 import 'package:flutter/cupertino.dart';
@@ -50,8 +51,8 @@ GoRouter appRouter(AuthProvider authProvider) {
             builder: (context, state) => const HomePage(),
           ),
           GoRoute(
-            path: '/settings',
-            builder: (context, state) => const Center(child: Text('Настройки')),
+            path: '/account',
+            builder: (context, state) => const AccountPage(),
           ),
           GoRoute(
             path: '/profile',

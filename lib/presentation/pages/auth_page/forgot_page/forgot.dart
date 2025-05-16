@@ -1,4 +1,6 @@
-import 'package:flow/core/utils/provider/auth_provider/auth_provider.dart';
+import 'package:flow/core/theme/app_ext.dart';
+import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
@@ -22,6 +24,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     final isTablet = ResponsiveBreakpoints.of(context).isTablet;
     final size = MediaQuery.of(context).size;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       // backgroundColor: const Color(0xFF121212),
       body: Center(
@@ -39,7 +43,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
-                color: const Color(0xFF191D1E),
+                // color: const Color(0xFF191D1E),
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -52,8 +57,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         alignment: Alignment.centerLeft,
                         child: IconButton(
                           onPressed: () => context.go('/auth/login'),
-                          icon: const Icon(IconlyLight.arrow_left,
-                              color: Colors.white),
+                          icon: Icon(
+                            IconlyLight.arrow_left,
+                            color: Theme.of(context)
+                                .extension<AppColorsExtension>()
+                                ?.mainText,
+                          ),
                         ),
                       ),
                       Row(
@@ -68,16 +77,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             filterQuality: FilterQuality.high,
                           ),
                           const SizedBox(width: 8),
-                          
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 32),
 
-                  const Text(
-                    "Enter the email address to which you will receive the password reset link.:",
-                    style: TextStyle(color: Colors.white70),
+                  Text(
+                    S.of(context).ForgotenterTheEmailAddressToWhichYouWillReceiveThe,
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .extension<AppColorsExtension>()
+                            ?.subText),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -87,10 +98,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     controller: _emailController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: "Email",
+                      hintText: S.of(context).RegHintEmail,
                       hintStyle: const TextStyle(color: Colors.white54),
                       filled: true,
-                      fillColor: const Color(0xFF2C2C2C),
+                      fillColor: isDark ?  const Color.fromARGB(255, 34, 34, 34): const Color(0xFFD3D3D3),
+                      // fillColor: Theme.of(context).colorScheme.onSurface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -105,13 +117,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () async {
-                        await auth.sendPasswordReset(
-                            _emailController.text.trim());
+                        await auth
+                            .sendPasswordReset(_emailController.text.trim());
 
                         if (auth.errorMessage == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("The email has been sent! Check your email."),
+                             SnackBar(
+                              content: Text(
+                                  S.of(context).theEmailHasBeenSentCheckYourEmail),
                               backgroundColor: Colors.green,
                             ),
                           );
@@ -132,7 +145,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text("Reset password"),
+                      child:  Text(S.of(context).resetPassword),
                     ),
                   ),
                 ],

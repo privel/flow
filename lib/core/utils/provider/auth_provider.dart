@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -27,6 +28,45 @@ class AuthProvider with ChangeNotifier {
     _user = _auth.currentUser;
     notifyListeners();
   }
+
+Future<String?> uploadProfileImage(Uint8List imageBytes, String uid) async {
+  try {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('profile_images')
+        .child('$uid.jpg');
+
+    final uploadTask = await ref.putData(imageBytes);
+    final url = await ref.getDownloadURL();
+    return url;
+  } catch (e) {
+    print("Ошибка загрузки: $e");
+    return null;
+  }
+}
+
+
+
+  Future<void> updateProfile({String? displayName, String? photoURL}) async {
+  try {
+    _setError(null);
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.updateDisplayName(displayName);
+      await user.updatePhotoURL(photoURL);
+
+      await user.reload(); // обязательно обновить данные в локальной копии
+      _user = _auth.currentUser;
+
+      notifyListeners();
+    } else {
+      _setError("User is not signed in.");
+    }
+  } catch (e) {
+    _setError("Profile update error: ${e.toString()}");
+  }
+}
+
 
   Future<void> sendVerificationEmail() async {
     try {

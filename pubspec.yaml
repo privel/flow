@@ -11,16 +11,20 @@ dependencies:
   responsive_framework: ^1.5.1
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.3
+  firebase_storage: ^12.4.5
   google_sign_in: ^6.3.0
-  flutter_side_menu: ^0.5.41  
+  flutter_side_menu: ^0.5.41
   provider: ^6.1.5
   shared_preferences: ^2.5.3
   iconly: ^1.0.1
-  
-  
+  intl: ^0.19.0
+  image_picker: ^1.1.2
+  file_picker: ^10.1.9
+
   flutter:
     sdk: flutter
-    
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -35,7 +39,6 @@ flutter:
     - assets/image/logo/
     - assets/image/logo/logoff.png
     - assets/fonts/San Francisco Pro Text/
-    
 
   fonts:
     - family: SFProText
@@ -70,6 +73,5 @@ flutter:
         - asset: assets/fonts/San Francisco Pro Text/SFProText-HeavyItalic.ttf
           weight: 800
           style: italic
-    
-
-
+flutter_intl:
+  enabled: true

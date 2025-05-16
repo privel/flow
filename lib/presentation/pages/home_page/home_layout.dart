@@ -11,9 +11,9 @@ class HomeLayout {
 
   double get ImageScaleIcon {
     return isMobile
-        ? 50
+        ? 8.0
         : isTablet
-            ? 60
-            : 70;
+            ? 10.0
+            : 10.0;
   }
 }
