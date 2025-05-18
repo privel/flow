@@ -74,15 +74,21 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пожалуйста, подтвердите адрес электронной почты.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Подтверждение"),
+    "createBoard": MessageLookupByLibrary.simpleMessage("Создать Доску"),
+    "createCard": MessageLookupByLibrary.simpleMessage("Создать Карту"),
     "language": MessageLookupByLibrary.simpleMessage("Язык"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Языковые настройки",
     ),
     "logOut": MessageLookupByLibrary.simpleMessage("Выйти"),
+    "newBoard": MessageLookupByLibrary.simpleMessage("Новая Доска"),
     "resend": MessageLookupByLibrary.simpleMessage("Отправить повторно"),
     "resendtext": m0,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Сброс пароля"),
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
+    "searchYourTask": MessageLookupByLibrary.simpleMessage(
+      "Найдите свою задачу...",
+    ),
     "selectLanguage": MessageLookupByLibrary.simpleMessage("ВЫБОР ЯЗЫКА"),
     "sentIn": m1,
     "settingAndTools": MessageLookupByLibrary.simpleMessage(

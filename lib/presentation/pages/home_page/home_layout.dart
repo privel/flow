@@ -16,4 +16,12 @@ class HomeLayout {
             ? 10.0
             : 10.0;
   }
+
+  TextStyle get h2Style {
+    return TextStyle(
+      fontFamily: 'SFProText',
+      fontWeight: FontWeight.w600,
+      fontSize: 14,
+    );
+  }
 }

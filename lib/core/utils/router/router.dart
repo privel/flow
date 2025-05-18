@@ -5,6 +5,7 @@ import 'package:flow/presentation/pages/auth_page/forgot_page/forgot.dart';
 import 'package:flow/presentation/pages/auth_page/login_page/login.dart';
 import 'package:flow/presentation/pages/auth_page/register_page/register.dart';
 import 'package:flow/presentation/pages/auth_page/verif_page/verification.dart';
+import 'package:flow/presentation/pages/board_page/board.dart';
 import 'package:flow/presentation/pages/home_page/home.dart';
 import 'package:flow/presentation/pages/account_page/account.dart';
 import 'package:flow/presentation/pages/welcome_page/welcome.dart';
@@ -78,6 +79,15 @@ GoRouter appRouter(AuthProvider authProvider) {
         path: '/auth/forgot-password',
         builder: (context, state) => const ForgotPasswordPage(),
       ),
+
+      GoRoute(
+  path: '/board/:id',
+  name: 'board',
+  builder: (context, state) {
+    final boardId = state.pathParameters['id']!;
+    return BoardPage(boardId: boardId);
+  },
+),
     ],
   );
 }

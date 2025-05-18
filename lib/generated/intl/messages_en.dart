@@ -68,15 +68,21 @@ class MessageLookup extends MessageLookupByLibrary {
       "Please confirm your email address.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Confirm"),
+    "createBoard": MessageLookupByLibrary.simpleMessage("Create Board"),
+    "createCard": MessageLookupByLibrary.simpleMessage("Create Card"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Language Settings",
     ),
     "logOut": MessageLookupByLibrary.simpleMessage("Log out"),
+    "newBoard": MessageLookupByLibrary.simpleMessage("New Board"),
     "resend": MessageLookupByLibrary.simpleMessage("Resend"),
     "resendtext": m0,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Reset password"),
     "save": MessageLookupByLibrary.simpleMessage("Save"),
+    "searchYourTask": MessageLookupByLibrary.simpleMessage(
+      "Search your task...",
+    ),
     "selectLanguage": MessageLookupByLibrary.simpleMessage("SELECT LANGUAGE"),
     "sentIn": m1,
     "settingAndTools": MessageLookupByLibrary.simpleMessage(

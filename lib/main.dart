@@ -1,6 +1,7 @@
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/core/utils/provider/board_provider.dart';
 import 'package:flow/core/utils/provider/local_provider.dart';
 import 'package:flow/core/utils/provider/theme_provider.dart';
 import 'package:flow/core/utils/router/router.dart';
@@ -8,7 +9,6 @@ import 'package:flow/core/utils/supabase_service.dart';
 import 'package:flow/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app.dart';
 
 //App Check Android:  keytool -genkey -v -keystore my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
@@ -43,7 +43,9 @@ void main() async {
           value: themeProvider,
         ),
         ChangeNotifierProvider<LocaleProvider>.value(value: localeProvider),
-
+        ChangeNotifierProvider<BoardProvider>(
+          create: (_) => BoardProvider(),
+        ),
         // 🔽 сюда добавляй другие Provider
         // ChangeNotifierProvider(create: (_) => ThemeProvider()),
         // ChangeNotifierProvider(create: (_) => SomeOtherProvider()),

@@ -374,6 +374,36 @@ class S {
   String get save {
     return Intl.message('Save', name: 'save', desc: '', args: []);
   }
+
+  /// `Search your task...`
+  String get searchYourTask {
+    return Intl.message(
+      'Search your task...',
+      name: 'searchYourTask',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Card`
+  String get createCard {
+    return Intl.message('Create Card', name: 'createCard', desc: '', args: []);
+  }
+
+  /// `Create Board`
+  String get createBoard {
+    return Intl.message(
+      'Create Board',
+      name: 'createBoard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Board`
+  String get newBoard {
+    return Intl.message('New Board', name: 'newBoard', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

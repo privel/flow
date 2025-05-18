@@ -41,5 +41,9 @@
   "appVersion": "App version:",
   "build": "Build:",
   "logOut": "Log out",
-  "save": "Save"
+  "save": "Save",
+  "searchYourTask": "Search your task...",
+  "createCard": "Create Card",
+  "createBoard": "Create Board",
+  "newBoard": "New Board"
 }
