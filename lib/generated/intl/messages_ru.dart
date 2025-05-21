@@ -64,11 +64,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пароли не совпадают",
     ),
     "accountPage": MessageLookupByLibrary.simpleMessage("Аккаунт"),
+    "add": MessageLookupByLibrary.simpleMessage("Add"),
     "appInformation": MessageLookupByLibrary.simpleMessage(
       "ИНФОРМАЦИЯ О ПРИЛОЖЕНИИ",
     ),
     "appVersion": MessageLookupByLibrary.simpleMessage("Версия приложения:"),
     "build": MessageLookupByLibrary.simpleMessage("Сборка:"),
+    "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Проверить снова"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
       "Пожалуйста, подтвердите адрес электронной почты.",

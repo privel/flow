@@ -45,5 +45,7 @@
   "searchYourTask": "Search your task...",
   "createCard": "Create Card",
   "createBoard": "Create Board",
-  "newBoard": "New Board"
+  "newBoard": "New Board",
+  "cancel": "Cancel",
+  "add": "Add"
 }

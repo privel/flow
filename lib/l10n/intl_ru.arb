@@ -47,5 +47,7 @@
   "searchYourTask": "Найдите свою задачу...",
   "createCard": "Создать Карту",
   "createBoard": "Создать Доску",
-  "newBoard": "Новая Доска"
+  "newBoard": "Новая Доска",
+  "cancel": "Cancel",
+  "add": "Add"
 }

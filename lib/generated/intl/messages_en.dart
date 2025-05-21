@@ -60,9 +60,11 @@ class MessageLookup extends MessageLookupByLibrary {
       "Passwords don\'t match",
     ),
     "accountPage": MessageLookupByLibrary.simpleMessage("Account"),
+    "add": MessageLookupByLibrary.simpleMessage("Add"),
     "appInformation": MessageLookupByLibrary.simpleMessage("APP INFORMATION"),
     "appVersion": MessageLookupByLibrary.simpleMessage("App version:"),
     "build": MessageLookupByLibrary.simpleMessage("Build:"),
+    "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
       "Please confirm your email address.",

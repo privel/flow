@@ -8,6 +8,7 @@ import 'package:flow/presentation/pages/auth_page/verif_page/verification.dart';
 import 'package:flow/presentation/pages/board_page/board.dart';
 import 'package:flow/presentation/pages/home_page/home.dart';
 import 'package:flow/presentation/pages/account_page/account.dart';
+import 'package:flow/presentation/pages/task_page/task.dart';
 import 'package:flow/presentation/pages/welcome_page/welcome.dart';
 import 'package:flow/presentation/widgets/header/responsive_layout.dart';
 import 'package:flutter/cupertino.dart';
@@ -81,13 +82,21 @@ GoRouter appRouter(AuthProvider authProvider) {
       ),
 
       GoRoute(
-  path: '/board/:id',
-  name: 'board',
-  builder: (context, state) {
-    final boardId = state.pathParameters['id']!;
-    return BoardPage(boardId: boardId);
-  },
-),
+        path: '/board/:id',
+        name: 'board',
+        builder: (context, state) {
+          final boardId = state.pathParameters['id']!;
+          return BoardPage(boardId: boardId);
+        },
+      ),
+      GoRoute(
+        path: '/board/:boardId/card/:cardId/task/:taskId',
+        builder: (context, state) => TaskDetailPage(
+          boardId: state.pathParameters['boardId']!,
+          cardId: state.pathParameters['cardId']!,
+          taskId: state.pathParameters['taskId']!,
+        ),
+      ),
     ],
   );
 }
