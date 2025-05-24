@@ -460,6 +460,7 @@ class _HomePageState extends State<HomePage> {
                 controller: _searchController,
                 isDark: isDark,
               ),
+              
               const SizedBox(height: 16),
               Text(
                 "YOUR WORKSPACES",

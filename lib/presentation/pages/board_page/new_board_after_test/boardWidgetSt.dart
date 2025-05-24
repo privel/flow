@@ -57,58 +57,104 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     }
   }
 
+  // AppFlowyBoardController _createBoardController(BoardModel board) {
+  //   final newController = AppFlowyBoardController(
+  //     onMoveGroup: (dynamic p1, dynamic p2, dynamic p3, dynamic p4) {
+  //       // Выводим реальные типы параметров, которые передает библиотека
+  //       debugPrint('onMoveGroup callback params runtimeTypes:');
+  //       debugPrint(
+  //           'p1: ${p1.runtimeType}, p2: ${p2.runtimeType}, p3: ${p3.runtimeType}, p4: ${p4.runtimeType}');
+  //       debugPrint(
+  //           'p1 value: $p1, p2 value: $p2, p3 value: $p3, p4 value: $p4');
+
+  //       // Пытаемся извлечь ID и индексы
+  //       // Предполагаем, что p1 - это ID или объект перемещаемой группы,
+  //       // p2 - ее старый индекс (int),
+  //       // p3 - ID или объект целевой группы/контекста (может быть таким же, как p1),
+  //       // p4 - новый индекс (int).
+  //       String? fromGroupId;
+  //       int? fromIndex;
+  //       String?
+  //           toGroupId; // Может не использоваться, если p4 - абсолютный индекс
+  //       int? toIndex;
+
+  //       if (p1 is String) {
+  //         fromGroupId = p1;
+  //       } else if (p1 is AppFlowyGroupData) {
+  //         fromGroupId = p1.id;
+  //       } else if (p1 is flow.CardModel) {
+  //         // На случай если библиотека передает наш CardModel
+  //         fromGroupId = p1.id;
+  //       }
+
+  //       if (p2 is int) fromIndex = p2;
+
+  //       if (p3 is String) {
+  //         toGroupId = p3;
+  //       } else if (p3 is AppFlowyGroupData) {
+  //         toGroupId = p3.id;
+  //       } else if (p3 is flow.CardModel) {
+  //         toGroupId = p3.id;
+  //       }
+
+  //       if (p4 is int) toIndex = p4;
+
+  //       if (fromGroupId != null && fromIndex != null && toIndex != null) {
+  //         // toGroupId может быть не нужен, если toIndex - это новый абсолютный индекс fromGroupId
+  //         _handleMoveGroup(
+  //             fromGroupId, fromIndex, toGroupId ?? fromGroupId, toIndex);
+  //       } else {
+  //         debugPrint('onMoveGroup: Could not determine correct parameters.');
+  //       }
+  //     },
+  //     onMoveGroupItem: (String groupId, int itemFromIndex, int itemToIndex) {
+  //       _handleMoveGroupItem(groupId, itemFromIndex, itemToIndex);
+  //     },
+  //     onMoveGroupItemToGroup:
+  //         (String fromGroupId, int fromIndex, String toGroupId, int toIndex) {
+  //       _handleMoveGroupItemToGroup(fromGroupId, fromIndex, toGroupId, toIndex);
+  //     },
+  //   );
+
+  //   final sortedCards = board.cards.values.toList()
+  //     ..sort((a, b) => a.order.compareTo(b.order));
+
+  //   for (final cardModel in sortedCards) {
+  //     final sortedTasks = cardModel.tasks.values.toList()
+  //       ..sort((a, b) => a.order.compareTo(b.order));
+
+  //     final group = AppFlowyGroupData(
+  //       id: cardModel.id,
+  //       name: cardModel.title,
+  //       items: sortedTasks.map((task) => FlowTaskItem(task)).toList(),
+  //     );
+  //     newController.addGroup(group);
+  //   }
+  //   return newController;
+  // }
+
+//NEW
+
   AppFlowyBoardController _createBoardController(BoardModel board) {
     final newController = AppFlowyBoardController(
       onMoveGroup: (dynamic p1, dynamic p2, dynamic p3, dynamic p4) {
-        // Выводим реальные типы параметров, которые передает библиотека
-        debugPrint('onMoveGroup callback params runtimeTypes:');
-        debugPrint(
-            'p1: ${p1.runtimeType}, p2: ${p2.runtimeType}, p3: ${p3.runtimeType}, p4: ${p4.runtimeType}');
-        debugPrint(
-            'p1 value: $p1, p2 value: $p2, p3 value: $p3, p4 value: $p4');
-
-        // Пытаемся извлечь ID и индексы
-        // Предполагаем, что p1 - это ID или объект перемещаемой группы,
-        // p2 - ее старый индекс (int),
-        // p3 - ID или объект целевой группы/контекста (может быть таким же, как p1),
-        // p4 - новый индекс (int).
         String? fromGroupId;
         int? fromIndex;
-        String?
-            toGroupId; // Может не использоваться, если p4 - абсолютный индекс
+        String? toGroupId;
         int? toIndex;
 
-        if (p1 is String) {
-          fromGroupId = p1;
-        } else if (p1 is AppFlowyGroupData) {
-          fromGroupId = p1.id;
-        } else if (p1 is flow.CardModel) {
-          // На случай если библиотека передает наш CardModel
-          fromGroupId = p1.id;
-        }
-
+        if (p1 is String) fromGroupId = p1;
         if (p2 is int) fromIndex = p2;
-
-        if (p3 is String) {
-          toGroupId = p3;
-        } else if (p3 is AppFlowyGroupData) {
-          toGroupId = p3.id;
-        } else if (p3 is flow.CardModel) {
-          toGroupId = p3.id;
-        }
-
+        if (p3 is String) toGroupId = p3;
         if (p4 is int) toIndex = p4;
 
         if (fromGroupId != null && fromIndex != null && toIndex != null) {
-          // toGroupId может быть не нужен, если toIndex - это новый абсолютный индекс fromGroupId
           _handleMoveGroup(
               fromGroupId, fromIndex, toGroupId ?? fromGroupId, toIndex);
-        } else {
-          debugPrint('onMoveGroup: Could not determine correct parameters.');
         }
       },
-      onMoveGroupItem: (String groupId, int itemFromIndex, int itemToIndex) {
-        _handleMoveGroupItem(groupId, itemFromIndex, itemToIndex);
+      onMoveGroupItem: (String groupId, int fromIndex, int toIndex) {
+        _handleMoveGroupItem(groupId, fromIndex, toIndex);
       },
       onMoveGroupItemToGroup:
           (String fromGroupId, int fromIndex, String toGroupId, int toIndex) {
@@ -133,39 +179,21 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     return newController;
   }
 
+//NEW TEST
   void _handleMoveGroup(String movedGroupId, int oldIndex,
       String targetContextGroupId, int newIndex) {
-    debugPrint(
-        "Handling Move Group: movedGroupId: $movedGroupId (oldIndex: $oldIndex) to newIndex: $newIndex (targetContextGroupId: $targetContextGroupId)");
-
-    // 1. Получаем список CardModel из Map.
     List<flow.CardModel> cardsList = widget.boardModel.cards.values.toList();
-
-    // 2. Сортируем этот список по полю 'order'.
     cardsList.sort((a, b) => a.order.compareTo(b.order));
-
-    // 3. Преобразуем отсортированный список CardModel в список их ID (String).
     List<String> orderedCardIds = cardsList.map((c) => c.id).toList();
-
-    // Остальная логика остается прежней
     if (orderedCardIds.contains(movedGroupId)) {
       orderedCardIds.remove(movedGroupId);
     }
-
-    int effectiveToIndex = newIndex;
-    if (newIndex < 0) {
-      effectiveToIndex = 0;
-    } else if (newIndex > orderedCardIds.length) {
-      effectiveToIndex = orderedCardIds.length;
-    }
-
+    int effectiveToIndex = newIndex.clamp(0, orderedCardIds.length);
     orderedCardIds.insert(effectiveToIndex, movedGroupId);
-
     boardProvider.reorderCards(widget.boardModel.id, orderedCardIds);
   }
 
   void _handleMoveGroupItem(String groupId, int fromIndex, int toIndex) {
-    debugPrint("Moved item in group $groupId from $fromIndex to $toIndex");
     final groupController = controller.getGroupController(groupId);
     if (groupController != null) {
       final orderedItemIds =
@@ -177,29 +205,15 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
 
   void _handleMoveGroupItemToGroup(
       String fromGroupId, int fromIndex, String toGroupId, int toIndex) {
-    debugPrint(
-        "Item moved from group $fromGroupId (potentially from index $fromIndex) to group $toGroupId (at index $toIndex)");
-
     final targetGroupController = controller.getGroupController(toGroupId);
-    if (targetGroupController == null) {
-      debugPrint("Error: Target group $toGroupId not found after move.");
-      return;
-    }
+    if (targetGroupController == null) return;
 
     final itemsInTargetGroup = targetGroupController.groupData.items;
-    if (toIndex < 0 || toIndex >= itemsInTargetGroup.length) {
-      debugPrint(
-          "Error: toIndex $toIndex is out of bounds for target group $toGroupId with ${itemsInTargetGroup.length} items.");
-      return;
-    }
-    final String movedItemId = itemsInTargetGroup[toIndex].id;
-    final taskToMove = widget.boardModel.cards[fromGroupId]?.tasks[movedItemId];
+    if (toIndex < 0 || toIndex >= itemsInTargetGroup.length) return;
 
-    if (taskToMove == null) {
-      debugPrint(
-          "Error: Task data not found for moved item $movedItemId (expected in fromGroupId $fromGroupId)");
-      return;
-    }
+    final movedItemId = itemsInTargetGroup[toIndex].id;
+    final taskToMove = widget.boardModel.cards[fromGroupId]?.tasks[movedItemId];
+    if (taskToMove == null) return;
 
     final sourceGroupController = controller.getGroupController(fromGroupId);
     final orderedTaskIdsInSource =
@@ -217,8 +231,92 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     );
   }
 
-  void _addNewCard() async {
-    String? title = await _showTextDialog("Новая колонка");
+  // void _handleMoveGroup(String movedGroupId, int oldIndex,
+  //     String targetContextGroupId, int newIndex) {
+  //   debugPrint(
+  //       "Handling Move Group: movedGroupId: $movedGroupId (oldIndex: $oldIndex) to newIndex: $newIndex (targetContextGroupId: $targetContextGroupId)");
+
+  //   // 1. Получаем список CardModel из Map.
+  //   List<flow.CardModel> cardsList = widget.boardModel.cards.values.toList();
+
+  //   // 2. Сортируем этот список по полю 'order'.
+  //   cardsList.sort((a, b) => a.order.compareTo(b.order));
+
+  //   // 3. Преобразуем отсортированный список CardModel в список их ID (String).
+  //   List<String> orderedCardIds = cardsList.map((c) => c.id).toList();
+
+  //   // Остальная логика остается прежней
+  //   if (orderedCardIds.contains(movedGroupId)) {
+  //     orderedCardIds.remove(movedGroupId);
+  //   }
+
+  //   int effectiveToIndex = newIndex;
+  //   if (newIndex < 0) {
+  //     effectiveToIndex = 0;
+  //   } else if (newIndex > orderedCardIds.length) {
+  //     effectiveToIndex = orderedCardIds.length;
+  //   }
+
+  //   orderedCardIds.insert(effectiveToIndex, movedGroupId);
+
+  //   boardProvider.reorderCards(widget.boardModel.id, orderedCardIds);
+  // }
+
+  // void _handleMoveGroupItem(String groupId, int fromIndex, int toIndex) {
+  //   debugPrint("Moved item in group $groupId from $fromIndex to $toIndex");
+  //   final groupController = controller.getGroupController(groupId);
+  //   if (groupController != null) {
+  //     final orderedItemIds =
+  //         groupController.groupData.items.map((item) => item.id).toList();
+  //     boardProvider.reorderTasksWithinCard(
+  //         widget.boardModel.id, groupId, orderedItemIds);
+  //   }
+  // }
+
+  // void _handleMoveGroupItemToGroup(
+  //     String fromGroupId, int fromIndex, String toGroupId, int toIndex) {
+  //   debugPrint(
+  //       "Item moved from group $fromGroupId (potentially from index $fromIndex) to group $toGroupId (at index $toIndex)");
+
+  //   final targetGroupController = controller.getGroupController(toGroupId);
+  //   if (targetGroupController == null) {
+  //     debugPrint("Error: Target group $toGroupId not found after move.");
+  //     return;
+  //   }
+
+  //   final itemsInTargetGroup = targetGroupController.groupData.items;
+  //   if (toIndex < 0 || toIndex >= itemsInTargetGroup.length) {
+  //     debugPrint(
+  //         "Error: toIndex $toIndex is out of bounds for target group $toGroupId with ${itemsInTargetGroup.length} items.");
+  //     return;
+  //   }
+  //   final String movedItemId = itemsInTargetGroup[toIndex].id;
+  //   final taskToMove = widget.boardModel.cards[fromGroupId]?.tasks[movedItemId];
+
+  //   if (taskToMove == null) {
+  //     debugPrint(
+  //         "Error: Task data not found for moved item $movedItemId (expected in fromGroupId $fromGroupId)");
+  //     return;
+  //   }
+
+  //   final sourceGroupController = controller.getGroupController(fromGroupId);
+  //   final orderedTaskIdsInSource =
+  //       sourceGroupController?.groupData.items.map((i) => i.id).toList() ?? [];
+  //   final orderedTaskIdsInTarget = itemsInTargetGroup.map((i) => i.id).toList();
+
+  //   boardProvider.moveTaskToDifferentCard(
+  //     boardId: widget.boardModel.id,
+  //     sourceCardId: fromGroupId,
+  //     targetCardId: toGroupId,
+  //     taskId: movedItemId,
+  //     taskData: taskToMove,
+  //     orderedTaskIdsInSourceCard: orderedTaskIdsInSource,
+  //     orderedTaskIdsInTargetCard: orderedTaskIdsInTarget,
+  //   );
+  // }
+
+  void _addNewCard(bool isDark) async {
+    String? title = await _showTextDialog("Новая колонка", isDark);
     if (title != null && title.isNotEmpty) {
       final newCardId = _uuid.v4();
       final newOrder = widget.boardModel.cards.length;
@@ -232,8 +330,8 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     }
   }
 
-  void _addNewTaskToCard(String cardId) async {
-    String? title = await _showTextDialog("Новая задача");
+  void _addNewTaskToCard(String cardId, bool isDark) async {
+    String? title = await _showTextDialog("Новая задача", isDark);
     if (title != null && title.isNotEmpty) {
       final cardModel = widget.boardModel.cards[cardId];
       if (cardModel == null) return;
@@ -250,12 +348,20 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     }
   }
 
-  Future<String?> _showTextDialog(String title) async {
+  Future<String?> _showTextDialog(String title, bool isDark) async {
     TextEditingController textController = TextEditingController();
     return showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(title),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+            fontFamily: 'SFProText',
+            fontWeight: FontWeight.w600,
+            fontSize: 17,
+          ),
+        ),
         content: TextField(
           controller: textController,
           autofocus: true,
@@ -263,11 +369,27 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
         ),
         actions: [
           TextButton(
-            child: const Text("Отмена"),
+            child: Text(
+              S.of(context).cancel,
+              style: TextStyle(
+                color: isDark ? Colors.white70 : Colors.black87,
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text("Добавить"),
+            child: Text(
+              S.of(context).add,
+              style: TextStyle(
+                color: Colors.greenAccent.shade400,
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
             onPressed: () => Navigator.of(context).pop(textController.text),
           ),
         ],
@@ -275,13 +397,9 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     );
   }
 
-
-   void showBottomModalEdit(BuildContext context, String cardId, String currentTitle, bool isDark) {
-    
+  void showBottomModalEdit(
+      BuildContext context, String cardId, String currentTitle, bool isDark) {
     final size = MediaQuery.of(context).size;
-    final isMobile = ResponsiveBreakpoints.of(context).isMobile;
-
-  
 
     TextEditingController nameBoard = TextEditingController();
     nameBoard.text = currentTitle;
@@ -305,7 +423,7 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
             ),
             child: DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.5,
+              initialChildSize: 0.6,
               minChildSize: 0.3,
               maxChildSize: 0.7,
               builder: (context, scrollController) {
@@ -327,7 +445,8 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                await _renameCardWithOutUpdate(cardId, currentTitle, nameBoard.text);
+                                await _renameCardWithOutUpdate(
+                                    cardId, currentTitle, nameBoard.text);
                                 Navigator.pop(context);
                               },
                               child: Text(
@@ -387,12 +506,13 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     );
   }
 
-Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String newTitle) async{
-
-  if (newTitle != null && newTitle.isNotEmpty && newTitle != currentTitle) {
+  Future<void> _renameCardWithOutUpdate(
+      String cardId, String currentTitle, String newTitle) async {
+    if (newTitle != null && newTitle.isNotEmpty && newTitle != currentTitle) {
       await boardProvider.renameCard(widget.boardModel.id, cardId, newTitle);
     }
-}
+  }
+
   Future<void> _renameCard(String cardId, String currentTitle) async {
     TextEditingController textController =
         TextEditingController(text: currentTitle);
@@ -416,20 +536,52 @@ Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String
     }
   }
 
-  Future<void> _deleteCard(String cardId) async {
+  Future<void> _deleteCard(String cardId, bool isDark) async {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Удалить колонку?"),
-        content: const Text(
-            "Вы уверены, что хотите удалить эту колонку и все ее задачи?"),
+        title: Text(
+          S.of(context).DeleteColumn,
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+            fontFamily: 'SFProText',
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
+        content: Text(
+          S.of(context).areYouSureYouWantToDeleteThisColumnAnd,
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black54,
+            fontFamily: 'SFProText',
+            fontWeight: FontWeight.w400,
+            fontSize: 13,
+          ),
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text("Отмена")),
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              S.of(context).cancel,
+              style: const TextStyle(
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+              ),
+            ),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text("Удалить")),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              S.of(context).delete,
+              style: TextStyle(
+                color: Colors.redAccent.shade400,
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -465,7 +617,7 @@ Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String
     }
   }
 
-  Future<void> _deleteTask(String cardId, String taskId) async {
+  Future<void> _deleteTask(String cardId, String taskId, bool isDark) async {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -581,10 +733,9 @@ Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String
     ).then((String? value) {
       if (value == 'rename') {
         // _renameCard(cardId, cardTitle);
-      showBottomModalEdit(context, cardId, cardTitle, isDark);
-
+        showBottomModalEdit(context, cardId, cardTitle, isDark);
       } else if (value == 'delete') {
-        _deleteCard(cardId);
+        _deleteCard(cardId, isDark);
       }
     });
   }
@@ -612,7 +763,39 @@ Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String
 
     return AppFlowyBoard(
       controller: controller,
-      trailing: Text("123"),
+      leading: const SizedBox(
+        width: 20,
+      ),
+      trailing: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: SizedBox(
+          width: 300,
+          height: 50,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark
+                  ? const Color.fromARGB(145, 31, 31, 31)
+                  : const Color.fromARGB(150, 211, 211, 211),
+              foregroundColor: isDark ? Colors.white : Colors.black87,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            onPressed: () {
+              _addNewCard(isDark);
+            },
+            child: const Text(
+              "Add List",
+              style: TextStyle(
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
       cardBuilder: (context, groupData, groupItemObject) {
         String groupTitle = _getGroupname(groupData);
         final currentItem = groupItemObject as FlowTaskItem;
@@ -710,14 +893,11 @@ Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String
         String groupTitle = _getGroupname(groupData);
 
         return Container(
-          // ИЗМЕНЕНО: Добавляем ключ к заголовку группы
           key: ValueKey('header_${groupData.id}'),
           padding: const EdgeInsets.only(left: 14.0),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F5),
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(8),
-            ), // Если нужны скругленные углы только сверху
+            borderRadius: BorderRadius.circular(30),
           ),
           height: 30,
           child: Row(
@@ -790,7 +970,7 @@ Future<void> _renameCardWithOutUpdate(String cardId, String currentTitle, String
         return InkWell(
           key: ValueKey(
               'footer_${groupData.id}'), // ИЗМЕНЕНО: Добавляем ключ к футеру группы
-          onTap: () => _addNewTaskToCard(groupData.id),
+          onTap: () => _addNewTaskToCard(groupData.id, isDark),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12.0),
             decoration: BoxDecoration(

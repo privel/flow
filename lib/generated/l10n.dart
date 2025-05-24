@@ -424,6 +424,31 @@ class S {
   String get renameIt {
     return Intl.message('Rename it', name: 'renameIt', desc: '', args: []);
   }
+
+  /// `Delete a column?`
+  String get DeleteColumn {
+    return Intl.message(
+      'Delete a column?',
+      name: 'DeleteColumn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete this column and all its tasks?`
+  String get areYouSureYouWantToDeleteThisColumnAnd {
+    return Intl.message(
+      'Are you sure you want to delete this column and all its tasks?',
+      name: 'areYouSureYouWantToDeleteThisColumnAnd',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete`
+  String get delete {
+    return Intl.message('Delete', name: 'delete', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -51,5 +51,8 @@
   "cancel": "Отменить",
   "add": "Добавить",
   "deleteList": "Удалить Лист",
-  "renameIt": "Переименовать"
+  "renameIt": "Переименовать",
+  "DeleteColumn": "Удалить колонку?",
+  "areYouSureYouWantToDeleteThisColumnAnd": "Вы уверены, что хотите удалить эту колонку и все ее задачи?",
+  "delete": "Удалить"
 }

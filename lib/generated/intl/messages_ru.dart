@@ -26,6 +26,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "DeleteColumn": MessageLookupByLibrary.simpleMessage("Удалить колонку?"),
     "ForgotenterTheEmailAddressToWhichYouWillReceiveThe":
         MessageLookupByLibrary.simpleMessage(
           "Введите адрес электронной почты, на который вы получите ссылку для сброса пароля.:",
@@ -69,6 +70,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "ИНФОРМАЦИЯ О ПРИЛОЖЕНИИ",
     ),
     "appVersion": MessageLookupByLibrary.simpleMessage("Версия приложения:"),
+    "areYouSureYouWantToDeleteThisColumnAnd":
+        MessageLookupByLibrary.simpleMessage(
+          "Вы уверены, что хотите удалить эту колонку и все ее задачи?",
+        ),
     "build": MessageLookupByLibrary.simpleMessage("Сборка:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Отменить"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Проверить снова"),
@@ -78,6 +83,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Подтверждение"),
     "createBoard": MessageLookupByLibrary.simpleMessage("Создать Доску"),
     "createCard": MessageLookupByLibrary.simpleMessage("Создать Карту"),
+    "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Удалить Лист"),
     "language": MessageLookupByLibrary.simpleMessage("Язык"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(

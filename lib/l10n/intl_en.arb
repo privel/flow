@@ -49,5 +49,8 @@
   "cancel": "Cancel",
   "add": "Add",
   "deleteList": "Delete List",
-  "renameIt": "Rename it"
+  "renameIt": "Rename it",
+  "DeleteColumn": "Delete a column?",
+  "areYouSureYouWantToDeleteThisColumnAnd": "Are you sure you want to delete this column and all its tasks?",
+  "delete": "Delete"
 }

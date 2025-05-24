@@ -26,6 +26,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "DeleteColumn": MessageLookupByLibrary.simpleMessage("Delete a column?"),
     "ForgotenterTheEmailAddressToWhichYouWillReceiveThe":
         MessageLookupByLibrary.simpleMessage(
           "Enter the email address to which you will receive the password reset link.:",
@@ -63,6 +64,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "add": MessageLookupByLibrary.simpleMessage("Add"),
     "appInformation": MessageLookupByLibrary.simpleMessage("APP INFORMATION"),
     "appVersion": MessageLookupByLibrary.simpleMessage("App version:"),
+    "areYouSureYouWantToDeleteThisColumnAnd":
+        MessageLookupByLibrary.simpleMessage(
+          "Are you sure you want to delete this column and all its tasks?",
+        ),
     "build": MessageLookupByLibrary.simpleMessage("Build:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
@@ -72,6 +77,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Confirm"),
     "createBoard": MessageLookupByLibrary.simpleMessage("Create Board"),
     "createCard": MessageLookupByLibrary.simpleMessage("Create Card"),
+    "delete": MessageLookupByLibrary.simpleMessage("Delete"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Delete List"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
