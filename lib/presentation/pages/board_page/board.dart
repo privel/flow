@@ -78,6 +78,9 @@ class _BoardPageState extends State<BoardPage> {
     }
 
     final board = _board!;
+    // Создаем список отсортированных записей
+    final sortedCardsEntries = board.cards.entries.toList()
+      ..sort((a, b) => a.value.order.compareTo(b.value.order));
 
     return Scaffold(
       backgroundColor: board.color,
@@ -116,8 +119,12 @@ class _BoardPageState extends State<BoardPage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ...board.cards.entries.map((entry) {
+
+                    
+
+                    ...sortedCardsEntries.map((entry) {
                       final card = entry.value;
+                      
 
                       final cardId = entry.key;
                       showInputMap.putIfAbsent(cardId, () => false);
@@ -161,18 +168,7 @@ class _BoardPageState extends State<BoardPage> {
                                         ),
                                       ),
                                     ),
-                                    // IconButton(
-                                    //   icon: Icon(showInputMap[card.id]!
-                                    //       ? Icons.close
-                                    //       : Icons.add),
-                                    //   onPressed: () {
-                                    //     setState(() {
-                                    //       showInputMap[card.id] =
-                                    //           !showInputMap[card.id]!;
-                                    //       inputControllers[card.id]!.clear();
-                                    //     });
-                                    //   },
-                                    // ),
+                                  
                                   ],
                                 ),
                                 const SizedBox(height: 8),
@@ -389,7 +385,8 @@ class _BoardPageState extends State<BoardPage> {
                                                     id: newTaskId,
                                                     title: text,
                                                     description: '',
-                                                    isDone: false,
+                                                    isDone: false, order: board.cards[cardId]!.tasks.length,
+                                                    
                                                   ),
                                                 );
                                                 inputControllers[card.id]!
@@ -422,7 +419,7 @@ class _BoardPageState extends State<BoardPage> {
                           ),
                         ),
                       );
-                    }),
+                    }).toList(),
                     Container(
                       width: 300,
                       margin: const EdgeInsets.all(8),
@@ -437,6 +434,7 @@ class _BoardPageState extends State<BoardPage> {
                             id: newCardId,
                             title: "Новая карточка",
                             tasks: {},
+                            order: _board!.cards.length,
                           );
 
                           await boardProvider.addCardToBoard(
@@ -492,24 +490,3 @@ class _BoardPageState extends State<BoardPage> {
 }
 
 
-
- //       // floatingActionButton: FloatingActionButton(
-    //       //   onPressed: () async {
-    //       //     final newCardId =
-    //       //         FirebaseFirestore.instance.collection('dummy').doc().id;
-
-    //       //     final card = CardModel(
-    //       //       id: newCardId,
-    //       //       title: "Новая карточка",
-    //       //       tasks: {},
-    //       //     );
-
-    //       //     await boardProvider.addCardToBoard(widget.boardId, card);
-
-    //       //     if (!mounted) return;
-    //       //     ScaffoldMessenger.of(context).showSnackBar(
-    //       //       const SnackBar(content: Text('Добавлена карточка')),
-    //       //     );
-    //       //   },
-    //       //   child: const Icon(Icons.add),
-    //       // ),

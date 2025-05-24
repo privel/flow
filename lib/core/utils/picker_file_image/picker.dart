@@ -12,7 +12,7 @@ class Picker {
       final result = await FilePicker.platform.pickFiles(type: FileType.image);
       if (result?.files.first.bytes == null) return null;
 
-      // 👇 избегаем async gap: контекст запоминаем заранее
+   
       final currentContext = context;
 
       final croppedFile = await ImageCropper().cropImage(

@@ -345,6 +345,7 @@ class _HomePageState extends State<HomePage> {
       appBar: isMobile || isTablet
           ? AppBar(
               actions: [
+                
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: InkWell(
@@ -482,6 +483,7 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   final boards = snapshot.data!;
+                  
                   return ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -492,7 +494,9 @@ class _HomePageState extends State<HomePage> {
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
                           onTap: () {
-                            context.go('/board/${board.id}');
+                            // context.go('/board/${board.id}');
+                            context.goNamed('boardtest2', pathParameters: {'id': board.id});
+
                           },
                           onTapDown: (TapDownDetails details) async {
                             final tapPosition = details.globalPosition;

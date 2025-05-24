@@ -48,6 +48,8 @@
   "createCard": "Создать Карту",
   "createBoard": "Создать Доску",
   "newBoard": "Новая Доска",
-  "cancel": "Cancel",
-  "add": "Add"
+  "cancel": "Отменить",
+  "add": "Добавить",
+  "deleteList": "Удалить Лист",
+  "renameIt": "Переименовать"
 }

@@ -414,6 +414,16 @@ class S {
   String get add {
     return Intl.message('Add', name: 'add', desc: '', args: []);
   }
+
+  /// `Delete List`
+  String get deleteList {
+    return Intl.message('Delete List', name: 'deleteList', desc: '', args: []);
+  }
+
+  /// `Rename it`
+  String get renameIt {
+    return Intl.message('Rename it', name: 'renameIt', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

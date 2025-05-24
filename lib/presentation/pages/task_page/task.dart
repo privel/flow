@@ -33,26 +33,49 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     _isDone = task.isDone;
   }
 
-  Future<void> _saveTask(BoardProvider provider) async {
-    final updatedTask = TaskModel(
-      id: widget.taskId,
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      isDone: _isDone,
-    );
+  // Future<void> _saveTask(BoardProvider provider, int order) async {
+  //   final updatedTask = TaskModel(
+  //     id: widget.taskId,
+  //     title: _titleController.text.trim(),
+  //     description: _descriptionController.text.trim(),
+  //     isDone: _isDone, 
+  //   );
 
-    await provider.updateTask(
-      widget.boardId,
-      widget.cardId,
-      updatedTask,
-    );
+  //   await provider.updateTask(
+  //     widget.boardId,
+  //     widget.cardId,
+  //     updatedTask,
+  //   );
 
-    if (!mounted) return;
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Изменения сохранены')),
-    );
-  }
+  //   if (!mounted) return;
+  //   Navigator.pop(context);
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(content: Text('Изменения сохранены')),
+  //   );
+  // }
+
+  Future<void> _saveTask(BoardProvider provider, int order) async {
+  final updatedTask = TaskModel(
+    id: widget.taskId,
+    title: _titleController.text.trim(),
+    description: _descriptionController.text.trim(),
+    isDone: _isDone,
+    order: order,
+  );
+
+  await provider.updateTask(
+    widget.boardId,
+    widget.cardId,
+    updatedTask,
+  );
+
+  if (!mounted) return;
+  Navigator.pop(context);
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Изменения сохранены')),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +104,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.save),
-                onPressed: () => _saveTask(provider),
+                onPressed: () => _saveTask(provider, task.order),
               ),
             ],
           ),

@@ -14,6 +14,29 @@ class BoardProvider extends ChangeNotifier {
   List<BoardModel> get boards => _boards;
 
 
+
+Future<void> renameCard(String boardId, String cardId, String newTitle) async {
+  final docRef = _firestore.collection('boards').doc(boardId);
+  final doc = await docRef.get();
+
+  if (!doc.exists) return;
+
+  final board = BoardModel.fromMap(doc.data()!, boardId);
+  final updatedCards = Map<String, CardModel>.from(board.cards);
+
+  if (updatedCards.containsKey(cardId)) {
+    final updatedCard = updatedCards[cardId]!.copyWith(title: newTitle);
+    updatedCards[cardId] = updatedCard;
+
+    final updatedBoard = board.copyWith(cards: updatedCards);
+    await docRef.set(updatedBoard.toMap());
+  }
+}
+
+
+
+
+
 Future<void> addCardToBoard(String boardId, CardModel card) async {
   final boardRef = FirebaseFirestore.instance.collection('boards').doc(boardId);
 
@@ -55,6 +78,72 @@ Future<void> updateTask(String boardId, String cardId, TaskModel updatedTask) as
 }
 
 
+
+
+
+
+  Future<void> reorderCards(String boardId, List<String> orderedCardIds) async {
+    final boardRef = _firestore.collection('boards').doc(boardId);
+    WriteBatch batch = _firestore.batch();
+
+    for (int i = 0; i < orderedCardIds.length; i++) {
+      final cardId = orderedCardIds[i];
+      batch.update(boardRef, {'cards.$cardId.order': i});
+    }
+    await batch.commit();
+  }
+
+  Future<void> reorderTasksWithinCard(String boardId, String cardId, List<String> orderedTaskIds) async {
+    final boardRef = _firestore.collection('boards').doc(boardId);
+    WriteBatch batch = _firestore.batch();
+
+    for (int i = 0; i < orderedTaskIds.length; i++) {
+      final taskId = orderedTaskIds[i];
+      batch.update(boardRef, {'cards.$cardId.tasks.$taskId.order': i});
+    }
+    await batch.commit();
+  }
+
+  Future<void> moveTaskToDifferentCard({
+    required String boardId,
+    required String sourceCardId,
+    required String targetCardId,
+    required String taskId,
+    required TaskModel taskData, // Full task data, new order will be set
+    required List<String> orderedTaskIdsInSourceCard, // Tasks remaining in source, ordered
+    required List<String> orderedTaskIdsInTargetCard, // All tasks in target (including moved one), ordered
+  }) async {
+    final boardRef = _firestore.collection('boards').doc(boardId);
+    WriteBatch batch = _firestore.batch();
+
+    // 1. Remove task from source card's task map
+    batch.update(boardRef, {'cards.$sourceCardId.tasks.$taskId': FieldValue.delete()});
+
+    // 2. Re-order remaining tasks in source card
+    for (int i = 0; i < orderedTaskIdsInSourceCard.length; i++) {
+      final currentTaskId = orderedTaskIdsInSourceCard[i];
+      batch.update(boardRef, {'cards.$sourceCardId.tasks.$currentTaskId.order': i});
+    }
+
+    // 3. Add/Update task in target card's task map and re-order all tasks in target
+    // The taskData should have its order field updated before this step by the caller if needed,
+    // but here we explicitly set order based on orderedTaskIdsInTargetCard list.
+    for (int i = 0; i < orderedTaskIdsInTargetCard.length; i++) {
+      final currentTaskId = orderedTaskIdsInTargetCard[i];
+      if (currentTaskId == taskId) {
+        // Add the moved task with its new order in the target card
+        batch.set(
+          boardRef,
+          {'cards.$targetCardId.tasks.$taskId': taskData.copyWith(order: i).toMap()},
+          SetOptions(merge: true), // Use merge to avoid overwriting the whole tasks map if it exists
+        );
+      } else {
+        // Update order for other tasks in the target card
+         batch.update(boardRef, {'cards.$targetCardId.tasks.$currentTaskId.order': i});
+      }
+    }
+    await batch.commit();
+  }
 
 
 
@@ -112,13 +201,31 @@ Future<void> updateTask(String boardId, String cardId, TaskModel updatedTask) as
 // }
 
 
-Future<BoardModel?> getBoardById(String boardId) async {
-  final doc = await _firestore.collection('boards').doc(boardId).get();
-  if (doc.exists) {
-    return BoardModel.fromMap(doc.data()!, doc.id);
+// Future<BoardModel?> getBoardById(String boardId) async {
+//   final doc = await _firestore.collection('boards').doc(boardId).get();
+//   if (doc.exists) {
+//     return BoardModel.fromMap(doc.data()!, doc.id);
+//   }
+//   return null;
+// }
+
+  Future<BoardModel?> getBoardById(String boardId) async {
+    try {
+      // ИЗМЕНЕНИЕ ЗДЕСЬ: Принудительно читаем с сервера для диагностики
+      final doc = await _firestore
+          .collection('boards')
+          .doc(boardId)
+          .get(const GetOptions(source: Source.server)); // Добавляем GetOptions
+
+      if (doc.exists) {
+        return BoardModel.fromMap(doc.data()!, doc.id);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Error fetching board by ID from server: $e");
+      return null; // В случае ошибки возвращаем null или обрабатываем иначе
+    }
   }
-  return null;
-}
 
 
 

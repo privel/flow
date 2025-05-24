@@ -79,6 +79,7 @@ class _BoardContentViewState extends State<BoardContentView> {
                                         title: 'Новая задача',
                                         description: 'Описание задачи',
                                         isDone: false,
+                                        order: 0,
                                       ),
                                     );
 

@@ -47,5 +47,7 @@
   "createBoard": "Create Board",
   "newBoard": "New Board",
   "cancel": "Cancel",
-  "add": "Add"
+  "add": "Add",
+  "deleteList": "Delete List",
+  "renameIt": "Rename it"
 }

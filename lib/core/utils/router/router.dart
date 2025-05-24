@@ -10,6 +10,8 @@ import 'package:flow/presentation/pages/home_page/home.dart';
 import 'package:flow/presentation/pages/account_page/account.dart';
 import 'package:flow/presentation/pages/task_page/task.dart';
 import 'package:flow/presentation/pages/welcome_page/welcome.dart';
+import 'package:flow/presentation/pages/board_page/new_board_after_test/other_test.dart';
+import 'package:flow/presentation/test/test.dart';
 import 'package:flow/presentation/widgets/header/responsive_layout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -97,6 +99,24 @@ GoRouter appRouter(AuthProvider authProvider) {
           taskId: state.pathParameters['taskId']!,
         ),
       ),
+
+      GoRoute(
+  path: '/boardtest/:id',
+  name: 'boardtest',
+  builder: (context, state) {
+    final boardId = state.pathParameters['id']!;
+    return BoardPaget(boardId: boardId);
+  },
+),
+
+GoRoute(
+  path: '/boardtest2/:id',
+  name: 'boardtest2',
+  builder: (context, state) {
+    final boardId = state.pathParameters['id']!;
+    return BoardTest2(boardId: boardId);
+  },
+),
     ],
   );
 }
