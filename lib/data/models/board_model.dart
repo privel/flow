@@ -139,4 +139,15 @@ class BoardModel {
       hexColor: hexColor ?? this.hexColor,
     );
   }
+
+  factory BoardModel.empty() {
+  return BoardModel(
+    id: '',
+    title: '',
+    ownerId: '',
+    sharedWith: {},
+    cards: {},
+  );
+}
+
 }

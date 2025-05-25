@@ -98,10 +98,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingAndTools": MessageLookupByLibrary.simpleMessage(
       "SETTING AND TOOLS",
     ),
+    "starredBoards": MessageLookupByLibrary.simpleMessage("Starred Boards"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Successful exit"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "The email has been sent! Check your email.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+    "yourWorkspaces": MessageLookupByLibrary.simpleMessage("YOUR WORKSPACES"),
   };
 }

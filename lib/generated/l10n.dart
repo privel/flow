@@ -449,6 +449,26 @@ class S {
   String get delete {
     return Intl.message('Delete', name: 'delete', desc: '', args: []);
   }
+
+  /// `Starred Boards`
+  String get starredBoards {
+    return Intl.message(
+      'Starred Boards',
+      name: 'starredBoards',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `YOUR WORKSPACES`
+  String get yourWorkspaces {
+    return Intl.message(
+      'YOUR WORKSPACES',
+      name: 'yourWorkspaces',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -30,6 +30,7 @@ dependencies:
   kanban_board: ^1.0.0+2
   appflowy_board: ^0.1.2
   uuid:
+  flutter_colorpicker: ^1.1.0
 
 
 

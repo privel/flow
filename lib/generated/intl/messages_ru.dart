@@ -104,10 +104,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingAndTools": MessageLookupByLibrary.simpleMessage(
       "НАСТРОЙКИ И ИНСТРУМЕНТЫ",
     ),
+    "starredBoards": MessageLookupByLibrary.simpleMessage("Сохранёные Доски"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Успешный выход"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "Письмо отправлено! Проверьте свой электронный адрес.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Тема"),
+    "yourWorkspaces": MessageLookupByLibrary.simpleMessage(
+      "РАБОЧИЕ ПРОСТРАНСТВА",
+    ),
   };
 }

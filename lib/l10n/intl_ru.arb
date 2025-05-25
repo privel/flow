@@ -54,5 +54,7 @@
   "renameIt": "Переименовать",
   "DeleteColumn": "Удалить колонку?",
   "areYouSureYouWantToDeleteThisColumnAnd": "Вы уверены, что хотите удалить эту колонку и все ее задачи?",
-  "delete": "Удалить"
+  "delete": "Удалить",
+  "starredBoards": "Сохранёные Доски",
+  "yourWorkspaces": "РАБОЧИЕ ПРОСТРАНСТВА"
 }

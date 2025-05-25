@@ -52,5 +52,7 @@
   "renameIt": "Rename it",
   "DeleteColumn": "Delete a column?",
   "areYouSureYouWantToDeleteThisColumnAnd": "Are you sure you want to delete this column and all its tasks?",
-  "delete": "Delete"
+  "delete": "Delete",
+  "starredBoards": "Starred Boards",
+  "yourWorkspaces": "YOUR WORKSPACES"
 }

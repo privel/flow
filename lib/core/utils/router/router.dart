@@ -101,22 +101,24 @@ GoRouter appRouter(AuthProvider authProvider) {
       ),
 
       GoRoute(
-  path: '/boardtest/:id',
-  name: 'boardtest',
-  builder: (context, state) {
-    final boardId = state.pathParameters['id']!;
-    return BoardPaget(boardId: boardId);
-  },
-),
+        path: '/boardtest/:id',
+        name: 'boardtest',
+        builder: (context, state) {
+          final boardId = state.pathParameters['id']!;
+          return BoardPaget(boardId: boardId);
+        },
+      ),
 
-GoRoute(
-  path: '/boardtest2/:id',
-  name: 'boardtest2',
-  builder: (context, state) {
-    final boardId = state.pathParameters['id']!;
-    return BoardTest2(boardId: boardId);
-  },
-),
+      GoRoute(
+        path: '/boardtest2/:id',
+        name: 'boardtest2',
+        builder: (context, state) {
+          final boardId = state.pathParameters['id']!;
+          return BoardTest2(boardId: boardId);
+        },
+      ),
+      GoRoute(path: "/test/color",
+      builder: (context, state) => const Text("Test"),),
     ],
   );
 }
