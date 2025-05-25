@@ -68,6 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Are you sure you want to delete this column and all its tasks?",
         ),
+    "boardMenu": MessageLookupByLibrary.simpleMessage("Board Menu"),
     "build": MessageLookupByLibrary.simpleMessage("Build:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
@@ -75,16 +76,28 @@ class MessageLookup extends MessageLookupByLibrary {
       "Please confirm your email address.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Confirm"),
+    "couldntAddTask": MessageLookupByLibrary.simpleMessage(
+      "Couldn\'t add task",
+    ),
+    "couldntAddToFavorite": MessageLookupByLibrary.simpleMessage(
+      "Couldn`t add to favorite",
+    ),
     "createBoard": MessageLookupByLibrary.simpleMessage("Create Board"),
     "createCard": MessageLookupByLibrary.simpleMessage("Create Card"),
     "delete": MessageLookupByLibrary.simpleMessage("Delete"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Delete List"),
+    "description": MessageLookupByLibrary.simpleMessage("Description"),
+    "dueDate": MessageLookupByLibrary.simpleMessage("Due date"),
+    "en_ru": MessageLookupByLibrary.simpleMessage("en"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Language Settings",
     ),
     "logOut": MessageLookupByLibrary.simpleMessage("Log out"),
+    "members": MessageLookupByLibrary.simpleMessage("Members"),
+    "nameTask": MessageLookupByLibrary.simpleMessage("Name task"),
     "newBoard": MessageLookupByLibrary.simpleMessage("New Board"),
+    "notSelected": MessageLookupByLibrary.simpleMessage("Not selected"),
     "renameIt": MessageLookupByLibrary.simpleMessage("Rename it"),
     "resend": MessageLookupByLibrary.simpleMessage("Resend"),
     "resendtext": m0,
@@ -98,12 +111,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingAndTools": MessageLookupByLibrary.simpleMessage(
       "SETTING AND TOOLS",
     ),
+    "someDescription": MessageLookupByLibrary.simpleMessage("Some Description"),
     "starredBoards": MessageLookupByLibrary.simpleMessage("Starred Boards"),
+    "startDate": MessageLookupByLibrary.simpleMessage("Start date"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Successful exit"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "The email has been sent! Check your email.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+    "title": MessageLookupByLibrary.simpleMessage("Title"),
     "yourWorkspaces": MessageLookupByLibrary.simpleMessage("YOUR WORKSPACES"),
   };
 }

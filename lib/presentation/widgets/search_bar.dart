@@ -6,12 +6,13 @@ class SearchBarWidget extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String>? onChanged;
   final bool isDark;
+  final String hintText;
 
   const SearchBarWidget({
     super.key,
     required this.controller,
     required this.isDark,
-    this.onChanged,
+    this.onChanged, required this.hintText,
   });
 
   @override
@@ -25,7 +26,7 @@ class SearchBarWidget extends StatelessWidget {
             TextStyle(color: isDark ? Colors.white : const Color(0xFF1F1F1F)),
         // cursorColor: Colors.white54,
         decoration: InputDecoration(
-          hintText: S.of(context).searchYourTask,
+          hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey[400]),
           prefixIcon: Icon(
             IconlyLight.search,

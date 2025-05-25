@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/data/models/user_models.dart';
 import 'package:flow/presentation/pages/board_page/new_board_after_test/boardWidgetSt.dart';
+import 'package:flow/presentation/widgets/settings_board.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +25,8 @@ class _BoardTest2State extends State<BoardTest2> {
   late BoardProvider boardProvider;
   BoardModel? _boardModel;
   StreamSubscription<BoardModel?>? _subscription;
+ 
+
   bool _isLoading = true;
   String? _error;
 
@@ -29,6 +34,7 @@ class _BoardTest2State extends State<BoardTest2> {
   void initState() {
     super.initState();
     boardProvider = Provider.of<BoardProvider>(context, listen: false);
+
 
     _subscription = boardProvider.watchBoardById(widget.boardId).listen(
       (board) {
@@ -104,6 +110,55 @@ class _BoardTest2State extends State<BoardTest2> {
     }
   }
 
+
+void showBottomModalSettings(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final size = MediaQuery.of(context).size;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final initialName = (auth.user?.displayName?.trim().isNotEmpty ?? false)
+        ? auth.user!.displayName!
+        : 'No Name';
+
+    //Theme.of(context).extension<AppColorsExtension>()?.mainText
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF161616) : const Color(0xFFD3D3D3),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.9,
+              minChildSize: 0.3,
+              maxChildSize: 0.9,
+              builder: (context, scrollController) {
+                
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SettingsBoard(
+                    scrollController: scrollController,
+                    size: size,
+                    board: _boardModel!,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -139,7 +194,7 @@ class _BoardTest2State extends State<BoardTest2> {
         actions: [
           IconButton(
             onPressed: () {
-              // можно добавить опции
+              showBottomModalSettings(context);
             },
             icon: const Icon(Icons.more_vert_outlined, size: 22),
           ),

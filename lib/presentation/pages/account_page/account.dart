@@ -190,9 +190,10 @@ class _AccountPageState extends State<AccountPage> {
                               },
                               child: auth.user?.photoURL != null
                                   ? CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(auth.user!.photoURL!, ),
-                                          radius: isMobile ? 70 : 100,
+                                      backgroundImage: NetworkImage(
+                                        auth.user!.photoURL!,
+                                      ),
+                                      radius: isMobile ? 70 : 100,
                                     )
                                   : CircleAvatar(
                                       backgroundColor: Colors.grey,
@@ -575,47 +576,54 @@ class _AccountPageState extends State<AccountPage> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             Card(
               color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFE8E8E8),
-              child: ListTile(
-                leading: auth.user?.photoURL != null
-                    ? CircleAvatar(
-                        backgroundImage: NetworkImage(auth.user!.photoURL!),
-                      )
-                    : const CircleAvatar(
-                        backgroundColor: Colors.grey,
-                        radius: 25,
-                        child: Icon(IconlyLight.profile, color: Colors.white),
+              child: Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  return ListTile(
+                    leading: auth.user?.photoURL != null
+                        ? CircleAvatar(
+                            backgroundImage: NetworkImage(auth.user!.photoURL!),
+                          )
+                        : const CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            radius: 25,
+                            child:
+                                Icon(IconlyLight.profile, color: Colors.white),
+                          ),
+                    title: Text(
+                      auth.user?.displayName?.isNotEmpty == true
+                          ? auth.user!.displayName!
+                          : "No name",
+                      style: AccountLayout.CardMainTitle.copyWith(
+                        color: Theme.of(context)
+                            .extension<AppColorsExtension>()
+                            ?.mainText,
                       ),
-                title: Text(
-                  auth.user?.displayName?.isNotEmpty == true
-                      ? auth.user!.displayName!
-                      : "No name",
-                  style: AccountLayout.CardMainTitle.copyWith(
-                      color: Theme.of(context)
-                          .extension<AppColorsExtension>()
-                          ?.mainText),
-                ),
-                subtitle: Text(
-                  auth.user?.email ?? "",
-                  style: AccountLayout.CardSubTitle.copyWith(
-                      color: Theme.of(context)
-                          .extension<AppColorsExtension>()
-                          ?.subText),
-                ),
-                trailing: CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  radius: 15,
-                  child: const Icon(
-                    IconlyLight.edit,
-                    size: 18,
-                  ),
-                ),
-                onTap: () {
-                  final auth =
-                      Provider.of<AuthProvider>(context, listen: false);
-                  final uid = auth.user?.uid;
-                  if (uid == null) return;
+                    ),
+                    subtitle: Text(
+                      auth.user?.email ?? "",
+                      style: AccountLayout.CardSubTitle.copyWith(
+                        color: Theme.of(context)
+                            .extension<AppColorsExtension>()
+                            ?.subText,
+                      ),
+                    ),
+                    trailing: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      radius: 15,
+                      child: const Icon(
+                        IconlyLight.edit,
+                        size: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      final auth =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      final uid = auth.user?.uid;
+                      if (uid == null) return;
 
-                  showBottomModalAccountEdit(context);
+                      showBottomModalAccountEdit(context);
+                    },
+                  );
                 },
               ),
             ),

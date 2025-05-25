@@ -74,14 +74,15 @@
 //   }
 // }
 
-
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TaskModel {
   final String id;
   final String title;
   final String description;
   final bool isDone;
+  final DateTime? startDate;
+  final DateTime? dueDate;
   final int order; // <-- Новое поле
 
   TaskModel({
@@ -89,6 +90,8 @@ class TaskModel {
     required this.title,
     required this.description,
     required this.isDone,
+    this.startDate,
+    this.dueDate,
     required this.order,
   });
 
@@ -97,6 +100,8 @@ class TaskModel {
     String? title,
     String? description,
     bool? isDone,
+    DateTime? startDate,
+    DateTime? dueDate,
     int? order,
   }) {
     return TaskModel(
@@ -104,6 +109,8 @@ class TaskModel {
       title: title ?? this.title,
       description: description ?? this.description,
       isDone: isDone ?? this.isDone,
+      startDate: startDate ?? this.startDate,
+      dueDate: dueDate ?? this.dueDate,
       order: order ?? this.order,
     );
   }
@@ -114,6 +121,12 @@ class TaskModel {
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       isDone: map['isDone'] ?? false,
+      startDate: map['startDate'] != null
+          ? (map['startDate'] as Timestamp).toDate()
+          : null,
+      dueDate: map['dueDate'] != null
+          ? (map['dueDate'] as Timestamp).toDate()
+          : null,
       order: map['order'] ?? 0,
     );
   }
@@ -123,6 +136,8 @@ class TaskModel {
       'title': title,
       'description': description,
       'isDone': isDone,
+      'startDate': startDate,
+      'dueDate': dueDate,
       'order': order,
     };
   }

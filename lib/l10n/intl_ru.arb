@@ -56,5 +56,17 @@
   "areYouSureYouWantToDeleteThisColumnAnd": "Вы уверены, что хотите удалить эту колонку и все ее задачи?",
   "delete": "Удалить",
   "starredBoards": "Сохранёные Доски",
-  "yourWorkspaces": "РАБОЧИЕ ПРОСТРАНСТВА"
+  "yourWorkspaces": "РАБОЧИЕ ПРОСТРАНСТВА",
+  "couldntAddTask": "Не удалось добавить задачу",
+  "title": "Название",
+  "nameTask": "Назовите задачу",
+  "description": "Описание",
+  "someDescription": "Какое-то описание",
+  "en_ru": "ru",
+  "notSelected": "Не выбрано",
+  "startDate": "Дата начала",
+  "dueDate": "Дата конца",
+  "couldntAddToFavorite": "Couldn`t add to favorite",
+  "boardMenu": "Board Menu",
+  "members": "Members"
 }

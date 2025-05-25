@@ -74,6 +74,7 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Вы уверены, что хотите удалить эту колонку и все ее задачи?",
         ),
+    "boardMenu": MessageLookupByLibrary.simpleMessage("Board Menu"),
     "build": MessageLookupByLibrary.simpleMessage("Сборка:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Отменить"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Проверить снова"),
@@ -81,16 +82,28 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пожалуйста, подтвердите адрес электронной почты.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Подтверждение"),
+    "couldntAddTask": MessageLookupByLibrary.simpleMessage(
+      "Не удалось добавить задачу",
+    ),
+    "couldntAddToFavorite": MessageLookupByLibrary.simpleMessage(
+      "Couldn`t add to favorite",
+    ),
     "createBoard": MessageLookupByLibrary.simpleMessage("Создать Доску"),
     "createCard": MessageLookupByLibrary.simpleMessage("Создать Карту"),
     "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Удалить Лист"),
+    "description": MessageLookupByLibrary.simpleMessage("Описание"),
+    "dueDate": MessageLookupByLibrary.simpleMessage("Дата конца"),
+    "en_ru": MessageLookupByLibrary.simpleMessage("ru"),
     "language": MessageLookupByLibrary.simpleMessage("Язык"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Языковые настройки",
     ),
     "logOut": MessageLookupByLibrary.simpleMessage("Выйти"),
+    "members": MessageLookupByLibrary.simpleMessage("Members"),
+    "nameTask": MessageLookupByLibrary.simpleMessage("Назовите задачу"),
     "newBoard": MessageLookupByLibrary.simpleMessage("Новая Доска"),
+    "notSelected": MessageLookupByLibrary.simpleMessage("Не выбрано"),
     "renameIt": MessageLookupByLibrary.simpleMessage("Переименовать"),
     "resend": MessageLookupByLibrary.simpleMessage("Отправить повторно"),
     "resendtext": m0,
@@ -104,12 +117,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "settingAndTools": MessageLookupByLibrary.simpleMessage(
       "НАСТРОЙКИ И ИНСТРУМЕНТЫ",
     ),
+    "someDescription": MessageLookupByLibrary.simpleMessage(
+      "Какое-то описание",
+    ),
     "starredBoards": MessageLookupByLibrary.simpleMessage("Сохранёные Доски"),
+    "startDate": MessageLookupByLibrary.simpleMessage("Дата начала"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Успешный выход"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "Письмо отправлено! Проверьте свой электронный адрес.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Тема"),
+    "title": MessageLookupByLibrary.simpleMessage("Название"),
     "yourWorkspaces": MessageLookupByLibrary.simpleMessage(
       "РАБОЧИЕ ПРОСТРАНСТВА",
     ),

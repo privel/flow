@@ -469,6 +469,86 @@ class S {
       args: [],
     );
   }
+
+  /// `Couldn't add task`
+  String get couldntAddTask {
+    return Intl.message(
+      'Couldn\'t add task',
+      name: 'couldntAddTask',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Title`
+  String get title {
+    return Intl.message('Title', name: 'title', desc: '', args: []);
+  }
+
+  /// `Name task`
+  String get nameTask {
+    return Intl.message('Name task', name: 'nameTask', desc: '', args: []);
+  }
+
+  /// `Description`
+  String get description {
+    return Intl.message('Description', name: 'description', desc: '', args: []);
+  }
+
+  /// `Some Description`
+  String get someDescription {
+    return Intl.message(
+      'Some Description',
+      name: 'someDescription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `en`
+  String get en_ru {
+    return Intl.message('en', name: 'en_ru', desc: '', args: []);
+  }
+
+  /// `Not selected`
+  String get notSelected {
+    return Intl.message(
+      'Not selected',
+      name: 'notSelected',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start date`
+  String get startDate {
+    return Intl.message('Start date', name: 'startDate', desc: '', args: []);
+  }
+
+  /// `Due date`
+  String get dueDate {
+    return Intl.message('Due date', name: 'dueDate', desc: '', args: []);
+  }
+
+  /// `Couldn't add to favorite`
+  String get couldntAddToFavorite {
+    return Intl.message(
+      'Couldn`t add to favorite',
+      name: 'couldntAddToFavorite',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Board Menu`
+  String get boardMenu {
+    return Intl.message('Board Menu', name: 'boardMenu', desc: '', args: []);
+  }
+
+  /// `Members`
+  String get members {
+    return Intl.message('Members', name: 'members', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

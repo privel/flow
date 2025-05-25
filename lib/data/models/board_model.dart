@@ -63,7 +63,6 @@ import 'package:flow/data/models/card_model.dart';
 //   }
 // }
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flow/data/models/card_model.dart';
 import 'package:flutter/material.dart';
@@ -76,8 +75,9 @@ class BoardModel {
   final Map<String, CardModel> cards; // ✅ Map вместо List
   final String hexColor;
   final bool favorite;
-  
-   Color get color => Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
+
+  Color get color =>
+      Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
 
   BoardModel({
     required this.id,
@@ -95,18 +95,22 @@ class BoardModel {
 
     final cardMap = <String, CardModel>{};
     cardsData.forEach((cardId, cardData) {
-      cardMap[cardId] = CardModel.fromMap(Map<String, dynamic>.from(cardData), cardId);
+      cardMap[cardId] =
+          CardModel.fromMap(Map<String, dynamic>.from(cardData), cardId);
     });
 
+    final favoriteValue = map['isFavorite'];
+
     return BoardModel(
-      id: boardId,
-      title: map['title'] ?? '',
-      ownerId: map['ownerId'] ?? '',
-      sharedWith: sharedMap.map((key, value) => MapEntry(key, value.toString())),
-      cards: cardMap,
-      favorite: map['favorite'] ?? false,
-      hexColor: map['hexColor'] ?? "11998e"
-    );
+        id: boardId,
+        title: map['title'] ?? '',
+        ownerId: map['ownerId'] ?? '',
+        sharedWith:
+            sharedMap.map((key, value) => MapEntry(key, value.toString())),
+        cards: cardMap,
+        // favorite: map['favorite'] ?? false,
+        favorite: favoriteValue == true,
+        hexColor: map['hexColor'] ?? "11998e");
   }
 
   Map<String, dynamic> toMap() {
@@ -141,13 +145,12 @@ class BoardModel {
   }
 
   factory BoardModel.empty() {
-  return BoardModel(
-    id: '',
-    title: '',
-    ownerId: '',
-    sharedWith: {},
-    cards: {},
-  );
-}
-
+    return BoardModel(
+      id: '',
+      title: '',
+      ownerId: '',
+      sharedWith: {},
+      cards: {},
+    );
+  }
 }

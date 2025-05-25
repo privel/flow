@@ -15,6 +15,8 @@ class BoardProvider extends ChangeNotifier {
 
 
 
+
+
 Future<void> renameCard(String boardId, String cardId, String newTitle) async {
   final docRef = _firestore.collection('boards').doc(boardId);
   final doc = await docRef.get();
@@ -325,6 +327,13 @@ Stream<TaskModel?> watchTaskById(String boardId, String cardId, String taskId) {
       notifyListeners();
     }
   }
+
+  Future<void> markBoardAsFavorite(String boardId, bool isFavorite) async {
+  await FirebaseFirestore.instance
+      .collection('boards')
+      .doc(boardId)
+      .update({'isFavorite': isFavorite});
+}
 
   Future<void> deleteBoard(String boardId) async {
     await _firestore.collection('boards').doc(boardId).delete();

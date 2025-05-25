@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flow/data/models/board_model.dart';
+import 'package:flow/data/models/role_model.dart';
+import 'package:flow/data/models/user_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -36,16 +39,54 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateUserPhoto(Uint8List imageBytes) async {
+    final userId = _user?.uid;
+    if (userId == null) return;
 
+    final fileName = '$userId.jpg';
 
+    // Загрузка в Supabase Storage
+    final path = await supa.Supabase.instance.client.storage
+        .from('avatars')
+        .uploadBinary(
+          fileName,
+          imageBytes,
+          fileOptions: const supa.FileOptions(
+            upsert: true,
+            contentType: 'image/jpeg',
+          ),
+        );
+
+    debugPrint("📤 Загружено в: $path");
+
+    // Получение публичной ссылки
+    final publicUrl = supa.Supabase.instance.client.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+    // Обновление в Firebase Auth
+    await _user?.updatePhotoURL(publicUrl);
+    await _user?.reload();
+
+    // Обновление в Firestore
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'photoUrl': publicUrl,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    _user = _auth.currentUser;
+    _user = FirebaseAuth.instance.currentUser;
+    notifyListeners();
+  }
+
+//OLD WITHOUT ADD TO FIRESTORE
 // Future<void> updateUserPhoto(Uint8List imageBytes) async {
 //   final userId = _user?.uid;
 //   if (userId == null) return;
 
-//   // final fileName = 'avatars/$userId.jpg';
 //   final fileName = '$userId.jpg';
 
-//   final error = await supa.Supabase.instance.client.storage
+//   final path = await supa.Supabase.instance.client.storage
 //       .from('avatars')
 //       .uploadBinary(
 //         fileName,
@@ -56,14 +97,8 @@ class AuthProvider with ChangeNotifier {
 //         ),
 //       );
 
-//   if (error != null && error.isNotEmpty) {
-    
-//     debugPrint("Ошибка при загрузке фото: $error");
-//     debugPrint("Тип ошибки: ${error.runtimeType}");
-//     return;
-//   }
+//   debugPrint("📤 Загружено в: $path"); // <-- просто путь к файлу
 
- 
 //   final publicUrl = supa.Supabase.instance.client.storage
 //       .from('avatars')
 //       .getPublicUrl(fileName);
@@ -75,52 +110,44 @@ class AuthProvider with ChangeNotifier {
 //   notifyListeners();
 // }
 
+  Future<void> removeUserPhoto() async {
+    final userId = _user?.uid;
+    if (userId == null) return;
 
-Future<void> updateUserPhoto(Uint8List imageBytes) async {
-  final userId = _user?.uid;
-  if (userId == null) return;
+    final fileName = '$userId.jpg';
 
-  final fileName = '$userId.jpg';
+    // Удаление из Supabase Storage
+    final result = await supa.Supabase.instance.client.storage
+        .from('avatars')
+        .remove([fileName]);
 
-  final path = await supa.Supabase.instance.client.storage
-      .from('avatars')
-      .uploadBinary(
-        fileName,
-        imageBytes,
-        fileOptions: const supa.FileOptions(
-          upsert: true,
-          contentType: 'image/jpeg',
-        ),
-      );
+    debugPrint("🗑️ Удалено: $result");
 
-  debugPrint("📤 Загружено в: $path"); // <-- просто путь к файлу
+    // Обновление в Firebase Auth
+    await _user?.updatePhotoURL(null);
+    await _user?.reload();
 
-  final publicUrl = supa.Supabase.instance.client.storage
-      .from('avatars')
-      .getPublicUrl(fileName);
+    // Удаление photoUrl из Firestore
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'photoUrl': FieldValue.delete(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
 
-  await _user?.updatePhotoURL(publicUrl);
-  await _user?.reload();
-
-  _user = _auth.currentUser;
-  notifyListeners();
-}
-
+    _user = _auth.currentUser;
+    notifyListeners();
+  }
+// old remove without firestore
 // Future<void> removeUserPhoto() async {
 //   final userId = _user?.uid;
 //   if (userId == null) return;
 
-//   // final fileName = 'avatars/$userId.jpg';
 //   final fileName = '$userId.jpg';
 
-//   final error = await supa.Supabase.instance.client.storage
+//   final result = await supa.Supabase.instance.client.storage
 //       .from('avatars')
 //       .remove([fileName]);
 
-//   if (error != null && error.isNotEmpty) {
-//     debugPrint("Ошибка при удалении фото: $error");
-//     return;
-//   }
+//   debugPrint("🗑️ Удалено: $result"); // это список удалённых файлов
 
 //   await _user?.updatePhotoURL(null);
 //   await _user?.reload();
@@ -129,55 +156,73 @@ Future<void> updateUserPhoto(Uint8List imageBytes) async {
 //   notifyListeners();
 // }
 
-Future<void> removeUserPhoto() async {
-  final userId = _user?.uid;
-  if (userId == null) return;
+  Future<AppUser?> fetchUserById(String uid) async {
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    if (doc.exists) {
+      return AppUser.fromMap(doc.id, doc.data()!);
+    }
+    return null;
+  }
 
-  final fileName = '$userId.jpg';
+  Future<List<AppUser>> searchUsersByEmail(String query) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isGreaterThanOrEqualTo: query)
+        .where('email', isLessThanOrEqualTo: '$query\uf8ff')
+        .limit(10)
+        .get();
 
-  final result = await supa.Supabase.instance.client.storage
-      .from('avatars')
-      .remove([fileName]);
+    return snapshot.docs
+        .map((doc) => AppUser.fromMap(
+              doc.id,
+              doc.data(),
+            ))
+        .toList();
+  }
 
-  debugPrint("🗑️ Удалено: $result"); // это список удалённых файлов
+  Future<List<BoardMember>> loadBoardUsers(BoardModel board) async {
+    List<BoardMember> result = [];
 
-  await _user?.updatePhotoURL(null);
-  await _user?.reload();
+    // Добавляем владельца с ролью admin
+    final owner = await fetchUserById(board.ownerId);
+    if (owner != null) {
+      result.add(BoardMember(user: owner, role: 'owner'));
+    }
 
-  _user = _auth.currentUser;
-  notifyListeners();
-}
+    // Добавляем участников из sharedWith
+    for (final entry in board.sharedWith.entries) {
+      final userId = entry.key;
+      final role = entry.value;
 
+      if (userId != board.ownerId) {
+        final user = await fetchUserById(userId);
+        if (user != null) {
+          result.add(BoardMember(user: user, role: role));
+        }
+      }
+    }
 
+    return result;
+  }
 
+// Future<List<AppUser>> loadBoardUsers(BoardModel board) async {
+//   List<AppUser> result = [];
 
-  // // Обновление фото (в виде base64)
-  // Future<void> updateUserPhoto(Uint8List imageBytes) async {
-  //   final base64Image = base64Encode(imageBytes);
+//   // Загружаем владельца доски
+//   final owner = await fetchUserById(board.ownerId);
+//   if (owner != null) result.add(owner);
 
-  //   // Сохраняем в Firestore
-  //   await FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(user!.uid)
-  //       .set({'photoBase64': base64Image}, SetOptions(merge: true));
+//   // Загружаем участников из sharedWith (если есть)
+//   for (final userId in board.sharedWith.keys) {
+//     if (userId != board.ownerId) {
+//       final user = await fetchUserById(userId);
+//       if (user != null) result.add(user);
+//     }
+//   }
 
-  //   // Обновим локально (для UI), задав временный URL через data URI
-  //   final photoUrl = 'data:image/jpeg;base64,$base64Image';
-  //   await user?.updatePhotoURL(photoUrl);
-  //   await user?.reload();
-  //   notifyListeners();
-  // }
-
-  // // Удаление фото
-  // Future<void> removeUserPhoto() async {
-  //   await FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(user!.uid)
-  //       .update({'photoBase64': FieldValue.delete()});
-  //   await user?.updatePhotoURL(null);
-  //   await user?.reload();
-  //   notifyListeners();
-  // }
+//   return result;
+// }
 
   // Загрузка фото из Firestore при входе
   Future<void> fetchUserPhotoFromFirestore() async {

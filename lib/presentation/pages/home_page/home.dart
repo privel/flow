@@ -7,6 +7,7 @@ import 'package:flow/presentation/pages/account_page/account_layout.dart';
 import 'package:flow/presentation/pages/home_page/home_layout.dart';
 import 'package:flow/presentation/widgets/add_task_widget.dart';
 import 'package:flow/presentation/widgets/color_picker.dart';
+import 'package:flow/presentation/widgets/date_time_picker.dart';
 import 'package:flow/presentation/widgets/drop_down_widget.dart';
 import 'package:flow/presentation/widgets/horizontal_datapicker.dart';
 import 'package:flow/presentation/widgets/search_bar.dart';
@@ -139,8 +140,11 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
+                  // color: isDark
+                  //     ? const Color(0xFF2A2A2A)
+                  //     : const Color(0xFFD3D3D3),
                   color: isDark
-                      ? const Color(0xFF2A2A2A)
+                      ? const Color(0xFF161616)
                       : const Color(0xFFD3D3D3),
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(20)),
@@ -367,222 +371,6 @@ class _HomePageState extends State<HomePage> {
                                           : const SizedBox.shrink(),
                                     ],
                                   ),
-                                  // Container(
-                                  //   width: 320,
-                                  //   decoration: BoxDecoration(
-                                  //     borderRadius: BorderRadius.circular(15),
-                                  //     color: isDark
-                                  //         ? const Color(0xFF494B4D)
-                                  //         : const Color(0xFFF6F6F6),
-                                  //   ),
-                                  //   child: Padding(
-                                  //     padding: const EdgeInsets.all(12.0),
-                                  //     child: Column(
-                                  //       children: [
-                                  //         GestureDetector(
-                                  //           onTap: () {
-                                  //             setState(() {
-                                  //               showExtraOptions =
-                                  //                   !showExtraOptions;
-                                  //             });
-                                  //           },
-                                  //           child: Row(
-                                  //             mainAxisAlignment:
-                                  //                 MainAxisAlignment
-                                  //                     .spaceBetween,
-                                  //             children: [
-                                  //               const Text(
-                                  //                 "Background",
-                                  //                 style: TextStyle(
-                                  //                   fontFamily: 'SFProText',
-                                  //                   fontWeight: FontWeight.w700,
-                                  //                   fontSize: 14,
-                                  //                 ),
-                                  //               ),
-                                  //               const Spacer(),
-                                  //               Container(
-                                  //                 color:
-                                  //                     HexToColor(selectedColor),
-                                  //                 height: 20,
-                                  //                 width: 30,
-                                  //               ),
-                                  //               const SizedBox(width: 4),
-                                  //               Icon(!showExtraOptions
-                                  //                   ? Icons
-                                  //                       .arrow_drop_down_rounded
-                                  //                   : Icons
-                                  //                       .arrow_drop_up_rounded)
-                                  //             ],
-                                  //           ),
-                                  //         ),
-                                  //         AnimatedSize(
-                                  //           duration: const Duration(
-                                  //               microseconds: 500),
-                                  //           child: showExtraOptions
-                                  //               ? Column(
-                                  //                   children: [
-                                  //                     Divider(
-                                  //                       height: 25,
-                                  //                       color: isDark
-                                  //                           ? Colors.white38
-                                  //                           : Colors.black45,
-                                  //                       thickness: 0.6,
-                                  //                     ),
-                                  //                     GridView.builder(
-                                  //                       shrinkWrap: true,
-                                  //                       physics:
-                                  //                           const NeverScrollableScrollPhysics(),
-                                  //                       gridDelegate:
-                                  //                           const SliverGridDelegateWithFixedCrossAxisCount(
-                                  //                         crossAxisCount: 2,
-                                  //                         mainAxisExtent: 100,
-                                  //                         mainAxisSpacing: 10,
-                                  //                         crossAxisSpacing: 10,
-                                  //                       ),
-                                  //                       itemCount: ListColorsHex
-                                  //                               .length +
-                                  //                           1,
-                                  //                       itemBuilder:
-                                  //                           (context, index) {
-                                  //                         // Если это последний элемент — кастомный элемент
-                                  //                         if (index ==
-                                  //                             ListColorsHex
-                                  //                                 .length) {
-                                  //                           return GestureDetector(
-                                  //                             onTap: () {
-                                  //                               setState(() {
-                                  //                                 showColorPicker =
-                                  //                                     true;
-                                  //                               });
-                                  //                             },
-                                  //                             child: Container(
-                                  //                               decoration:
-                                  //                                   BoxDecoration(
-                                  //                                 color: customColorChoose
-                                  //                                         .isEmpty
-                                  //                                     ? isDark
-                                  //                                         ? Colors.grey[
-                                  //                                             800]
-                                  //                                         : Colors.grey[
-                                  //                                             300]
-                                  //                                     : HexToColor(
-                                  //                                         customColorChoose),
-                                  //                                 borderRadius:
-                                  //                                     BorderRadius
-                                  //                                         .circular(
-                                  //                                             8),
-                                  //                                 border: Border
-                                  //                                     .all(
-                                  //                                   color: isDark
-                                  //                                       ? Colors
-                                  //                                           .white54
-                                  //                                       : Colors
-                                  //                                           .black45,
-                                  //                                 ),
-                                  //                               ),
-                                  //                               child:
-                                  //                                   const Center(
-                                  //                                 child: Icon(
-                                  //                                     Icons.add,
-                                  //                                     size: 30,
-                                  //                                     color: Colors
-                                  //                                         .black54),
-                                  //                               ),
-                                  //                             ),
-                                  //                           );
-                                  //                         }
-                                  //                         final colorHex =
-                                  //                             ListColorsHex[
-                                  //                                 index];
-                                  //                         final isSelected =
-                                  //                             selectedColor ==
-                                  //                                 colorHex;
-
-                                  //                         return InkWell(
-                                  //                           onTap: () {
-                                  //                             setState(() {
-                                  //                               selectedColor =
-                                  //                                   colorHex;
-                                  //                               showColorPicker =
-                                  //                                   false;
-                                  //                             });
-                                  //                           },
-                                  //                           splashColor: Colors
-                                  //                               .black
-                                  //                               // ignore: deprecated_member_use
-                                  //                               .withOpacity(
-                                  //                                   0.2),
-                                  //                           highlightColor: Colors
-                                  //                               .black
-                                  //                               // ignore: deprecated_member_use
-                                  //                               .withOpacity(
-                                  //                                   0.3),
-                                  //                           child: Container(
-                                  //                             decoration:
-                                  //                                 BoxDecoration(
-                                  //                               color:
-                                  //                                   HexToColor(
-                                  //                                 ListColorsHex[
-                                  //                                     index],
-                                  //                               ),
-                                  //                               borderRadius:
-                                  //                                   BorderRadius
-                                  //                                       .circular(
-                                  //                                           8),
-                                  //                             ),
-                                  //                             child: isSelected
-                                  //                                 ? const Center(
-                                  //                                     child:
-                                  //                                         Icon(
-                                  //                                       Icons
-                                  //                                           .check,
-                                  //                                       size:
-                                  //                                           30,
-                                  //                                     ),
-                                  //                                   )
-                                  //                                 : const SizedBox
-                                  //                                     .shrink(),
-                                  //                           ),
-                                  //                         );
-                                  //                       },
-                                  //                     ),
-                                  //                     showColorPicker
-                                  //                         ? Padding(
-                                  //                             padding:
-                                  //                                 const EdgeInsets
-                                  //                                     .symmetric(
-                                  //                                     vertical:
-                                  //                                         10),
-                                  //                             child:
-                                  //                                 ColorPickerWidget(
-                                  //                               initialColor:
-                                  //                                   HexToColor(
-                                  //                                       selectedColor),
-                                  //                               onColorSelected:
-                                  //                                   (color) {
-                                  //                                 setState(() {
-                                  //                                   selectedColor = color
-                                  //                                       .value
-                                  //                                       .toRadixString(
-                                  //                                           16)
-                                  //                                       .substring(
-                                  //                                           2);
-                                  //                                   customColorChoose =
-                                  //                                       selectedColor;
-                                  //                                 });
-                                  //                               },
-                                  //                             ),
-                                  //                           )
-                                  //                         : const SizedBox
-                                  //                             .shrink(),
-                                  //                   ],
-                                  //                 )
-                                  //               : const SizedBox.shrink(),
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  // ),
                                 ],
                               ),
                             ),
@@ -747,7 +535,7 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFD3D3D3),
+              color: isDark ? const Color(0xFF161616) : const Color(0xFFD3D3D3),
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(20)),
             ),
@@ -755,7 +543,7 @@ class _HomePageState extends State<HomePage> {
               expand: false,
               initialChildSize: 0.5,
               minChildSize: 0.3,
-              maxChildSize: 0.7,
+              maxChildSize: 0.9,
               builder: (context, scrollController) {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -793,6 +581,8 @@ class _HomePageState extends State<HomePage> {
     final isDesktop = ResponsiveBreakpoints.of(context).isDesktop;
     final size = MediaQuery.of(context).size;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    DateTime? dueDate;
 
     HomeLayout homeLayout = HomeLayout(isMobile, isTablet);
 
@@ -867,7 +657,8 @@ class _HomePageState extends State<HomePage> {
                                           ?.mainText,
                                     ),
                                   ),
-                                  const Icon(Icons.table_rows_outlined),
+                                  const Icon(
+                                      Icons.check_box_outline_blank_outlined),
                                 ],
                               ),
                             ),
@@ -891,7 +682,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
               title: Image.asset(
-                "assets/image/logo/logoFlowApp2.png",
+                isDark
+                    ? "assets/image/logo/logoFlowApp2.png"
+                    : "assets/image/logo/logoFlowApp2black.png",
                 scale: homeLayout.ImageScaleIcon,
               ),
               backgroundColor:
@@ -915,6 +708,7 @@ class _HomePageState extends State<HomePage> {
               SearchBarWidget(
                 controller: _searchController,
                 isDark: isDark,
+                hintText: S.of(context).searchYourTask,
                 onChanged: (value) {
                   setState(() {
                     _searchText = value.toLowerCase().trim();
@@ -927,6 +721,7 @@ class _HomePageState extends State<HomePage> {
               StreamBuilder<List<BoardModel>>(
                 stream: boardStream,
                 builder: (context, snapshot) {
+                  
                   if (snapshot.connectionState == ConnectionState.waiting &&
                       !snapshot.hasData) {
                     return const SizedBox();
@@ -939,6 +734,7 @@ class _HomePageState extends State<HomePage> {
                   final favoriteBoards = snapshot.data!
                       .where((board) => board.favorite == true)
                       .toList();
+                  
 
                   final filteredFavorites = _searchText.isEmpty
                       ? favoriteBoards

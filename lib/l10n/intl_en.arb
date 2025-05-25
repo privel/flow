@@ -54,5 +54,17 @@
   "areYouSureYouWantToDeleteThisColumnAnd": "Are you sure you want to delete this column and all its tasks?",
   "delete": "Delete",
   "starredBoards": "Starred Boards",
-  "yourWorkspaces": "YOUR WORKSPACES"
+  "yourWorkspaces": "YOUR WORKSPACES",
+  "couldntAddTask": "Couldn't add task",
+  "title": "Title",
+  "nameTask": "Name task",
+  "description": "Description",
+  "someDescription": "Some Description",
+  "en_ru": "en",
+  "notSelected": "Not selected",
+  "startDate": "Start date",
+  "dueDate": "Due date",
+  "couldntAddToFavorite": "Couldn`t add to favorite",
+  "boardMenu": "Board Menu",
+  "members": "Members"
 }
