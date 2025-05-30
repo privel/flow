@@ -9,6 +9,8 @@ import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/widgets/rounded_container.dart';
 import 'package:flow/presentation/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
@@ -30,6 +32,9 @@ class _SettingsBoardState extends State<SettingsBoard> {
   Timer? _debounce;
   bool _isFavoritel = false;
   late AuthProvider auth;
+  late String? userId;
+  String? userRole;
+
   StreamSubscription<BoardModel?>? _boardSub;
 
   List<BoardMember> boardUsers = [];
@@ -58,6 +63,9 @@ class _SettingsBoardState extends State<SettingsBoard> {
       auth = Provider.of<AuthProvider>(context, listen: false);
       final boardProvider = Provider.of<BoardProvider>(context, listen: false);
 
+      userId = auth.user?.uid;
+      userRole = boardProvider.getUserRole(widget.board, auth.user?.uid ?? '');
+
       _boardSub = boardProvider
           .watchBoardById(widget.board.id)
           .listen((updatedBoard) async {
@@ -67,6 +75,7 @@ class _SettingsBoardState extends State<SettingsBoard> {
             setState(() {
               boardUsers = users;
               _titleController.text = updatedBoard.title;
+              _isFavoritel = updatedBoard.favorite;
             });
           }
         }
@@ -99,6 +108,9 @@ class _SettingsBoardState extends State<SettingsBoard> {
       children: members.map((member) {
         final user = member.user;
         final role = member.role;
+        if (userRole == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         return Padding(
           padding: const EdgeInsets.symmetric(
@@ -171,6 +183,10 @@ class _SettingsBoardState extends State<SettingsBoard> {
   //     }).toList(),
   //   );
   // }
+
+  String generateInviteLink(String inviteId) {
+    return 'https://flow-ed624.web.app/invite/$inviteId';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -270,29 +286,56 @@ class _SettingsBoardState extends State<SettingsBoard> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.only(bottom: 15),
                 child: RoundedContainerCustom(
                   isDark: isDark,
                   width: 320,
                   height: 55,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 6),
-                  childWidget: TextField(
-                    controller: _titleController,
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
-                    ),
-                    cursorWidth: 1.5,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: S.of(context).nameTask,
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      isDense: true,
-                      fillColor: isDark
-                          ? const Color(0xFF333333)
-                          : const Color(0xFFF0F0F0),
-                    ),
-                  ),
+
+                  childWidget: (userRole != 'viewer')
+                      ? TextField(
+                          controller: _titleController,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                          cursorWidth: 1.5,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: S.of(context).nameTask,
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            isDense: true,
+                            fillColor: isDark
+                                ? const Color(0xFF333333)
+                                : const Color(0xFFF0F0F0),
+                          ),
+                        )
+                      : Text(
+                          _titleController.text,
+                          style: TextStyle(
+                            fontFamily: 'SFProText',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 17,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                  // childWidget: TextField(
+                  //   controller: _titleController,
+                  //   style: TextStyle(
+                  //     color: isDark ? Colors.white : Colors.black,
+                  //   ),
+                  //   cursorWidth: 1.5,
+                  //   decoration: InputDecoration(
+                  //     border: InputBorder.none,
+                  //     hintText: S.of(context).nameTask,
+                  //     hintStyle: const TextStyle(color: Colors.grey),
+                  //     isDense: true,
+                  //     fillColor: isDark
+                  //         ? const Color(0xFF333333)
+                  //         : const Color(0xFFF0F0F0),
+                  //   ),
+                  // ),
                 ),
               ),
               RoundedContainerCustom(
@@ -312,7 +355,7 @@ class _SettingsBoardState extends State<SettingsBoard> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          "Members",
+                          S.of(context).members,
                           style: TextStyle(
                             fontFamily: 'SFProText',
                             fontWeight: FontWeight.w600,
@@ -342,6 +385,94 @@ class _SettingsBoardState extends State<SettingsBoard> {
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 300,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStatePropertyAll(Colors.redAccent.shade400),
+                  ),
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(
+                          S.of(context).deleteTheBoard,
+                          style: TextStyle(
+                            fontFamily: 'SFProText',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        content: Text(
+                          S.of(context).thisActionCannotBeUndoneContinue,
+                          style: TextStyle(
+                            fontFamily: 'SFProText',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: isDark ? Colors.white60 : Colors.black54,
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(false),
+                            child: Text(
+                              S.of(context).cancel,
+                              style: TextStyle(
+                                fontFamily: 'SFProText',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Colors.greenAccent.shade400,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(true),
+                            child: Text(
+                              S.of(context).delete,
+                              style: TextStyle(
+                                fontFamily: 'SFProText',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: Colors.redAccent.shade400,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirmed == true) {
+                      await boardProvider.deleteBoard(widget.board.id);
+                      if (mounted) {
+                        Navigator.pop(context);
+                        context.go('/');
+                      }
+                    }
+                  },
+                  child: Text(
+                    "Delete Board",
+                    style: TextStyle(
+                      fontFamily: 'SFProText',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  final inviteUrl = generateInviteLink(widget.board.inviteId);
+                  Clipboard.setData(ClipboardData(text: inviteUrl));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Ссылка скопирована')),
+                  );
+                },
+                child: const Text('Пригласить по ссылке'),
+              )
             ],
           ),
         ),
@@ -404,6 +535,7 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
   }
 
   bool _isAlreadyMember(String userId) {
+    // debugPrint("${widget.board.sharedWith.values}");
     return widget.board.ownerId == userId ||
         widget.board.sharedWith.containsKey(userId);
   }

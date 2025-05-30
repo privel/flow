@@ -66,5 +66,21 @@
   "dueDate": "Due date",
   "couldntAddToFavorite": "Couldn`t add to favorite",
   "boardMenu": "Board Menu",
-  "members": "Members"
+  "members": "Members",
+  "thisActionCannotBeUndoneContinue": "This action cannot be undone. Continue?",
+  "deleteTheBoard": "Delete the board?",
+  "addATask": "Add a task",
+  "renameAColumn": "Rename a column",
+  "editATask": "Edit a task",
+  "taskName": "Task name",
+  "deleteATask": "Delete a task?",
+  "areYouSureYouWantToDeleteThisTask": "Are you sure you want to delete this task?",
+  "newColumn": "New column",
+  "aNewTask": "A new task",
+  "enterTheName": "Enter the name",
+  "changesSaved": "Changes saved",
+  "editTask": "Edit: {task}",
+  "complete": "Complete",
+  "addList": "Add List",
+  "youDontHaveAnyNotifications": "You Don`t have any notifications."
 }

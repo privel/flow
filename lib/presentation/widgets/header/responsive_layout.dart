@@ -80,7 +80,7 @@ class ResponsiveLayout extends StatelessWidget {
 
   const ResponsiveLayout({super.key, required this.child});
 
-  static final tabs = ['/', '/profile', '/account'];
+  static final tabs = ['/', '/notification', '/account'];
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +144,8 @@ class ResponsiveLayout extends StatelessWidget {
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.voice_over_off),
-                    label: 'Profile',
+                    icon: Icon(IconlyLight.notification),
+                    label: 'Notification',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(IconlyLight.profile),

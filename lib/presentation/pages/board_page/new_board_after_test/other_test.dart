@@ -139,7 +139,7 @@ void showBottomModalSettings(BuildContext context) {
             ),
             child: DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.9,
+              initialChildSize: 0.8,
               minChildSize: 0.3,
               maxChildSize: 0.9,
               builder: (context, scrollController) {

@@ -20,9 +20,11 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
-  static String m0(resendText) => "${resendText}";
+  static String m0(task) => "Edit: ${task}";
 
-  static String m1(seconds) => "Sent (${seconds} sec)";
+  static String m1(resendText) => "${resendText}";
+
+  static String m2(seconds) => "Sent (${seconds} sec)";
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
@@ -60,18 +62,26 @@ class MessageLookup extends MessageLookupByLibrary {
     "RegisterHintPassCheck": MessageLookupByLibrary.simpleMessage(
       "Passwords don\'t match",
     ),
+    "aNewTask": MessageLookupByLibrary.simpleMessage("A new task"),
     "accountPage": MessageLookupByLibrary.simpleMessage("Account"),
     "add": MessageLookupByLibrary.simpleMessage("Add"),
+    "addATask": MessageLookupByLibrary.simpleMessage("Add a task"),
+    "addList": MessageLookupByLibrary.simpleMessage("Add List"),
     "appInformation": MessageLookupByLibrary.simpleMessage("APP INFORMATION"),
     "appVersion": MessageLookupByLibrary.simpleMessage("App version:"),
     "areYouSureYouWantToDeleteThisColumnAnd":
         MessageLookupByLibrary.simpleMessage(
           "Are you sure you want to delete this column and all its tasks?",
         ),
+    "areYouSureYouWantToDeleteThisTask": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to delete this task?",
+    ),
     "boardMenu": MessageLookupByLibrary.simpleMessage("Board Menu"),
     "build": MessageLookupByLibrary.simpleMessage("Build:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+    "changesSaved": MessageLookupByLibrary.simpleMessage("Changes saved"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
+    "complete": MessageLookupByLibrary.simpleMessage("Complete"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
       "Please confirm your email address.",
     ),
@@ -85,10 +95,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "createBoard": MessageLookupByLibrary.simpleMessage("Create Board"),
     "createCard": MessageLookupByLibrary.simpleMessage("Create Card"),
     "delete": MessageLookupByLibrary.simpleMessage("Delete"),
+    "deleteATask": MessageLookupByLibrary.simpleMessage("Delete a task?"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Delete List"),
+    "deleteTheBoard": MessageLookupByLibrary.simpleMessage("Delete the board?"),
     "description": MessageLookupByLibrary.simpleMessage("Description"),
     "dueDate": MessageLookupByLibrary.simpleMessage("Due date"),
+    "editATask": MessageLookupByLibrary.simpleMessage("Edit a task"),
+    "editTask": m0,
     "en_ru": MessageLookupByLibrary.simpleMessage("en"),
+    "enterTheName": MessageLookupByLibrary.simpleMessage("Enter the name"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Language Settings",
@@ -97,17 +112,19 @@ class MessageLookup extends MessageLookupByLibrary {
     "members": MessageLookupByLibrary.simpleMessage("Members"),
     "nameTask": MessageLookupByLibrary.simpleMessage("Name task"),
     "newBoard": MessageLookupByLibrary.simpleMessage("New Board"),
+    "newColumn": MessageLookupByLibrary.simpleMessage("New column"),
     "notSelected": MessageLookupByLibrary.simpleMessage("Not selected"),
+    "renameAColumn": MessageLookupByLibrary.simpleMessage("Rename a column"),
     "renameIt": MessageLookupByLibrary.simpleMessage("Rename it"),
     "resend": MessageLookupByLibrary.simpleMessage("Resend"),
-    "resendtext": m0,
+    "resendtext": m1,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Reset password"),
     "save": MessageLookupByLibrary.simpleMessage("Save"),
     "searchYourTask": MessageLookupByLibrary.simpleMessage(
       "Search your task...",
     ),
     "selectLanguage": MessageLookupByLibrary.simpleMessage("SELECT LANGUAGE"),
-    "sentIn": m1,
+    "sentIn": m2,
     "settingAndTools": MessageLookupByLibrary.simpleMessage(
       "SETTING AND TOOLS",
     ),
@@ -115,11 +132,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "starredBoards": MessageLookupByLibrary.simpleMessage("Starred Boards"),
     "startDate": MessageLookupByLibrary.simpleMessage("Start date"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Successful exit"),
+    "taskName": MessageLookupByLibrary.simpleMessage("Task name"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "The email has been sent! Check your email.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+    "thisActionCannotBeUndoneContinue": MessageLookupByLibrary.simpleMessage(
+      "This action cannot be undone. Continue?",
+    ),
     "title": MessageLookupByLibrary.simpleMessage("Title"),
+    "youDontHaveAnyNotifications": MessageLookupByLibrary.simpleMessage(
+      "You Don`t have any notifications.",
+    ),
     "yourWorkspaces": MessageLookupByLibrary.simpleMessage("YOUR WORKSPACES"),
   };
 }

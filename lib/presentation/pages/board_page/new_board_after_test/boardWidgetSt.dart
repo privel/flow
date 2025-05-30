@@ -40,12 +40,21 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
   late AppFlowyBoardController controller;
   late BoardProvider boardProvider;
   final Uuid _uuid = const Uuid();
+  late AuthProvider auth;
+  late String? userId;
+  String? userRole;
+  bool _isDone = false;
 
   @override
   void initState() {
     super.initState();
+    auth = Provider.of<AuthProvider>(context, listen: false);
     boardProvider = Provider.of<BoardProvider>(context, listen: false);
     controller = _createBoardController(widget.boardModel);
+
+    userId = auth.user?.uid;
+    userRole =
+        boardProvider.getUserRole(widget.boardModel, auth.user?.uid ?? '');
   }
 
   @override
@@ -316,7 +325,7 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
   // }
 
   void _addNewCard(bool isDark) async {
-    String? title = await _showTextDialog("Новая колонка", isDark);
+    String? title = await _showTextDialog(S.of(context).newColumn, isDark);
     if (title != null && title.isNotEmpty) {
       final newCardId = _uuid.v4();
       final newOrder = widget.boardModel.cards.length;
@@ -331,7 +340,7 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
   }
 
   void _addNewTaskToCard(String cardId, bool isDark) async {
-    String? title = await _showTextDialog("Новая задача", isDark);
+    String? title = await _showTextDialog(S.of(context).aNewTask, isDark);
     if (title != null && title.isNotEmpty) {
       final cardModel = widget.boardModel.cards[cardId];
       if (cardModel == null) return;
@@ -365,7 +374,10 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
         content: TextField(
           controller: textController,
           autofocus: true,
-          decoration: const InputDecoration(hintText: "Введите название"),
+          decoration: InputDecoration(hintText: S.of(context).enterTheName),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
         actions: [
           TextButton(
@@ -519,15 +531,15 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     String? newTitle = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Переименовать колонку"),
+        title: Text(S.of(context).renameAColumn),
         content: TextField(controller: textController, autofocus: true),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Отмена")),
+              child: Text(S.of(context).cancel)),
           TextButton(
               onPressed: () => Navigator.pop(context, textController.text),
-              child: const Text("Сохранить")),
+              child: Text(S.of(context).save)),
         ],
       ),
     );
@@ -596,18 +608,18 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     String? newTitle = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Редактировать задачу"),
+        title: Text(S.of(context).editATask),
         content: TextField(
             controller: titleController,
             autofocus: true,
-            decoration: const InputDecoration(labelText: "Название задачи")),
+            decoration: InputDecoration(labelText: S.of(context).taskName)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Отмена")),
+              child: Text(S.of(context).cancel)),
           TextButton(
               onPressed: () => Navigator.pop(context, titleController.text),
-              child: const Text("Сохранить")),
+              child: Text(S.of(context).save)),
         ],
       ),
     );
@@ -621,15 +633,23 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Удалить задачу?"),
-        content: const Text("Вы уверены, что хотите удалить эту задачу?"),
+        title: Text(
+          S.of(context).deleteATask,
+          style: TextStyle(
+            fontFamily: 'SFProText',
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        content: Text(S.of(context).areYouSureYouWantToDeleteThisTask),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text("Отмена")),
+              child: Text(S.of(context).cancel)),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text("Удалить")),
+              child: Text(S.of(context).save)),
         ],
       ),
     );
@@ -785,8 +805,8 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
             onPressed: () {
               _addNewCard(isDark);
             },
-            child: const Text(
-              "Add List",
+            child: Text(
+              S.of(context).addList,
               style: TextStyle(
                 fontFamily: 'SFProText',
                 fontWeight: FontWeight.bold,
@@ -807,12 +827,13 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
           ), // Уменьшаем отступы для визуальной отладки
           child: Card(
             color: isDark ? const Color(0xFF3A3A3D) : Colors.white,
-            elevation: 2,
+            elevation: 10,
             margin: const EdgeInsets.symmetric(vertical: 4),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
               title: Text(
                 currentItem.title,
                 style: TextStyle(
@@ -826,6 +847,39 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
+              leading: IconButton(
+                icon: Icon(
+                  currentItem.isDone
+                      ? Icons.check_box
+                      : Icons.check_box_outline_blank_outlined,
+                  color: currentItem.isDone ? Colors.green : Colors.grey,
+                ),
+                onPressed: () async {
+                  final boardProvider = context.read<BoardProvider>();
+                  if (userRole != "viewer") {
+                    final updatedTask = currentItem.task.copyWith(
+                      isDone: !currentItem.isDone, // инвертируем состояние
+                    );
+
+                    await boardProvider.updateTask(
+                      widget.boardModel.id, // boardId
+                      groupData.id, // cardId
+                      updatedTask,
+                    );
+                  }
+                },
+              ),
+
+              // trailing: (userRole != "viewer")
+              //     ? IconButton(
+              //         onPressed: () async {
+              //           await _deleteTask(groupData.id, currentItem.id, isDark);
+              //         },
+              //         icon: Icon(
+              //           IconlyLight.delete,
+              //           color: Colors.redAccent.shade400,
+              //         ))
+              //     : null,
               onTap: () {
                 // debugPrint("CUrretn ITEM ${currentItem}");
                 // debugPrint("SAMPEL ${groupData}");
@@ -835,58 +889,6 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
               },
             ),
           ),
-          // child: Card(
-          //   margin: EdgeInsets.zero,
-
-          //   elevation: 0.0,
-          //   color: const Color(0xFFF0F4F8), // Светло-голубовато-серый
-          //   shape:
-          //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          //   child: ListTile(
-          //     leading: Text("123"),
-          //   ),
-
-          // child: Padding(
-          //   padding:
-          //       const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-          //   child: Row(
-          //     children: [
-          //       Expanded(
-          //         child: Column(
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             Text(currentItem.title,
-          //                 style: const TextStyle(
-          //                     fontWeight: FontWeight.bold,
-          //                     fontSize: 15,
-          //                     color: Color(0xFF263238))), // Темно-серый
-          //             if (currentItem.description.isNotEmpty)
-          //               Padding(
-          //                 padding: const EdgeInsets.only(top: 4.0, left: 30),
-          //                 child: Text(
-          //                   currentItem.description,
-          //                   style: TextStyle(
-          //                       color: Colors.blueGrey[700], fontSize: 13),
-          //                   maxLines: 2,
-          //                   overflow: TextOverflow.ellipsis,
-          //                 ),
-          //               ),
-          //           ],
-          //         ),
-          //       ),
-          //       IconButton(
-          //           icon: Icon(Icons.edit,
-          //               size: 18, color: Colors.blueGrey[500]),
-          //           onPressed: () =>
-          //               _renameTask(groupData.id, currentItem.task)),
-          //       IconButton(
-          //           icon: Icon(Icons.delete_outline,
-          //               size: 18, color: Colors.red[300]),
-          //           onPressed: () =>
-          //               _deleteTask(groupData.id, currentItem.id)),
-          //     ],
-          //   ),
-          // ),
         );
       },
       headerBuilder: (context, groupData) {
@@ -955,8 +957,8 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
         );
       },
       groupConstraints: const BoxConstraints(
-        minWidth: 330.0,
-        maxWidth: 330.0,
+        minWidth: 350.0,
+        maxWidth: 350.0,
         maxHeight: 600,
         minHeight: 100,
       ),
@@ -986,7 +988,7 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Добавить задачу',
+                  S.of(context).addATask,
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.black87,
                     fontWeight: FontWeight.w500,

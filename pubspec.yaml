@@ -31,6 +31,10 @@ dependencies:
   appflowy_board: ^0.1.2
   uuid:
   flutter_colorpicker: ^1.1.0
+  firebase_messaging: ^15.2.6
+  flutter_local_notifications: ^17.0.0
+  flutter_launcher_icons: ^0.14.3
+  # uni_links: ^0.5.1
 
 
 
@@ -38,6 +42,24 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/image/logo/logoFlowSecond.png"
+  min_sdk_android: 21 
+  web:
+    generate: true
+    image_path: "assets/image/logo/logoFlowSecond.png"
+    background_color: "#38BB5A"
+    theme_color: "#38BB5A"
+  windows:
+    generate: true
+    image_path: "assets/image/logo/logoFlowSecond.png"
+    icon_size: 48 
+  macos:
+    generate: true
+    image_path: "assets/image/logo/logoFlowSecond.png"
 
 dev_dependencies:
   flutter_test:

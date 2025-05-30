@@ -549,6 +549,131 @@ class S {
   String get members {
     return Intl.message('Members', name: 'members', desc: '', args: []);
   }
+
+  /// `This action cannot be undone. Continue?`
+  String get thisActionCannotBeUndoneContinue {
+    return Intl.message(
+      'This action cannot be undone. Continue?',
+      name: 'thisActionCannotBeUndoneContinue',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete the board?`
+  String get deleteTheBoard {
+    return Intl.message(
+      'Delete the board?',
+      name: 'deleteTheBoard',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a task`
+  String get addATask {
+    return Intl.message('Add a task', name: 'addATask', desc: '', args: []);
+  }
+
+  /// `Rename a column`
+  String get renameAColumn {
+    return Intl.message(
+      'Rename a column',
+      name: 'renameAColumn',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit a task`
+  String get editATask {
+    return Intl.message('Edit a task', name: 'editATask', desc: '', args: []);
+  }
+
+  /// `Task name`
+  String get taskName {
+    return Intl.message('Task name', name: 'taskName', desc: '', args: []);
+  }
+
+  /// `Delete a task?`
+  String get deleteATask {
+    return Intl.message(
+      'Delete a task?',
+      name: 'deleteATask',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete this task?`
+  String get areYouSureYouWantToDeleteThisTask {
+    return Intl.message(
+      'Are you sure you want to delete this task?',
+      name: 'areYouSureYouWantToDeleteThisTask',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New column`
+  String get newColumn {
+    return Intl.message('New column', name: 'newColumn', desc: '', args: []);
+  }
+
+  /// `A new task`
+  String get aNewTask {
+    return Intl.message('A new task', name: 'aNewTask', desc: '', args: []);
+  }
+
+  /// `Enter the name`
+  String get enterTheName {
+    return Intl.message(
+      'Enter the name',
+      name: 'enterTheName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Changes saved`
+  String get changesSaved {
+    return Intl.message(
+      'Changes saved',
+      name: 'changesSaved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit: {task}`
+  String editTask(Object task) {
+    return Intl.message(
+      'Edit: $task',
+      name: 'editTask',
+      desc: '',
+      args: [task],
+    );
+  }
+
+  /// `Complete`
+  String get complete {
+    return Intl.message('Complete', name: 'complete', desc: '', args: []);
+  }
+
+  /// `Add List`
+  String get addList {
+    return Intl.message('Add List', name: 'addList', desc: '', args: []);
+  }
+
+  /// `You Don't have any notifications.`
+  String get youDontHaveAnyNotifications {
+    return Intl.message(
+      'You Don`t have any notifications.',
+      name: 'youDontHaveAnyNotifications',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

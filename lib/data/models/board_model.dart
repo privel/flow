@@ -63,9 +63,9 @@ import 'package:flow/data/models/card_model.dart';
 //   }
 // }
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flow/data/models/card_model.dart';
+
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class BoardModel {
   final String id;
@@ -73,8 +73,11 @@ class BoardModel {
   final String ownerId; // ID создателя доски
   final Map<String, String> sharedWith; // userId -> role
   final Map<String, CardModel> cards; // ✅ Map вместо List
+  String inviteId;
   final String hexColor;
   final bool favorite;
+
+  
 
   Color get color =>
       Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
@@ -85,9 +88,10 @@ class BoardModel {
     required this.ownerId,
     required this.sharedWith,
     required this.cards,
+    String? inviteId,
     this.favorite = false,
     this.hexColor = "11998e",
-  });
+  }) : inviteId = inviteId ?? const Uuid().v4();
 
   factory BoardModel.fromMap(Map<String, dynamic> map, String boardId) {
     final cardsData = Map<String, dynamic>.from(map['cards'] ?? {});
@@ -109,6 +113,7 @@ class BoardModel {
             sharedMap.map((key, value) => MapEntry(key, value.toString())),
         cards: cardMap,
         // favorite: map['favorite'] ?? false,
+        inviteId: map['inviteId'] ?? const Uuid().v4(),
         favorite: favoriteValue == true,
         hexColor: map['hexColor'] ?? "11998e");
   }
@@ -119,6 +124,7 @@ class BoardModel {
       'ownerId': ownerId,
       'sharedWith': sharedWith,
       'cards': cards.map((key, value) => MapEntry(key, value.toMap())),
+      'inviteId':inviteId,
       'favorite': favorite,
       'hexColor': hexColor,
     };
@@ -130,6 +136,7 @@ class BoardModel {
     String? ownerId,
     Map<String, String>? sharedWith,
     Map<String, CardModel>? cards,
+    String? inviteId,
     bool? favorite,
     String? hexColor,
   }) {
@@ -139,6 +146,7 @@ class BoardModel {
       ownerId: ownerId ?? this.ownerId,
       sharedWith: sharedWith ?? Map<String, String>.from(this.sharedWith),
       cards: cards ?? Map<String, CardModel>.from(this.cards),
+      inviteId: inviteId ?? this.inviteId,
       favorite: favorite ?? this.favorite,
       hexColor: hexColor ?? this.hexColor,
     );

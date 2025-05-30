@@ -456,10 +456,10 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                       ),
                       DateTimePickerWidget(
                         label: S.of(context).dueDate,
-                        initialDateTime: startDate,
+                        initialDateTime: dueDate,
                         onDateTimeSelected: (picked) {
                           FocusScope.of(context).unfocus();
-                          setState(() => startDate = picked);
+                          setState(() => dueDate = picked);
                         },
                       ),
                     ],

@@ -8,6 +8,8 @@ import 'package:flow/presentation/pages/auth_page/verif_page/verification.dart';
 import 'package:flow/presentation/pages/board_page/board.dart';
 import 'package:flow/presentation/pages/home_page/home.dart';
 import 'package:flow/presentation/pages/account_page/account.dart';
+import 'package:flow/presentation/pages/invite_join_page/Invite_page.dart';
+import 'package:flow/presentation/pages/notification_page/notification.dart';
 import 'package:flow/presentation/pages/task_page/task.dart';
 import 'package:flow/presentation/pages/welcome_page/welcome.dart';
 import 'package:flow/presentation/pages/board_page/new_board_after_test/other_test.dart';
@@ -16,7 +18,9 @@ import 'package:flow/presentation/widgets/header/responsive_layout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
+
 GoRouter appRouter(AuthProvider authProvider) {
+ 
   return GoRouter(
     initialLocation: '/',
     refreshListenable: authProvider,
@@ -26,7 +30,8 @@ GoRouter appRouter(AuthProvider authProvider) {
       // Разрешаем доступ к forgot-password и register даже неавторизованным
       final allowedUnauthenticatedPaths = [
         '/auth/forgot-password',
-        '/auth/register'
+        '/auth/register',
+        '/invite',
       ];
 
       if (!isLoggedIn &&
@@ -59,8 +64,8 @@ GoRouter appRouter(AuthProvider authProvider) {
             builder: (context, state) => const AccountPage(),
           ),
           GoRoute(
-            path: '/profile',
-            builder: (context, state) => const Center(child: Text('Профиль')),
+            path: '/notification',
+            builder: (context, state) => const NotificationPage(),
           ),
         ],
       ),
@@ -117,6 +122,14 @@ GoRouter appRouter(AuthProvider authProvider) {
           return BoardTest2(boardId: boardId);
         },
       ),
+
+      GoRoute(
+  path: '/invite/:inviteId',
+  builder: (context, state) {
+    final inviteId = state.pathParameters['inviteId']!;
+    return InviteJoinPage(inviteId: inviteId);
+  },
+),
       GoRoute(path: "/test/color",
       builder: (context, state) => const Text("Test"),),
     ],

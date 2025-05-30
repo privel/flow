@@ -275,154 +275,167 @@ class _AccountPageState extends State<AccountPage> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor:
-          isDark ? const Color(0xFF1F1F1F) : const Color(0xFFD3D3D3),
+      backgroundColor: Colors.transparent,
+      // backgroundColor:
+      //     isDark ? const Color(0xFF1F1F1F) : const Color(0xFFD3D3D3),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Верхняя панель
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.close,
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            return Container(
+              decoration: BoxDecoration(
+                color:
+                    isDark ? const Color(0xFF1F1F1F) : const Color(0xFFD3D3D3),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Верхняя панель
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.close,
+                              color: Theme.of(context)
+                                  .extension<AppColorsExtension>()
+                                  ?.mainText),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Text(
+                          'Theme settings',
+                          style: TextStyle(
                             color: Theme.of(context)
                                 .extension<AppColorsExtension>()
-                                ?.mainText),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      Text(
-                        'Theme settings',
-                        style: TextStyle(
-                          color: Theme.of(context)
-                              .extension<AppColorsExtension>()
-                              ?.mainText,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                                ?.mainText,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 48), // для выравнивания
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  const SizedBox(height: 24),
-                  Text(
-                    "SELECT THEME",
-                    style: TextStyle(
-                      color: Theme.of(context)
-                          .extension<AppColorsExtension>()
-                          ?.subText,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                        const SizedBox(width: 48), // для выравнивания
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 12),
 
-                  AutoExpandableCard(
-                    children: [
-                      //  THEME SETTINGS
-                      InkWell(
-                        onTap: () {
-                          setState(() => currentMode = ThemeMode.system);
-                          themeProvider.toggleThemeMode(ThemeMode.system);
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.hdr_auto_outlined,
-                              color: isDark
-                                  ? const Color.fromARGB(255, 179, 179, 179)
-                                  : Colors.black87,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text("Automatic"),
-                            const Spacer(),
-                            if (currentMode == ThemeMode.system)
-                              Icon(Icons.check,
-                                  color: Theme.of(context).colorScheme.primary),
-                          ],
-                        ),
-                      ),
-                      const Divider(
-                        thickness: 0.5,
-                        color: Color.fromARGB(96, 158, 158, 158),
-                      ),
-                      //LANG SETTINGS
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () {
-                          setState(() => currentMode = ThemeMode.light);
-                          themeProvider.toggleThemeMode(ThemeMode.light);
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.light_mode_rounded,
-                              color: isDark
-                                  ? const Color.fromARGB(255, 179, 179, 179)
-                                  : Colors.black87,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text("Light"),
-                            const Spacer(),
-                            if (currentMode == ThemeMode.light)
-                              Icon(Icons.check,
-                                  color: Theme.of(context).colorScheme.primary),
-                          ],
-                        ),
-                      ),
-                      const Divider(
-                        thickness: 0.5,
-                        color: Color.fromARGB(96, 158, 158, 158),
-                      ),
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () {
-                          setState(() => currentMode = ThemeMode.dark);
-                          themeProvider.toggleThemeMode(ThemeMode.dark);
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.dark_mode_rounded,
-                              color: isDark
-                                  ? const Color.fromARGB(255, 179, 179, 179)
-                                  : Colors.black87,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text("Dark"),
-                            const Spacer(),
-                            if (currentMode == ThemeMode.dark)
-                              Icon(Icons.check,
-                                  color: Theme.of(context).colorScheme.primary),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    const SizedBox(height: 16),
 
-                  // _themeTile(
-                  //   title: "Dark",
-                  //   selected: currentMode == ThemeMode.dark,
-                  //   onTap: () {
-                  //     setState(() => currentMode = ThemeMode.dark);
-                  //     themeProvider.toggleThemeMode(ThemeMode.dark);
-                  //   },
-                  // ),
+                    const SizedBox(height: 24),
+                    Text(
+                      "SELECT THEME",
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .extension<AppColorsExtension>()
+                            ?.subText,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
 
-                  const SizedBox(height: 16),
-                ],
+                    AutoExpandableCard(
+                      children: [
+                        //  THEME SETTINGS
+                        InkWell(
+                          onTap: () {
+                            setState(() => currentMode = ThemeMode.system);
+                            themeProvider.toggleThemeMode(ThemeMode.system);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.hdr_auto_outlined,
+                                color: isDark
+                                    ? const Color.fromARGB(255, 179, 179, 179)
+                                    : Colors.black87,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text("Automatic"),
+                              const Spacer(),
+                              if (currentMode == ThemeMode.system)
+                                Icon(Icons.check,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                            ],
+                          ),
+                        ),
+                        const Divider(
+                          thickness: 0.5,
+                          color: Color.fromARGB(96, 158, 158, 158),
+                        ),
+                        //LANG SETTINGS
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap: () {
+                            setState(() => currentMode = ThemeMode.light);
+                            themeProvider.toggleThemeMode(ThemeMode.light);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.light_mode_rounded,
+                                color: isDark
+                                    ? const Color.fromARGB(255, 179, 179, 179)
+                                    : Colors.black87,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text("Light"),
+                              const Spacer(),
+                              if (currentMode == ThemeMode.light)
+                                Icon(Icons.check,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                            ],
+                          ),
+                        ),
+                        const Divider(
+                          thickness: 0.5,
+                          color: Color.fromARGB(96, 158, 158, 158),
+                        ),
+                        const SizedBox(height: 8),
+                        InkWell(
+                          onTap: () {
+                            setState(() => currentMode = ThemeMode.dark);
+                            themeProvider.toggleThemeMode(ThemeMode.dark);
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.dark_mode_rounded,
+                                color: isDark
+                                    ? const Color.fromARGB(255, 179, 179, 179)
+                                    : Colors.black87,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text("Dark"),
+                              const Spacer(),
+                              if (currentMode == ThemeMode.dark)
+                                Icon(Icons.check,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // _themeTile(
+                    //   title: "Dark",
+                    //   selected: currentMode == ThemeMode.dark,
+                    //   onTap: () {
+                    //     setState(() => currentMode = ThemeMode.dark);
+                    //     themeProvider.toggleThemeMode(ThemeMode.dark);
+                    //   },
+                    // ),
+
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             );
           },
