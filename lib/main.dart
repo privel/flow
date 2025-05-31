@@ -47,6 +47,7 @@ void main() async {
   await themeProvider.loadTheme();
   final localeProvider = LocaleProvider();
   await localeProvider.loadLocale();
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   // handleIncomingLinks();
 

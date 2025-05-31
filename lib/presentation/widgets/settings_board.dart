@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/core/utils/provider/board_provider.dart';
+import 'package:flow/core/utils/provider/notification_provider.dart';
 import 'package:flow/data/models/board_model.dart';
+import 'package:flow/data/models/notification_model.dart';
 import 'package:flow/data/models/role_model.dart';
 import 'package:flow/data/models/user_models.dart';
 import 'package:flow/generated/l10n.dart';
@@ -70,7 +72,7 @@ class _SettingsBoardState extends State<SettingsBoard> {
           .watchBoardById(widget.board.id)
           .listen((updatedBoard) async {
         if (updatedBoard != null) {
-          final users = await auth.loadBoardUsers(updatedBoard);
+          final users = await boardProvider.loadBoardUsers(updatedBoard, auth);
           if (mounted) {
             setState(() {
               boardUsers = users;
@@ -118,20 +120,39 @@ class _SettingsBoardState extends State<SettingsBoard> {
           ),
           child: Column(
             children: [
+              // CircleAvatar(
+              //   backgroundColor: Colors.grey,
+              //   radius: 25,
+              //   backgroundImage:
+              //       user.photoUrl != null && user.photoUrl!.isNotEmpty
+              //           ? NetworkImage(user.photoUrl!)
+              //           : null,
+              //   child: user.photoUrl == null || user.photoUrl!.isEmpty
+              //       ? Text(
+              //           user.displayName.isNotEmpty ? user.displayName[0] : 'No',
+              //           style: const TextStyle(color: Colors.white),
+              //         )
+              //       : null,
+              // ),
+
               CircleAvatar(
                 backgroundColor: Colors.grey,
                 radius: 25,
                 backgroundImage:
-                    user.photoUrl != null && user.photoUrl!.isNotEmpty
+                    (user.photoUrl != null && user.photoUrl!.trim().isNotEmpty)
                         ? NetworkImage(user.photoUrl!)
                         : null,
-                child: user.photoUrl == null || user.photoUrl!.isEmpty
+                child: (user.photoUrl == null || user.photoUrl!.trim().isEmpty)
                     ? Text(
-                        user.displayName.isNotEmpty ? user.displayName[0] : '?',
+                        (user.displayName != null &&
+                                user.displayName.trim().isNotEmpty)
+                            ? user.displayName[0].toUpperCase()
+                            : '?',
                         style: const TextStyle(color: Colors.white),
                       )
                     : null,
               ),
+
               const SizedBox(height: 4),
               Text(
                 role,
@@ -520,7 +541,7 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
   //   setState(() => currentMembers = users);
   // }
   Future<void> _loadCurrentMembers() async {
-    final users = await auth.loadBoardUsers(_board);
+    final users = await boardProvider.loadBoardUsers(_board, auth);
     setState(() => currentMembers = users);
   }
 
@@ -541,7 +562,31 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
   }
 
   Future<void> _addUser(AppUser user) async {
-    await boardProvider.addUserToBoard(widget.board, user.id, 'viewer');
+    final notificationProvider = context.read<NotificationProvider>();
+
+    final sender = context.read<AuthProvider>().currentAppUser!;
+
+    await boardProvider.addUserToBoard(
+      widget.board,
+      user.id,
+      'viewer',
+      sender,
+      notificationProvider,
+    );
+
+    // // Добавляем уведомление
+    // final notification = NotificationModel(
+    //   id: '', // будет сгенерирован Firestore
+    //   userId: user.id,
+    //   title: 'Приглашение в доску',
+    //   description: 'Вас пригласили в доску "${widget.board.title}"',
+    //   timestamp: DateTime.now(),
+    //   isRead: false,
+    // );
+
+    // await notificationProvider.createNotification(notification);
+    // // await context.read<NotificationProvider>().createNotification(notification);
+
     await _loadCurrentMembers();
   }
 
@@ -639,18 +684,31 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
                                             onChanged: (value) async {
                                               if (value != null &&
                                                   value != member.role) {
-                                                await context
-                                                    .read<BoardProvider>()
+                                                final boardProvider = context
+                                                    .read<BoardProvider>();
+                                                final authProvider = context
+                                                    .read<AuthProvider>();
+                                                final notificationProvider =
+                                                    context.read<
+                                                        NotificationProvider>();
+                                                final sender = authProvider
+                                                    .currentAppUser; // Убедись, что это AppUser, не User
+
+                                                await boardProvider
                                                     .addUserToBoard(
-                                                      _board,
-                                                      member.user.id,
-                                                      value,
-                                                    );
+                                                  _board,
+                                                  member.user.id,
+                                                  value,
+                                                  sender!,
+                                                  notificationProvider,
+                                                );
+
                                                 final updatedBoard =
                                                     await boardProvider
                                                         .getBoardById(
                                                             _board.id);
                                                 if (updatedBoard != null) {
+                                                  if (!mounted) return; // добавь перед setState
                                                   setState(() {
                                                     _board = updatedBoard;
                                                   });
@@ -707,13 +765,36 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
                             );
                           },
                           leading: CircleAvatar(
-                            backgroundImage: member.user.photoUrl != null
+                            radius: 20,
+                            backgroundColor: Colors.grey,
+                            backgroundImage: (member.user.photoUrl != null &&
+                                    member.user.photoUrl!.trim().isNotEmpty &&
+                                    member.user.photoUrl!.startsWith('http'))
                                 ? NetworkImage(member.user.photoUrl!)
                                 : null,
-                            child: member.user.photoUrl == null
-                                ? Text(member.user.displayName[0])
+                            child: (member.user.photoUrl == null ||
+                                    member.user.photoUrl!.trim().isEmpty ||
+                                    !member.user.photoUrl!.startsWith('http'))
+                                ? (member.user.displayName.isNotEmpty
+                                    ? Text(
+                                        member.user.displayName[0]
+                                            .toUpperCase(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )
+                                    : const Icon(Icons.person,
+                                        color: Colors.white))
                                 : null,
                           ),
+
+                          // leading: CircleAvatar(
+                          //   backgroundImage: member.user.photoUrl != null
+                          //       ? NetworkImage(member.user.photoUrl!)
+                          //       : null,
+                          //   child: member.user.photoUrl == null
+                          //       ? Text(member.user.displayName[0])
+                          //       : null,
+                          // ),
                           title: Text(
                             member.user.displayName,
                             style: TextStyle(

@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 class NotificationModel {
   final String id;
   final String userId;
   final String title;
   final String description;
   final DateTime timestamp;
-  bool isRead;
+   bool isRead;
 
   NotificationModel({
     required this.id,
@@ -16,24 +16,36 @@ class NotificationModel {
     required this.timestamp,
     required this.isRead,
   });
-  factory NotificationModel.fromMap(String id, Map<String, dynamic> map) {
-    return NotificationModel(
-      id: id,
-      userId: map['userId'],
-      title: map['title'],
-      description: map['description'],
-      timestamp: (map['timestamp'] as Timestamp).toDate(),
-      isRead: map['isRead'],
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
       'title': title,
       'description': description,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toIso8601String(),
       'isRead': isRead,
     };
   }
+
+  factory NotificationModel.fromMap(Map<String, dynamic> map, String id) {
+    return NotificationModel(
+      id: id,
+      userId: map['userId'] ?? '',
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      timestamp: DateTime.parse(map['timestamp']),
+      isRead: map['isRead'] ?? false,
+    );
+  }
+
+  factory NotificationModel.empty() {
+  return NotificationModel(
+    id: '',
+    userId: '',
+    title: '',
+    description: '',
+    timestamp: DateTime.now(),
+    isRead: true,
+  );
+}
 }

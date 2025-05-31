@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flow/data/models/board_model.dart';
 import 'package:flow/data/models/role_model.dart';
@@ -25,6 +26,12 @@ class AuthProvider with ChangeNotifier {
 
   bool get isLoggedIn => _user != null;
   bool get isEmailVerified => _user?.emailVerified ?? false;
+
+  AppUser? _currentAppUser;
+
+  AppUser? get currentAppUser => _currentAppUser;
+
+  
 
   AuthProvider() {
     _auth.authStateChanges().listen((user) {
@@ -160,6 +167,8 @@ class AuthProvider with ChangeNotifier {
     final doc =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (doc.exists) {
+      _currentAppUser = AppUser.fromMap(doc.id, doc.data()!);
+
       return AppUser.fromMap(doc.id, doc.data()!);
     }
     return null;
@@ -179,31 +188,6 @@ class AuthProvider with ChangeNotifier {
               doc.data(),
             ))
         .toList();
-  }
-
-  Future<List<BoardMember>> loadBoardUsers(BoardModel board) async {
-    List<BoardMember> result = [];
-
-    // Добавляем владельца с ролью admin
-    final owner = await fetchUserById(board.ownerId);
-    if (owner != null) {
-      result.add(BoardMember(user: owner, role: 'owner'));
-    }
-
-    // Добавляем участников из sharedWith
-    for (final entry in board.sharedWith.entries) {
-      final userId = entry.key;
-      final role = entry.value;
-
-      if (userId != board.ownerId) {
-        final user = await fetchUserById(userId);
-        if (user != null) {
-          result.add(BoardMember(user: user, role: role));
-        }
-      }
-    }
-
-    return result;
   }
 
 // Future<List<AppUser>> loadBoardUsers(BoardModel board) async {
@@ -431,10 +415,32 @@ class AuthProvider with ChangeNotifier {
   Future<void> register(String email, String password) async {
     try {
       _setError(null);
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
 
-      await _auth.currentUser?.sendEmailVerification();
+      // Создание аккаунта
+      final credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final user = credential.user;
+      if (user == null) {
+        _setError('Не удалось получить данные пользователя.');
+        return;
+      }
+
+      // Получаем токен FCM
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+
+      // Сохраняем данные пользователя в Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'email': user.email,
+        'displayName': user.displayName ?? '',
+        'photoUrl': user.photoURL ?? '',
+        'message_token': fcmToken ?? '',
+      });
+
+      // Отправляем email-подтверждение
+      await user.sendEmailVerification();
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':

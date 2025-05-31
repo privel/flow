@@ -1,6 +1,10 @@
+import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/core/utils/provider/notification_provider.dart';
 import 'package:flow/data/models/board_model.dart';
 import 'package:flow/data/models/card_model.dart';
+import 'package:flow/data/models/role_model.dart';
 import 'package:flow/data/models/task_model.dart';
+import 'package:flow/data/models/user_models.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
@@ -212,6 +216,30 @@ class BoardProvider extends ChangeNotifier {
 //   return null;
 // }
 
+Future<List<BoardMember>> loadBoardUsers(BoardModel board, AuthProvider auth) async {
+  List<BoardMember> result = [];
+
+  final owner = await auth.fetchUserById(board.ownerId);
+  if (owner != null) {
+    result.add(BoardMember(user: owner, role: 'owner'));
+  }
+
+  for (final entry in board.sharedWith.entries) {
+    final userId = entry.key;
+    final info = entry.value;
+
+    if (userId != board.ownerId && info['status'] == 'accepted') {
+      final user = await auth.fetchUserById(userId);
+      if (user != null) {
+        result.add(BoardMember(user: user, role: info['role']));
+      }
+    }
+  }
+
+  return result;
+}
+
+
   Future<BoardModel?> getBoardById(String boardId) async {
     try {
       // ИЗМЕНЕНИЕ ЗДЕСЬ: Принудительно читаем с сервера для диагностики
@@ -346,13 +374,13 @@ class BoardProvider extends ChangeNotifier {
 
   // Роли
   String? getUserRole(BoardModel board, String userId) {
-    if (board.ownerId == userId) return 'admin';
-    return board.sharedWith[userId];
+    if (board.ownerId == userId) return 'owner';
+    return board.sharedWith[userId]?['role'];
   }
 
   bool canEdit(BoardModel board, String userId) {
     final role = getUserRole(board, userId);
-    return role == 'editor' || role == 'admin';
+    return role == 'editor' || role == 'owner';
   }
 
   bool canView(BoardModel board, String userId) {
@@ -365,48 +393,83 @@ class BoardProvider extends ChangeNotifier {
 // }
 
   // Добавление участника
+  // Future<void> addUserToBoard(
+  //     BoardModel board, String newUserId, String role) async {
+  //   final updatedSharedWith =
+  //       Map<String, Map<String, dynamic>>.from(board.sharedWith);
+  //   updatedSharedWith[newUserId] = {
+  //     'role': role,
+  //     'status': 'pending',
+  //   };
+  //   final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
+  //   await updateBoard(updatedBoard);
+
+    
+  // }
+
   Future<void> addUserToBoard(
-      BoardModel board, String newUserId, String role) async {
-    final updatedSharedWith = Map<String, String>.from(board.sharedWith);
-    updatedSharedWith[newUserId] = role;
-    final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
-    await updateBoard(updatedBoard);
-  }
+  BoardModel board,
+  String newUserId,
+  String role,
+  AppUser sender,
+  NotificationProvider notificationProvider,
+) async {
+  final updatedSharedWith =
+      Map<String, Map<String, dynamic>>.from(board.sharedWith);
+  updatedSharedWith[newUserId] = {
+    'role': role,
+    'status': 'pending',
+  };
+
+  final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
+  await updateBoard(updatedBoard);
+
+  // Отправляем уведомление новому участнику
+  await notificationProvider.sendInvitationNotification(
+    recipientId: newUserId,
+    sender: sender,
+    board: updatedBoard,
+  );
+}
+
 
   // Удаление участника
   Future<void> removeUserFromBoard(
       BoardModel board, String removeUserId) async {
-    final updatedSharedWith = Map<String, String>.from(board.sharedWith);
+    final updatedSharedWith =
+        Map<String, Map<String, dynamic>>.from(board.sharedWith);
     updatedSharedWith.remove(removeUserId);
     final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
     await updateBoard(updatedBoard);
   }
 
-  Future<BoardModel?> joinBoardByInviteId(
-      String inviteId, String userId) async {
-    final snapshot = await _firestore
-        .collection('boards')
-        .where('inviteId', isEqualTo: inviteId)
-        .limit(1)
-        .get();
+Future<BoardModel?> joinBoardByInviteId(String inviteId, String userId) async {
+  final snapshot = await _firestore
+      .collection('boards')
+      .where('inviteId', isEqualTo: inviteId)
+      .limit(1)
+      .get();
 
-    if (snapshot.docs.isEmpty) return null;
+  if (snapshot.docs.isEmpty) return null;
 
-    final doc = snapshot.docs.first;
-    final boardId = doc.id;
-    final data = doc.data();
+  final doc = snapshot.docs.first;
+  final boardId = doc.id;
+  final data = doc.data();
 
-    final sharedWith = Map<String, dynamic>.from(data['sharedWith'] ?? {});
+  final sharedWith = Map<String, dynamic>.from(data['sharedWith'] ?? {});
 
-    if (!sharedWith.containsKey(userId)) {
-      sharedWith[userId] = 'member';
+  if (!sharedWith.containsKey(userId)) {
+    sharedWith[userId] = {
+      'role': 'viewer',
+      'status': 'pending',
+    };
 
-      await doc.reference.update({
-        'sharedWith': sharedWith,
-      });
-    }
-
-    final board = BoardModel.fromMap(data, boardId);
-    return board;
+    await doc.reference.update({
+      'sharedWith': sharedWith,
+    });
   }
+
+  return BoardModel.fromMap(data, boardId);
+}
+
 }

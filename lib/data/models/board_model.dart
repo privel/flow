@@ -63,7 +63,6 @@ import 'package:flow/data/models/card_model.dart';
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -71,13 +70,11 @@ class BoardModel {
   final String id;
   final String title;
   final String ownerId; // ID создателя доски
-  final Map<String, String> sharedWith; // userId -> role
+  final Map<String, Map<String, dynamic>> sharedWith; // userId -> role
   final Map<String, CardModel> cards; // ✅ Map вместо List
   String inviteId;
   final String hexColor;
   final bool favorite;
-
-  
 
   Color get color =>
       Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
@@ -103,19 +100,31 @@ class BoardModel {
           CardModel.fromMap(Map<String, dynamic>.from(cardData), cardId);
     });
 
+    final parsedSharedWith = <String, Map<String, dynamic>>{};
+    sharedMap.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        parsedSharedWith[key] = value;
+      } else {
+        // поддержка старого формата: просто роль без статуса
+        parsedSharedWith[key] = {
+          'role': value.toString(),
+          'status': 'accepted',
+        };
+      }
+    });
+
     final favoriteValue = map['isFavorite'];
 
     return BoardModel(
-        id: boardId,
-        title: map['title'] ?? '',
-        ownerId: map['ownerId'] ?? '',
-        sharedWith:
-            sharedMap.map((key, value) => MapEntry(key, value.toString())),
-        cards: cardMap,
-        // favorite: map['favorite'] ?? false,
-        inviteId: map['inviteId'] ?? const Uuid().v4(),
-        favorite: favoriteValue == true,
-        hexColor: map['hexColor'] ?? "11998e");
+      id: boardId,
+      title: map['title'] ?? '',
+      ownerId: map['ownerId'] ?? '',
+      sharedWith: parsedSharedWith,
+      cards: cardMap,
+      inviteId: map['inviteId'] ?? const Uuid().v4(),
+      favorite: favoriteValue == true,
+      hexColor: map['hexColor'] ?? "11998e",
+    );
   }
 
   Map<String, dynamic> toMap() {
@@ -124,7 +133,7 @@ class BoardModel {
       'ownerId': ownerId,
       'sharedWith': sharedWith,
       'cards': cards.map((key, value) => MapEntry(key, value.toMap())),
-      'inviteId':inviteId,
+      'inviteId': inviteId,
       'favorite': favorite,
       'hexColor': hexColor,
     };
@@ -134,7 +143,7 @@ class BoardModel {
     String? id,
     String? title,
     String? ownerId,
-    Map<String, String>? sharedWith,
+    Map<String, Map<String, dynamic>>? sharedWith,
     Map<String, CardModel>? cards,
     String? inviteId,
     bool? favorite,
@@ -144,7 +153,10 @@ class BoardModel {
       id: id ?? this.id,
       title: title ?? this.title,
       ownerId: ownerId ?? this.ownerId,
-      sharedWith: sharedWith ?? Map<String, String>.from(this.sharedWith),
+      sharedWith: sharedWith ??
+          this
+              .sharedWith
+              .map((k, v) => MapEntry(k, Map<String, dynamic>.from(v))),
       cards: cards ?? Map<String, CardModel>.from(this.cards),
       inviteId: inviteId ?? this.inviteId,
       favorite: favorite ?? this.favorite,
