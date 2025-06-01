@@ -82,5 +82,10 @@
   "editTask": "Edit: {task}",
   "complete": "Complete",
   "addList": "Add List",
-  "youDontHaveAnyNotifications": "You Don`t have any notifications."
+  "youDontHaveAnyNotifications": "You Don`t have any notifications.",
+  "notification": "Notification",
+  "notificationHistory": "Notification history",
+  "readAll": "Read all",
+  "saved": "Saved",
+  "markedAllAsRead": "Marked all as read"
 }

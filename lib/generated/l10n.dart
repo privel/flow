@@ -674,6 +674,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Notification`
+  String get notification {
+    return Intl.message(
+      'Notification',
+      name: 'notification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification history`
+  String get notificationHistory {
+    return Intl.message(
+      'Notification history',
+      name: 'notificationHistory',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Read all`
+  String get readAll {
+    return Intl.message('Read all', name: 'readAll', desc: '', args: []);
+  }
+
+  /// `Saved`
+  String get saved {
+    return Intl.message('Saved', name: 'saved', desc: '', args: []);
+  }
+
+  /// `Marked all as read`
+  String get markedAllAsRead {
+    return Intl.message(
+      'Marked all as read',
+      name: 'markedAllAsRead',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

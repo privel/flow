@@ -117,11 +117,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Языковые настройки",
     ),
     "logOut": MessageLookupByLibrary.simpleMessage("Выйти"),
+    "markedAllAsRead": MessageLookupByLibrary.simpleMessage(
+      "Marked all as read",
+    ),
     "members": MessageLookupByLibrary.simpleMessage("участники"),
     "nameTask": MessageLookupByLibrary.simpleMessage("Назовите задачу"),
     "newBoard": MessageLookupByLibrary.simpleMessage("Новая Доска"),
     "newColumn": MessageLookupByLibrary.simpleMessage("Новая колонка"),
     "notSelected": MessageLookupByLibrary.simpleMessage("Не выбрано"),
+    "notification": MessageLookupByLibrary.simpleMessage("Notification"),
+    "notificationHistory": MessageLookupByLibrary.simpleMessage(
+      "Notification history",
+    ),
+    "readAll": MessageLookupByLibrary.simpleMessage("Read all"),
     "renameAColumn": MessageLookupByLibrary.simpleMessage(
       "Переименование столбца",
     ),
@@ -130,6 +138,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resendtext": m1,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Сброс пароля"),
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
+    "saved": MessageLookupByLibrary.simpleMessage("Saved"),
     "searchYourTask": MessageLookupByLibrary.simpleMessage(
       "Найдите свою задачу...",
     ),

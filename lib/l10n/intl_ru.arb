@@ -84,5 +84,10 @@
   "editTask": "Редактирование: {task}",
   "complete": "Выполнено",
   "addList": "Добавить Список",
-  "youDontHaveAnyNotifications": "У вас нет никаких уведомлений."
+  "youDontHaveAnyNotifications": "У вас нет никаких уведомлений.",
+  "notification": "Notification",
+  "notificationHistory": "Notification history",
+  "readAll": "Read all",
+  "saved": "Saved",
+  "markedAllAsRead": "Marked all as read"
 }

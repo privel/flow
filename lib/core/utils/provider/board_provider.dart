@@ -216,29 +216,29 @@ class BoardProvider extends ChangeNotifier {
 //   return null;
 // }
 
-Future<List<BoardMember>> loadBoardUsers(BoardModel board, AuthProvider auth) async {
-  List<BoardMember> result = [];
+  Future<List<BoardMember>> loadBoardUsers(
+      BoardModel board, AuthProvider auth) async {
+    List<BoardMember> result = [];
 
-  final owner = await auth.fetchUserById(board.ownerId);
-  if (owner != null) {
-    result.add(BoardMember(user: owner, role: 'owner'));
-  }
+    final owner = await auth.fetchUserById(board.ownerId);
+    if (owner != null) {
+      result.add(BoardMember(user: owner, role: 'owner'));
+    }
 
-  for (final entry in board.sharedWith.entries) {
-    final userId = entry.key;
-    final info = entry.value;
+    for (final entry in board.sharedWith.entries) {
+      final userId = entry.key;
+      final info = entry.value;
 
-    if (userId != board.ownerId && info['status'] == 'accepted') {
-      final user = await auth.fetchUserById(userId);
-      if (user != null) {
-        result.add(BoardMember(user: user, role: info['role']));
+      if (userId != board.ownerId && info['status'] == 'accepted') {
+        final user = await auth.fetchUserById(userId);
+        if (user != null) {
+          result.add(BoardMember(user: user, role: info['role']));
+        }
       }
     }
+
+    return result;
   }
-
-  return result;
-}
-
 
   Future<BoardModel?> getBoardById(String boardId) async {
     try {
@@ -404,34 +404,72 @@ Future<List<BoardMember>> loadBoardUsers(BoardModel board, AuthProvider auth) as
   //   final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
   //   await updateBoard(updatedBoard);
 
-    
   // }
 
   Future<void> addUserToBoard(
-  BoardModel board,
-  String newUserId,
-  String role,
-  AppUser sender,
-  NotificationProvider notificationProvider,
-) async {
-  final updatedSharedWith =
-      Map<String, Map<String, dynamic>>.from(board.sharedWith);
-  updatedSharedWith[newUserId] = {
-    'role': role,
-    'status': 'pending',
-  };
+    BoardModel board,
+    String newUserId,
+    String role,
+    AppUser sender,
+    NotificationProvider notificationProvider,
+  ) async {
+    final updatedSharedWith =
+        Map<String, Map<String, dynamic>>.from(board.sharedWith);
 
-  final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
-  await updateBoard(updatedBoard);
+    final isNewUser = !updatedSharedWith.containsKey(newUserId);
 
-  // Отправляем уведомление новому участнику
-  await notificationProvider.sendInvitationNotification(
-    recipientId: newUserId,
-    sender: sender,
-    board: updatedBoard,
-  );
-}
+    updatedSharedWith[newUserId] = {
+      'role': role,
+      'status': isNewUser
+          ? 'pending'
+          : updatedSharedWith[newUserId]?['status'] ?? 'accepted',
+    };
 
+    final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
+    await updateBoard(updatedBoard);
+
+    if (isNewUser) {
+      // Отправляем уведомление только при первом добавлении
+      await notificationProvider.sendInvitationNotification(
+        recipientId: newUserId,
+        sender: sender,
+        board: updatedBoard,
+      );
+    }
+  }
+
+  Future<void> acceptInvite(String boardId, String userId) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('boards')
+        .doc(boardId)
+        .get();
+    if (doc.exists) {
+      final data = doc.data()!;
+      final sharedWith = Map<String, dynamic>.from(data['sharedWith']);
+      if (sharedWith.containsKey(userId)) {
+        sharedWith[userId]['status'] = 'accepted';
+
+        await FirebaseFirestore.instance
+            .collection('boards')
+            .doc(boardId)
+            .update({'sharedWith': sharedWith});
+      }
+    }
+  }
+
+  Future<void> declineInvite(String boardId, String userId) async {
+    final docRef = FirebaseFirestore.instance.collection('boards').doc(boardId);
+    final doc = await docRef.get();
+
+    if (!doc.exists) return;
+
+    final data = doc.data()!;
+    final sharedWith = Map<String, dynamic>.from(data['sharedWith'] ?? {});
+    if (sharedWith.containsKey(userId)) {
+      sharedWith[userId]['status'] = 'declined';
+      await docRef.update({'sharedWith': sharedWith});
+    }
+  }
 
   // Удаление участника
   Future<void> removeUserFromBoard(
@@ -443,33 +481,33 @@ Future<List<BoardMember>> loadBoardUsers(BoardModel board, AuthProvider auth) as
     await updateBoard(updatedBoard);
   }
 
-Future<BoardModel?> joinBoardByInviteId(String inviteId, String userId) async {
-  final snapshot = await _firestore
-      .collection('boards')
-      .where('inviteId', isEqualTo: inviteId)
-      .limit(1)
-      .get();
+  Future<BoardModel?> joinBoardByInviteId(
+      String inviteId, String userId) async {
+    final snapshot = await _firestore
+        .collection('boards')
+        .where('inviteId', isEqualTo: inviteId)
+        .limit(1)
+        .get();
 
-  if (snapshot.docs.isEmpty) return null;
+    if (snapshot.docs.isEmpty) return null;
 
-  final doc = snapshot.docs.first;
-  final boardId = doc.id;
-  final data = doc.data();
+    final doc = snapshot.docs.first;
+    final boardId = doc.id;
+    final data = doc.data();
 
-  final sharedWith = Map<String, dynamic>.from(data['sharedWith'] ?? {});
+    final sharedWith = Map<String, dynamic>.from(data['sharedWith'] ?? {});
 
-  if (!sharedWith.containsKey(userId)) {
-    sharedWith[userId] = {
-      'role': 'viewer',
-      'status': 'pending',
-    };
+    if (!sharedWith.containsKey(userId)) {
+      sharedWith[userId] = {
+        'role': 'viewer',
+        'status': 'pending',
+      };
 
-    await doc.reference.update({
-      'sharedWith': sharedWith,
-    });
+      await doc.reference.update({
+        'sharedWith': sharedWith,
+      });
+    }
+
+    return BoardModel.fromMap(data, boardId);
   }
-
-  return BoardModel.fromMap(data, boardId);
-}
-
 }

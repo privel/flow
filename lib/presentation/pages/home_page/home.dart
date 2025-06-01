@@ -7,9 +7,9 @@ import 'package:flow/presentation/pages/account_page/account_layout.dart';
 import 'package:flow/presentation/pages/home_page/home_layout.dart';
 import 'package:flow/presentation/widgets/add_task_widget.dart';
 import 'package:flow/presentation/widgets/color_picker.dart';
-import 'package:flow/presentation/widgets/date_time_picker.dart';
+// import 'package:flow/presentation/widgets/date_time_picker.dart';
 import 'package:flow/presentation/widgets/drop_down_widget.dart';
-import 'package:flow/presentation/widgets/horizontal_datapicker.dart';
+// import 'package:flow/presentation/widgets/horizontal_datapicker.dart';
 import 'package:flow/presentation/widgets/search_bar.dart';
 import 'package:flow/presentation/widgets/snackbar_helper.dart';
 import 'package:flutter/material.dart';
@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
     await boardProvider.createBoard(newBoard);
     if (!context.mounted) return;
 
-    SnackBarHelper.show(context, "Сохранено");
+    SnackBarHelper.show(context, S.of(context).saved);
   }
 
   void showBottomModalAddBoard(BuildContext context) {
@@ -721,7 +721,6 @@ class _HomePageState extends State<HomePage> {
               StreamBuilder<List<BoardModel>>(
                 stream: boardStream,
                 builder: (context, snapshot) {
-                  
                   if (snapshot.connectionState == ConnectionState.waiting &&
                       !snapshot.hasData) {
                     return const SizedBox();
@@ -734,7 +733,6 @@ class _HomePageState extends State<HomePage> {
                   final favoriteBoards = snapshot.data!
                       .where((board) => board.favorite == true)
                       .toList();
-                  
 
                   final filteredFavorites = _searchText.isEmpty
                       ? favoriteBoards
@@ -867,14 +865,30 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   final boards = snapshot.data!;
-                  boardForTask = boards;
+
+                  final visibleBoards = boards.where((board) {
+                    final isOwner = board.ownerId == userId;
+                    final isSharedAccepted =
+                        board.sharedWith[userId]?['status'] == 'accepted';
+                    return isOwner || isSharedAccepted;
+                  }).toList();
+
+                  // boardForTask = boards;
+                  boardForTask = visibleBoards;
 
                   final filteredBoards = _searchText.isEmpty
-                      ? boards
-                      : boards
-                          .where((board) =>
-                              board.title.toLowerCase().contains(_searchText))
+                      ? visibleBoards
+                      : visibleBoards
+                          .where((board) => board.title
+                              .toLowerCase()
+                              .contains(_searchText.toLowerCase()))
                           .toList();
+                  // final filteredBoards = _searchText.isEmpty
+                  //     ? boards
+                  //     : boards
+                  //         .where((board) =>
+                  //             board.title.toLowerCase().contains(_searchText))
+                  //         .toList();
 
                   return ListView.builder(
                     shrinkWrap: true,
