@@ -3,6 +3,7 @@ import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/data/models/task_model.dart';
 import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/pages/account_page/account_layout.dart';
+import 'package:flow/presentation/widgets/list_modal_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flow/data/models/board_model.dart';
@@ -659,6 +660,56 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     }
   }
 
+// void showBottomModalSettings(BuildContext context, String cardId,
+//       String cardTitle, bool isDark) {
+
+//     final size = MediaQuery.of(context).size;
+
+//     final auth = Provider.of<AuthProvider>(context, listen: false);
+//     final initialName = (auth.user?.displayName?.trim().isNotEmpty ?? false)
+//         ? auth.user!.displayName!
+//         : 'No Name';
+
+//     //Theme.of(context).extension<AppColorsExtension>()?.mainText
+
+//     showModalBottomSheet(
+//       context: context,
+//       isScrollControlled: true,
+//       backgroundColor: Colors.transparent,
+//       builder: (BuildContext context) {
+//         return GestureDetector(
+//           onTap: () => FocusScope.of(context).unfocus(),
+//           behavior: HitTestBehavior.opaque,
+//           child: Container(
+//             width: double.infinity,
+//             decoration: BoxDecoration(
+//               color: isDark ? const Color(0xFF161616) : const Color(0xFFD3D3D3),
+//               borderRadius:
+//                   const BorderRadius.vertical(top: Radius.circular(20)),
+//             ),
+//             child: DraggableScrollableSheet(
+//               expand: false,
+//               initialChildSize: 0.8,
+//               minChildSize: 0.3,
+//               maxChildSize: 0.9,
+//               builder: (context, scrollController) {
+
+//                 return Padding(
+//                   padding: const EdgeInsets.all(16.0),
+//                   child: ListModalWidget(
+//                     scrollController: scrollController,
+//                     size: size,
+//                     board: _boardModel!,
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+
   void _showCardActionsPopupMenu(BuildContext anchorContext, String cardId,
       String cardTitle, bool isDark) {
     final RenderBox renderBox = anchorContext.findRenderObject() as RenderBox;
@@ -786,36 +837,40 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
       leading: const SizedBox(
         width: 20,
       ),
-      trailing: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: SizedBox(
-          width: 300,
-          height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isDark
-                  ? const Color.fromARGB(145, 31, 31, 31)
-                  : const Color.fromARGB(150, 211, 211, 211),
-              foregroundColor: isDark ? Colors.white : Colors.black87,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+      trailing: userRole != 'viewer'
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: SizedBox(
+                width: 300,
+                height: 50,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark
+                        ? const Color.fromARGB(145, 31, 31, 31)
+                        : const Color.fromARGB(150, 211, 211, 211),
+                    foregroundColor: isDark ? Colors.white : Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () {
+                    _addNewCard(isDark);
+                  },
+                  child: Text(
+                    S.of(context).addList,
+                    style: const TextStyle(
+                      fontFamily: 'SFProText',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
+            )
+          : const SizedBox(
+              width: 20,
             ),
-            onPressed: () {
-              _addNewCard(isDark);
-            },
-            child: Text(
-              S.of(context).addList,
-              style: TextStyle(
-                fontFamily: 'SFProText',
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ),
-        ),
-      ),
       cardBuilder: (context, groupData, groupItemObject) {
         String groupTitle = _getGroupname(groupData);
         final currentItem = groupItemObject as FlowTaskItem;
@@ -922,8 +977,10 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
                 padding: EdgeInsets.zero,
                 iconSize: 24,
                 onPressed: () {
-                  _showCardActionsPopupMenu(
-                      context, groupData.id, groupTitle, isDark);
+                  if (userRole != 'viewer') {
+                    _showCardActionsPopupMenu(
+                        context, groupData.id, groupTitle, isDark);
+                  }
                 },
                 icon: Icon(
                   Icons.more_horiz_outlined,
@@ -969,35 +1026,39 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
         cardMargin: const EdgeInsets.symmetric(vertical: 10.0),
       ),
       footerBuilder: (context, groupData) {
-        return InkWell(
-          key: ValueKey(
-              'footer_${groupData.id}'), // ИЗМЕНЕНО: Добавляем ключ к футеру группы
-          onTap: () => _addNewTaskToCard(groupData.id, isDark),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F5),
-              // borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)), // Если нужны скругленные углы только снизу
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.add_task,
-                  color: isDark ? Colors.white70 : Colors.black87,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  S.of(context).addATask,
-                  style: TextStyle(
+        if (userRole != 'viewer') {
+          return InkWell(
+            key: ValueKey(
+                'footer_${groupData.id}'), // ИЗМЕНЕНО: Добавляем ключ к футеру группы
+            onTap: () => _addNewTaskToCard(groupData.id, isDark),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              decoration: BoxDecoration(
+                color:
+                    isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F0F5),
+                // borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)), // Если нужны скругленные углы только снизу
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_task,
                     color: isDark ? Colors.white70 : Colors.black87,
-                    fontWeight: FontWeight.w500,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    S.of(context).addATask,
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        }
+        return Container();
       },
     );
   }

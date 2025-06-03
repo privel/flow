@@ -67,6 +67,7 @@
 //   }
 // }
 
+import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/widgets/drawer_menu/drawer_menu.dart';
 import 'package:flow/presentation/widgets/side_bar/side_bar.dart';
 import 'package:flutter/foundation.dart';
@@ -138,18 +139,18 @@ class ResponsiveLayout extends StatelessWidget {
                     context.go(tabs[index]);
                   }
                 },
-                items: const [
+                items:  [
                   BottomNavigationBarItem(
-                    icon: Icon(IconlyLight.home),
-                    label: 'Home',
+                    icon: const Icon(IconlyLight.home),
+                    label: S.of(context).home,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(IconlyLight.notification),
-                    label: 'Notification',
+                    icon: const Icon(IconlyLight.notification),
+                    label: S.of(context).notification,
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(IconlyLight.profile),
-                    label: 'Account',
+                    icon: const Icon(IconlyLight.profile),
+                    label: S.of(context).account,
 
                   ),
                 ],

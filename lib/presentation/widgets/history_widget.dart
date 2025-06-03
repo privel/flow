@@ -1,15 +1,22 @@
 import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/core/utils/provider/notification_provider.dart';
 import 'package:flow/data/models/notification_model.dart';
+import 'package:flow/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HistoryNotificationSheet extends StatefulWidget {
   final Stream<List<NotificationModel>> stream;
-  const HistoryNotificationSheet({super.key, required this.stream});
+  final ScrollController scrollController;
+  const HistoryNotificationSheet({
+    super.key,
+    required this.scrollController,
+    required this.stream,
+  });
 
   @override
-  State<HistoryNotificationSheet> createState() => _HistoryNotificationSheetState();
+  State<HistoryNotificationSheet> createState() =>
+      _HistoryNotificationSheetState();
 }
 
 class _HistoryNotificationSheetState extends State<HistoryNotificationSheet> {
@@ -19,23 +26,40 @@ class _HistoryNotificationSheetState extends State<HistoryNotificationSheet> {
     final provider = Provider.of<NotificationProvider>(context, listen: false);
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('История уведомлений',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(
+                S.of(context).notificationHistory2,
+                style: TextStyle(
+                  fontFamily: 'SFProText',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
               TextButton(
                 onPressed: () async {
-                  final userId = Provider.of<AuthProvider>(context, listen: false).user?.uid;
+                  final userId =
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .user
+                          ?.uid;
                   if (userId != null) {
                     await provider.clearHistoryNotifications(userId);
                   }
                 },
-                child: const Text('Очистить все'),
+                child: Text(
+                  S.of(context).clearAll,
+                  style: const TextStyle(
+                    fontFamily: 'SFProText',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
               ),
             ],
           ),
@@ -45,11 +69,29 @@ class _HistoryNotificationSheetState extends State<HistoryNotificationSheet> {
             builder: (context, snapshot) {
               final history = snapshot.data ?? [];
               if (history.isEmpty) {
-                return const Text('Нет уведомлений');
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 70),
+                    Image.asset("assets/image/fishGreenDark.png",
+                        scale: 5),
+                    const SizedBox(height: 10),
+                    Text(
+                      S.of(context).notificationHistoryIsEmpty,
+                      style: TextStyle(
+                        fontFamily: 'SFProText',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ],
+                );
               }
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: history.length,
+                controller: widget.scrollController,
                 itemBuilder: (context, index) {
                   final n = history[index];
                   return ListTile(

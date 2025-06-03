@@ -406,6 +406,14 @@ class BoardProvider extends ChangeNotifier {
 
   // }
 
+  Future<void> getValidTaskAssignees(String boardId, String cardId, String taskId) async{
+      final brd = await FirebaseFirestore.instance
+        .collection('boards')
+        .doc(boardId)
+        .collection('cards').doc(cardId).collection('tasks').doc(taskId);
+      debugPrint('${brd.firestore.collection('assigneeIds').doc('0')}');
+  }
+
   Future<void> addUserToBoard(
     BoardModel board,
     String newUserId,

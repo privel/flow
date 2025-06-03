@@ -83,6 +83,7 @@ class TaskModel {
   final bool isDone;
   final DateTime? startDate;
   final DateTime? dueDate;
+  final List<String> assigneeIds;
   final int order; // <-- Новое поле
 
   TaskModel({
@@ -92,6 +93,7 @@ class TaskModel {
     required this.isDone,
     this.startDate,
     this.dueDate,
+    this.assigneeIds = const [],
     required this.order,
   });
 
@@ -102,6 +104,7 @@ class TaskModel {
     bool? isDone,
     DateTime? startDate,
     DateTime? dueDate,
+    List<String>? assigneeIds,
     int? order,
   }) {
     return TaskModel(
@@ -111,6 +114,7 @@ class TaskModel {
       isDone: isDone ?? this.isDone,
       startDate: startDate ?? this.startDate,
       dueDate: dueDate ?? this.dueDate,
+      assigneeIds: assigneeIds ?? this.assigneeIds,
       order: order ?? this.order,
     );
   }
@@ -128,6 +132,7 @@ class TaskModel {
           ? (map['dueDate'] as Timestamp).toDate()
           : null,
       order: map['order'] ?? 0,
+      assigneeIds: List<String>.from(map['assigneeIds'] ?? []),
     );
   }
 
@@ -138,6 +143,7 @@ class TaskModel {
       'isDone': isDone,
       'startDate': startDate,
       'dueDate': dueDate,
+      'assigneeIds': assigneeIds,
       'order': order,
     };
   }

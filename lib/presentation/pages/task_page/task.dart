@@ -1,5 +1,6 @@
 import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/widgets/date_time_picker.dart';
+import 'package:flow/presentation/widgets/rounded_container.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flow/core/utils/provider/board_provider.dart';
@@ -88,38 +89,55 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   Future<void> _deleteTask(String cardId, String taskId, bool isDark) async {
-  final boardProvider = Provider.of<BoardProvider>(context, listen: false);
+    final boardProvider = Provider.of<BoardProvider>(context, listen: false);
 
-  bool? confirm = await showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text(
-        S.of(context).deleteATask,
-        style: TextStyle(
-          fontFamily: 'SFProText',
-          fontWeight: FontWeight.w600,
-          fontSize: 18,
-          color: isDark ? Colors.white : Colors.black,
+    bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          S.of(context).deleteATask,
+          style: TextStyle(
+            fontFamily: 'SFProText',
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: isDark ? Colors.white : Colors.black,
+          ),
         ),
-      ),
-      content: Text(S.of(context).areYouSureYouWantToDeleteThisTask),
-      actions: [
-        TextButton(
+        content: Text(S.of(context).areYouSureYouWantToDeleteThisTask),
+        actions: [
+          TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(S.of(context).cancel)),
-        TextButton(
+            child: Text(
+              S.of(context).cancel,
+              style: TextStyle(
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(S.of(context).delete)),
-      ],
-    ),
-  );
+            child: Text(
+              S.of(context).delete,
+              style: TextStyle(
+                fontFamily: 'SFProText',
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                color: Colors.redAccent.shade400,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
 
-  if (confirm == true) {
-    await boardProvider.removeTaskFromCard(widget.boardId, cardId, taskId);
-    if (mounted) Navigator.pop(context); // Закрыть после удаления
+    if (confirm == true) {
+      await boardProvider.removeTaskFromCard(widget.boardId, cardId, taskId);
+      if (mounted) Navigator.pop(context); // Закрыть после удаления
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +148,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       stream: provider.watchBoardById(widget.boardId),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+              body: Center(child: CircularProgressIndicator()));
         }
 
         final board = snapshot.data!;
@@ -170,65 +189,65 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 controller: scrollController,
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 320,
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF333333)
-                                : const Color(0xFFF0F0F0),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              unselectedWidgetColor:
-                                  isDark ? Colors.white54 : Colors.black54,
-                            ),
-                            child: CheckboxListTile(
-                              value: _isDone,
-                              onChanged: (bool? value) async {
-                                setState(() {
-                                  _isDone = value ?? false;
-                                });
-                                final updatedTask = TaskModel(
-                                  id: widget.taskId,
-                                  title: _titleController.text.trim(),
-                                  description:
-                                      _descriptionController.text.trim(),
-                                  isDone: _isDone,
-                                  startDate: startDate,
-                                  dueDate: dueDate,
-                                  order: task.order,
-                                );
+                        // Container(
+                        //   width: 320,
+                        //   decoration: BoxDecoration(
+                        //     color: isDark
+                        //         ? const Color(0xFF333333)
+                        //         : const Color(0xFFF0F0F0),
+                        //     borderRadius: BorderRadius.circular(25),
+                        //   ),
+                        //   child: Theme(
+                        //     data: Theme.of(context).copyWith(
+                        //       unselectedWidgetColor:
+                        //           isDark ? Colors.white54 : Colors.black54,
+                        //     ),
+                        //     child: CheckboxListTile(
+                        //       value: _isDone,
+                        //       onChanged: (bool? value) async {
+                        //         setState(() {
+                        //           _isDone = value ?? false;
+                        //         });
+                        //         final updatedTask = TaskModel(
+                        //           id: widget.taskId,
+                        //           title: _titleController.text.trim(),
+                        //           description:
+                        //               _descriptionController.text.trim(),
+                        //           isDone: _isDone,
+                        //           startDate: startDate,
+                        //           dueDate: dueDate,
+                        //           order: task.order,
+                        //         );
 
-                                await provider.updateTask(
-                                  widget.boardId,
-                                  widget.cardId,
-                                  updatedTask,
-                                );
-                              },
-                              title: Text(
-                                S.of(context).complete,
-                                style: TextStyle(
-                                  color: isDark ? Colors.white : Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              activeColor:
-                                  Theme.of(context).colorScheme.primary,
-                              checkColor: Colors.white,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                          ),
-                        ),
+                        //         await provider.updateTask(
+                        //           widget.boardId,
+                        //           widget.cardId,
+                        //           updatedTask,
+                        //         );
+                        //       },
+                        //       title: Text(
+                        //         S.of(context).complete,
+                        //         style: TextStyle(
+                        //           color: isDark ? Colors.white : Colors.black,
+                        //           fontWeight: FontWeight.w600,
+                        //         ),
+                        //       ),
+                        //       activeColor:
+                        //           Theme.of(context).colorScheme.primary,
+                        //       checkColor: Colors.white,
+                        //       controlAffinity: ListTileControlAffinity.leading,
+                        //       contentPadding:
+                        //           const EdgeInsets.symmetric(horizontal: 16),
+                        //       shape: RoundedRectangleBorder(
+                        //         borderRadius: BorderRadius.circular(25),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         const SizedBox(
                           height: 15,
                         ),
@@ -254,21 +273,55 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           ),
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(horizontal: 6),
-                          child: TextField(
-                            controller: _titleController,
-                            style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                            cursorWidth: 1.5,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: S.of(context).nameTask,
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              isDense: true,
-                              fillColor: isDark
-                                  ? const Color(0xFF333333)
-                                  : const Color(0xFFF0F0F0),
-                            ),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 40,
+                                child: Checkbox(
+                                  value: _isDone,
+                                  onChanged: (bool? value) async {
+                                    setState(() {
+                                      _isDone = value ?? false;
+                                    });
+                                    final updatedTask = TaskModel(
+                                      id: widget.taskId,
+                                      title: _titleController.text.trim(),
+                                      description:
+                                          _descriptionController.text.trim(),
+                                      isDone: _isDone,
+                                      startDate: startDate,
+                                      dueDate: dueDate,
+                                      order: task.order,
+                                    );
+                                
+                                    await provider.updateTask(
+                                      widget.boardId,
+                                      widget.cardId,
+                                      updatedTask,
+                                    );
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: _titleController,
+                                  style: TextStyle(
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
+                                  cursorWidth: 1.5,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: S.of(context).nameTask,
+                                    hintStyle:
+                                        const TextStyle(color: Colors.grey),
+                                    isDense: true,
+                                    fillColor: isDark
+                                        ? const Color(0xFF333333)
+                                        : const Color(0xFFF0F0F0),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 15),
@@ -314,6 +367,26 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         ),
                       ],
                     ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(vertical: 12),
+                    //   child: RoundedContainerCustom(
+                    //     isDark: isDark,
+                    //     padding: const EdgeInsets.symmetric(horizontal: 10),
+                    //     childWidget: SingleChildScrollView(
+                    //   scrollDirection: Axis.horizontal,
+                    //   child: Align(
+                    //     alignment: Alignment.centerLeft,
+                    //     child: GestureDetector(
+                    //         onTap: () async {
+                    //           // showManageMembersModal(context, widget.board);
+                    //           await provider.getValidTaskAssignees(board.id, card!.id, task.id);
+                    //         },
+                    //         child: Text("123")),
+                    //   ),
+                    // ),
+                    //   ),
+                    // ),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12.0,
@@ -342,13 +415,16 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       ),
                     ),
 
-                    const SizedBox(height: 30), // отступ перед кнопкой
+                    const SizedBox(height: 270), // отступ перед кнопкой
                     SizedBox(
                       width: 320,
+                      height: 45,
                       child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(Colors.redAccent.shade400),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent.shade400,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                         ),
                         onPressed: () =>
                             _deleteTask(widget.cardId, widget.taskId, isDark),

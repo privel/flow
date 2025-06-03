@@ -898,6 +898,9 @@ class _HomePageState extends State<HomePage> {
                     itemBuilder: (context, index) {
                       // final board = boards[index];
                       final board = filteredBoards[index];
+                      final String? canEdit =
+                          boardProvider.getUserRole(board, userId);
+
                       return Card(
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
@@ -909,101 +912,105 @@ class _HomePageState extends State<HomePage> {
                           onTapDown: (TapDownDetails details) async {
                             final tapPosition = details.globalPosition;
 
-                            final value = await showMenu<String>(
-                              context: context,
-                              position: RelativeRect.fromLTRB(
-                                tapPosition.dx,
-                                tapPosition.dy + 10,
-                                tapPosition.dx,
-                                tapPosition.dy,
-                              ),
-                              items: [
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: SizedBox(
-                                    height: 36,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Редактировать",
-                                          style: AccountLayout.CardSubTitle
-                                              .copyWith(
-                                            color: Theme.of(context)
-                                                .extension<AppColorsExtension>()
-                                                ?.mainText,
+                            if (canEdit != "viewer") {
+                              final value = await showMenu<String>(
+                                context: context,
+                                position: RelativeRect.fromLTRB(
+                                  tapPosition.dx,
+                                  tapPosition.dy + 10,
+                                  tapPosition.dx,
+                                  tapPosition.dy,
+                                ),
+                                items: [
+                                  PopupMenuItem(
+                                    value: 'edit',
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: SizedBox(
+                                      height: 36,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Редактировать",
+                                            style: AccountLayout.CardSubTitle
+                                                .copyWith(
+                                              color: Theme.of(context)
+                                                  .extension<
+                                                      AppColorsExtension>()
+                                                  ?.mainText,
+                                            ),
                                           ),
-                                        ),
-                                        const Icon(IconlyLight.edit),
-                                      ],
+                                          const Icon(IconlyLight.edit),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const PopupMenuItem(
-                                  enabled: false,
-                                  height: 1,
-                                  padding: EdgeInsets.zero,
-                                  child: Divider(
-                                    thickness: 0.4,
+                                  const PopupMenuItem(
+                                    enabled: false,
                                     height: 1,
-                                    color: Colors.grey,
-                                    indent: 5,
-                                    endIndent: 5,
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15),
-                                  child: SizedBox(
-                                    height: 36,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          "Удалить",
-                                          style: AccountLayout.CardSubTitle
-                                              .copyWith(
-                                            color: Theme.of(context)
-                                                .extension<AppColorsExtension>()
-                                                ?.mainText,
-                                          ),
-                                        ),
-                                        const Icon(IconlyLight.delete),
-                                      ],
+                                    padding: EdgeInsets.zero,
+                                    child: Divider(
+                                      thickness: 0.4,
+                                      height: 1,
+                                      color: Colors.grey,
+                                      indent: 5,
+                                      endIndent: 5,
                                     ),
                                   ),
-                                ),
-                              ],
-                            );
-
-                            if (value == 'edit') {
-                              // await boardProvider.updateBoard(
-                              //   BoardModel(
-                              //     id: board.id,
-                              //     title: "3322",
-                              //     ownerId: board.ownerId,
-                              //     sharedWith: board.sharedWith,
-                              //     cards: board.cards,
-                              //   ),
-                              // );
-
-                              showBottomModalEdit(
-                                context,
-                                BoardModel(
-                                  id: board.id,
-                                  title: board.title,
-                                  ownerId: board.ownerId,
-                                  sharedWith: board.sharedWith,
-                                  cards: board.cards,
-                                ),
+                                  PopupMenuItem(
+                                    value: 'delete',
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: SizedBox(
+                                      height: 36,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Удалить",
+                                            style: AccountLayout.CardSubTitle
+                                                .copyWith(
+                                              color: Theme.of(context)
+                                                  .extension<
+                                                      AppColorsExtension>()
+                                                  ?.mainText,
+                                            ),
+                                          ),
+                                          const Icon(IconlyLight.delete),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               );
-                            } else if (value == 'delete') {
-                              await boardProvider.deleteBoard(board.id);
+
+                              if (value == 'edit') {
+                                // await boardProvider.updateBoard(
+                                //   BoardModel(
+                                //     id: board.id,
+                                //     title: "3322",
+                                //     ownerId: board.ownerId,
+                                //     sharedWith: board.sharedWith,
+                                //     cards: board.cards,
+                                //   ),
+                                // );
+
+                                showBottomModalEdit(
+                                  context,
+                                  BoardModel(
+                                    id: board.id,
+                                    title: board.title,
+                                    ownerId: board.ownerId,
+                                    sharedWith: board.sharedWith,
+                                    cards: board.cards,
+                                  ),
+                                );
+                              } else if (value == 'delete') {
+                                await boardProvider.deleteBoard(board.id);
+                              }
                             }
                           },
                           child: Padding(

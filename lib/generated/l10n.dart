@@ -714,6 +714,86 @@ class S {
       args: [],
     );
   }
+
+  /// `Notification history`
+  String get notificationHistory2 {
+    return Intl.message(
+      'Notification history',
+      name: 'notificationHistory2',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Clear all`
+  String get clearAll {
+    return Intl.message('Clear all', name: 'clearAll', desc: '', args: []);
+  }
+
+  /// `Notification history is empty`
+  String get notificationHistoryIsEmpty {
+    return Intl.message(
+      'Notification history is empty',
+      name: 'notificationHistoryIsEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter Email`
+  String get enterEmail {
+    return Intl.message('Enter Email', name: 'enterEmail', desc: '', args: []);
+  }
+
+  /// `Participant Management`
+  String get participantManagement {
+    return Intl.message(
+      'Participant Management',
+      name: 'participantManagement',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Choose a role:`
+  String get chooseARole {
+    return Intl.message(
+      'Choose a role:',
+      name: 'chooseARole',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete a participant`
+  String get deleteAParticipant {
+    return Intl.message(
+      'Delete a participant',
+      name: 'deleteAParticipant',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Do you really want to delete the participant?`
+  String get doYouReallyWantToDeleteTheParticipant {
+    return Intl.message(
+      'Do you really want to delete the participant?',
+      name: 'doYouReallyWantToDeleteTheParticipant',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Home`
+  String get home {
+    return Intl.message('Home', name: 'home', desc: '', args: []);
+  }
+
+  /// `Account`
+  String get account {
+    return Intl.message('Account', name: 'account', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

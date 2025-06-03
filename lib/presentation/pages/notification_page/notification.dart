@@ -176,9 +176,22 @@ class _NotificationPageState extends State<NotificationPage> {
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                    builder: (context) {
-                      return HistoryNotificationSheet(
-                          stream: _historyNotificationsStream);
+                    builder: (BuildContext context) {
+                      return DraggableScrollableSheet(
+                        expand: false,
+                        initialChildSize: 0.8,
+                        minChildSize: 0.3,
+                        maxChildSize: 0.9,
+                        builder: (context, scrollController) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: HistoryNotificationSheet(
+                              stream: _historyNotificationsStream,
+                              scrollController: scrollController,
+                            ),
+                          );
+                        },
+                      );
                     },
                   );
                 } else if (value == 'read') {
@@ -215,13 +228,13 @@ class _NotificationPageState extends State<NotificationPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset("assets/image/logo/whale.png", scale: 5),
+                    Image.asset("assets/image/whaleGreen.png", scale: 5),
                     const SizedBox(height: 10),
                     Text(
                       S.of(context).youDontHaveAnyNotifications,
                       style: TextStyle(
                         fontFamily: 'SFProText',
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                         fontSize: 15,
                         color: isDark ? Colors.white : Colors.black,
                       ),
@@ -231,60 +244,65 @@ class _NotificationPageState extends State<NotificationPage> {
               );
             }
 
-            return ListView.builder(
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                final n = notifications[index];
+            return Padding(
+              padding: const EdgeInsets.only(
+                left: 10.0,
+              ),
+              child: ListView.builder(
+                itemCount: notifications.length,
+                itemBuilder: (context, index) {
+                  final n = notifications[index];
 
-                if (n.type == 'invitation') {
-                  Widget trailingWidget;
+                  if (n.type == 'invitation') {
+                    Widget trailingWidget;
 
-                  if (n.action == 'accepted') {
-                    trailingWidget =
-                        const Icon(Icons.check_circle, color: Colors.green);
-                  } else if (n.action == 'declined') {
-                    trailingWidget =
-                        const Icon(Icons.cancel, color: Colors.red);
-                  } else {
-                    trailingWidget = Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.check, color: Colors.green),
-                          onPressed: () async {
-                            await boardProvider.acceptInvite(
-                                n.metadata?['boardId'], userId);
-                            await notificationProvider.setNotificationAction(
-                                n.id, 'accepted');
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.red),
-                          onPressed: () async {
-                            await notificationProvider.setNotificationAction(
-                                n.id, 'declined');
-                          },
-                        ),
-                      ],
-                    );
+                    if (n.action == 'accepted') {
+                      trailingWidget =
+                          const Icon(Icons.check_circle, color: Colors.green);
+                    } else if (n.action == 'declined') {
+                      trailingWidget =
+                          const Icon(Icons.cancel, color: Colors.red);
+                    } else {
+                      trailingWidget = Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.check, color: Colors.green),
+                            onPressed: () async {
+                              await boardProvider.acceptInvite(
+                                  n.metadata?['boardId'], userId);
+                              await notificationProvider.setNotificationAction(
+                                  n.id, 'accepted');
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red),
+                            onPressed: () async {
+                              await notificationProvider.setNotificationAction(
+                                  n.id, 'declined');
+                            },
+                          ),
+                        ],
+                      );
+                    }
+
+                    return buildNotificationTile(
+                        n.title, n.description, trailingWidget, isDark);
                   }
 
                   return buildNotificationTile(
-                      n.title, n.description, trailingWidget, isDark);
-                }
-
-                return buildNotificationTile(
-                  n.title,
-                  n.description,
-                  !n.isRead
-                      ? const Icon(Icons.fiber_new, color: Colors.red)
-                      : null,
-                  isDark,
-                  onTap: () async {
-                    await notificationProvider.markAsRead(n.id);
-                  },
-                );
-              },
+                    n.title,
+                    n.description,
+                    !n.isRead
+                        ? const Icon(Icons.fiber_new, color: Colors.red)
+                        : null,
+                    isDark,
+                    onTap: () async {
+                      await notificationProvider.markAsRead(n.id);
+                    },
+                  );
+                },
+              ),
             );
           },
         ),

@@ -16,21 +16,21 @@ import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 
-class SettingsBoard extends StatefulWidget {
+class ListModalWidget extends StatefulWidget {
   final ScrollController scrollController;
-  final Size size;
+
   final BoardModel board;
-  const SettingsBoard(
+  const ListModalWidget(
       {super.key,
       required this.scrollController,
-      required this.size,
+    
       required this.board});
 
   @override
-  State<SettingsBoard> createState() => _SettingsBoardState();
+  State<ListModalWidget> createState() => _ListModalWidgetState();
 }
 
-class _SettingsBoardState extends State<SettingsBoard> {
+class _ListModalWidgetState extends State<ListModalWidget> {
   Timer? _debounce;
   bool _isFavoritel = false;
   late AuthProvider auth;
@@ -143,45 +143,17 @@ class _SettingsBoardState extends State<SettingsBoard> {
                         ? NetworkImage(user.photoUrl!)
                         : null,
                 child: (user.photoUrl == null || user.photoUrl!.trim().isEmpty)
-                    ? (user.displayName != null &&
-                            user.displayName.trim().isNotEmpty)
-                        ? Text(
-                            user.displayName[0].toUpperCase(),
-                            style: const TextStyle(
-                              fontFamily: 'SFProText',
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        : Icon(Icons.person)
-                    // ? Text(
-                    //     (user.displayName != null &&
-                    //             user.displayName.trim().isNotEmpty)
-                    //         ? user.displayName[0].toUpperCase()
-                    //         : '?',
-                    //     style: const TextStyle(color: Colors.white),
-                    //   )
+                    ? Text(
+                        (user.displayName != null &&
+                                user.displayName.trim().isNotEmpty)
+                            ? user.displayName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(color: Colors.white),
+                      )
                     : null,
               ),
 
               const SizedBox(height: 4),
-               Text(
-                      user.displayName.isNotEmpty ? user.displayName: 'No name',
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                        fontFamily: 'SFProText',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                      ),
-                    ),
-              Text(
-                user.email,
-                style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.black54,
-                  fontFamily: 'SFProText',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 10,
-                ),
-              ),
               Text(
                 role,
                 style: TextStyle(
@@ -1186,8 +1158,8 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
                                     ? Icon(
                                         Icons.check,
                                         color: isDark
-                                            ? Colors.greenAccent.shade400
-                                            : Colors.green,
+                                              ? Colors.greenAccent.shade400
+                                              : Colors.green,
                                       )
                                     : const Icon(
                                         Icons.person_off_rounded,

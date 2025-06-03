@@ -67,6 +67,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пароли не совпадают",
     ),
     "aNewTask": MessageLookupByLibrary.simpleMessage("Новая задача"),
+    "account": MessageLookupByLibrary.simpleMessage("Аккаунт"),
     "accountPage": MessageLookupByLibrary.simpleMessage("Аккаунт"),
     "add": MessageLookupByLibrary.simpleMessage("Добавить"),
     "addATask": MessageLookupByLibrary.simpleMessage("Добавить задачу"),
@@ -89,6 +90,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Сохраненные изменения",
     ),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Проверить снова"),
+    "chooseARole": MessageLookupByLibrary.simpleMessage("Выберите роль:"),
+    "clearAll": MessageLookupByLibrary.simpleMessage("Очистить все"),
     "complete": MessageLookupByLibrary.simpleMessage("Выполнено"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
       "Пожалуйста, подтвердите адрес электронной почты.",
@@ -103,33 +106,49 @@ class MessageLookup extends MessageLookupByLibrary {
     "createBoard": MessageLookupByLibrary.simpleMessage("Создать Доску"),
     "createCard": MessageLookupByLibrary.simpleMessage("Создать Карту"),
     "delete": MessageLookupByLibrary.simpleMessage("Удалить"),
+    "deleteAParticipant": MessageLookupByLibrary.simpleMessage(
+      "Удалить участника",
+    ),
     "deleteATask": MessageLookupByLibrary.simpleMessage("Удалить задачу?"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Удалить Лист"),
     "deleteTheBoard": MessageLookupByLibrary.simpleMessage("Удалить доску?"),
     "description": MessageLookupByLibrary.simpleMessage("Описание"),
+    "doYouReallyWantToDeleteTheParticipant":
+        MessageLookupByLibrary.simpleMessage(
+          "Вы действительно хотите удалить участника?",
+        ),
     "dueDate": MessageLookupByLibrary.simpleMessage("Дата конца"),
     "editATask": MessageLookupByLibrary.simpleMessage("Редактировать задачу"),
     "editTask": m0,
     "en_ru": MessageLookupByLibrary.simpleMessage("ru"),
+    "enterEmail": MessageLookupByLibrary.simpleMessage("Введите почту"),
     "enterTheName": MessageLookupByLibrary.simpleMessage("Введите имя"),
+    "home": MessageLookupByLibrary.simpleMessage("Главная"),
     "language": MessageLookupByLibrary.simpleMessage("Язык"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Языковые настройки",
     ),
     "logOut": MessageLookupByLibrary.simpleMessage("Выйти"),
     "markedAllAsRead": MessageLookupByLibrary.simpleMessage(
-      "Marked all as read",
+      "Помечено все как прочитанное",
     ),
     "members": MessageLookupByLibrary.simpleMessage("участники"),
     "nameTask": MessageLookupByLibrary.simpleMessage("Назовите задачу"),
     "newBoard": MessageLookupByLibrary.simpleMessage("Новая Доска"),
     "newColumn": MessageLookupByLibrary.simpleMessage("Новая колонка"),
     "notSelected": MessageLookupByLibrary.simpleMessage("Не выбрано"),
-    "notification": MessageLookupByLibrary.simpleMessage("Notification"),
-    "notificationHistory": MessageLookupByLibrary.simpleMessage(
-      "Notification history",
+    "notification": MessageLookupByLibrary.simpleMessage("Уведомления"),
+    "notificationHistory": MessageLookupByLibrary.simpleMessage("История"),
+    "notificationHistory2": MessageLookupByLibrary.simpleMessage(
+      "История уведомлений",
     ),
-    "readAll": MessageLookupByLibrary.simpleMessage("Read all"),
+    "notificationHistoryIsEmpty": MessageLookupByLibrary.simpleMessage(
+      "История уведомлений пуста",
+    ),
+    "participantManagement": MessageLookupByLibrary.simpleMessage(
+      "Управление участниками",
+    ),
+    "readAll": MessageLookupByLibrary.simpleMessage("Прочитать все"),
     "renameAColumn": MessageLookupByLibrary.simpleMessage(
       "Переименование столбца",
     ),
@@ -138,7 +157,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "resendtext": m1,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Сброс пароля"),
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
-    "saved": MessageLookupByLibrary.simpleMessage("Saved"),
+    "saved": MessageLookupByLibrary.simpleMessage("Сохраненный"),
     "searchYourTask": MessageLookupByLibrary.simpleMessage(
       "Найдите свою задачу...",
     ),

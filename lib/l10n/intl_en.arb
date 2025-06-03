@@ -87,5 +87,15 @@
   "notificationHistory": "Notification history",
   "readAll": "Read all",
   "saved": "Saved",
-  "markedAllAsRead": "Marked all as read"
+  "markedAllAsRead": "Marked all as read",
+  "notificationHistory2": "Notification history",
+  "clearAll": "Clear all",
+  "notificationHistoryIsEmpty": "Notification history is empty",
+  "enterEmail": "Enter Email",
+  "participantManagement": "Participant Management",
+  "chooseARole": "Choose a role:",
+  "deleteAParticipant": "Delete a participant",
+  "doYouReallyWantToDeleteTheParticipant": "Do you really want to delete the participant?",
+  "home": "Home",
+  "account": "Account"
 }

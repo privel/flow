@@ -63,6 +63,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Passwords don\'t match",
     ),
     "aNewTask": MessageLookupByLibrary.simpleMessage("A new task"),
+    "account": MessageLookupByLibrary.simpleMessage("Account"),
     "accountPage": MessageLookupByLibrary.simpleMessage("Account"),
     "add": MessageLookupByLibrary.simpleMessage("Add"),
     "addATask": MessageLookupByLibrary.simpleMessage("Add a task"),
@@ -81,6 +82,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "changesSaved": MessageLookupByLibrary.simpleMessage("Changes saved"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
+    "chooseARole": MessageLookupByLibrary.simpleMessage("Choose a role:"),
+    "clearAll": MessageLookupByLibrary.simpleMessage("Clear all"),
     "complete": MessageLookupByLibrary.simpleMessage("Complete"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
       "Please confirm your email address.",
@@ -95,15 +98,24 @@ class MessageLookup extends MessageLookupByLibrary {
     "createBoard": MessageLookupByLibrary.simpleMessage("Create Board"),
     "createCard": MessageLookupByLibrary.simpleMessage("Create Card"),
     "delete": MessageLookupByLibrary.simpleMessage("Delete"),
+    "deleteAParticipant": MessageLookupByLibrary.simpleMessage(
+      "Delete a participant",
+    ),
     "deleteATask": MessageLookupByLibrary.simpleMessage("Delete a task?"),
     "deleteList": MessageLookupByLibrary.simpleMessage("Delete List"),
     "deleteTheBoard": MessageLookupByLibrary.simpleMessage("Delete the board?"),
     "description": MessageLookupByLibrary.simpleMessage("Description"),
+    "doYouReallyWantToDeleteTheParticipant":
+        MessageLookupByLibrary.simpleMessage(
+          "Do you really want to delete the participant?",
+        ),
     "dueDate": MessageLookupByLibrary.simpleMessage("Due date"),
     "editATask": MessageLookupByLibrary.simpleMessage("Edit a task"),
     "editTask": m0,
     "en_ru": MessageLookupByLibrary.simpleMessage("en"),
+    "enterEmail": MessageLookupByLibrary.simpleMessage("Enter Email"),
     "enterTheName": MessageLookupByLibrary.simpleMessage("Enter the name"),
+    "home": MessageLookupByLibrary.simpleMessage("Home"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Language Settings",
@@ -120,6 +132,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "notification": MessageLookupByLibrary.simpleMessage("Notification"),
     "notificationHistory": MessageLookupByLibrary.simpleMessage(
       "Notification history",
+    ),
+    "notificationHistory2": MessageLookupByLibrary.simpleMessage(
+      "Notification history",
+    ),
+    "notificationHistoryIsEmpty": MessageLookupByLibrary.simpleMessage(
+      "Notification history is empty",
+    ),
+    "participantManagement": MessageLookupByLibrary.simpleMessage(
+      "Participant Management",
     ),
     "readAll": MessageLookupByLibrary.simpleMessage("Read all"),
     "renameAColumn": MessageLookupByLibrary.simpleMessage("Rename a column"),
