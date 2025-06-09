@@ -406,12 +406,16 @@ class BoardProvider extends ChangeNotifier {
 
   // }
 
-  Future<void> getValidTaskAssignees(String boardId, String cardId, String taskId) async{
-      final brd = await FirebaseFirestore.instance
+  Future<void> getValidTaskAssignees(
+      String boardId, String cardId, String taskId) async {
+    final brd = await FirebaseFirestore.instance
         .collection('boards')
         .doc(boardId)
-        .collection('cards').doc(cardId).collection('tasks').doc(taskId);
-      debugPrint('${brd.firestore.collection('assigneeIds').doc('0')}');
+        .collection('cards')
+        .doc(cardId)
+        .collection('tasks')
+        .doc(taskId);
+    debugPrint('${brd.firestore.collection('assigneeIds').doc('0')}');
   }
 
   Future<void> addUserToBoard(
@@ -518,4 +522,189 @@ class BoardProvider extends ChangeNotifier {
 
     return BoardModel.fromMap(data, boardId);
   }
+
+  
+
+void addAssigneeToTask(BoardModel board, String cardId, String taskId, String userId) async {
+  final card = board.cards[cardId];
+  if (card == null) return;
+
+  final task = card.tasks[taskId];
+  if (task == null) return;
+
+  if (!task.assigneeIds.contains(userId)) {
+    final updatedAssignees = [...task.assigneeIds, userId];
+    final updatedTask = task.copyWith(assigneeIds: updatedAssignees);
+    card.tasks[taskId] = updatedTask;
+    
+    await updateBoard(board);
+    notifyListeners();
+  }
+}
+
+Future<void> removeAssigneeFromTask(
+  BoardModel board,
+  String cardId,
+  String taskId,
+  String userId,
+) async {
+  final card = board.cards[cardId];
+  if (card == null) return;
+
+  final task = card.tasks[taskId];
+  if (task == null) return;
+
+  if (task.assigneeIds.contains(userId)) {
+    final updatedAssignees = List<String>.from(task.assigneeIds)..remove(userId);
+    final updatedTask = task.copyWith(assigneeIds: updatedAssignees);
+    card.tasks[taskId] = updatedTask;
+
+    await updateBoard(board);
+    notifyListeners();
+  }
+}
+
+
+// // Метод: Получить валидных назначенных участников задачи
+//   List<AppUser> getValidTaskAssigneesTest(String boardId, String cardId, String taskId) {
+//     final board = boards1[boardId];
+//     if (board == null) return [];
+
+//     final card = board.cards[cardId];
+//     if (card == null) return [];
+
+//     final task = card.tasks[taskId];
+//     if (task == null) return [];
+
+//     final sharedUserIds = board.sharedWith.keys.toSet();
+//     final memberIds = board.sharedWith.keys.toSet();
+//     final validUserIds = {...sharedUserIds, ...memberIds, board.ownerId};
+
+//     return task.assigneeIds
+//         .where((id) => validUserIds.contains(id))
+//         .map((id) => allUsers1[id])
+//         .whereType<AppUser>()
+//         .toList();
+//   }
+
+//   // Метод: Получить всех пользователей, подтвердивших участие
+//   List<AppUser> getConfirmedBoardUsers(String boardId) {
+//     final board = boards1[boardId];
+//     if (board == null) return [];
+
+//     final confirmedUserIds = board.sharedWith.entries
+//         .where((entry) => entry.value['status'] == 'accepted')
+//         .map((e) => e.key)
+//         .toSet();
+
+//     final memberIds = board.sharedWith.keys.toSet();
+
+//     final validIds = {...confirmedUserIds, ...memberIds, board.ownerId};
+
+//     return validIds.map((uid) => allUsers1[uid]).whereType<AppUser>().toList();
+//   }
+
+//   // Метод: Добавить участника к задаче
+//   void addAssigneeToTask(String boardId, String cardId, String taskId, String userId) {
+//     final board = boards1[boardId];
+//     if (board == null ||
+//         !(board.sharedWith[userId]?['status'] == 'accepted') &&
+//         !board.sharedWith.containsKey(userId) &&
+//         userId != board.ownerId) return;
+
+//     final card = board.cards[cardId];
+//     if (card == null) return;
+
+//     final task = card.tasks[taskId];
+//     if (task == null) return;
+
+//     if (!task.assigneeIds.contains(userId)) {
+//       final updatedAssignees = [...task.assigneeIds, userId];
+//       final updatedTask = task.copyWith(assigneeIds: updatedAssignees);
+//       card.tasks[taskId] = updatedTask;
+//       notifyListeners();
+//     }
+//   }
+
+//   // Метод: Удалить участника из задачи
+//   void removeAssigneeFromTask(String boardId, String cardId, String taskId, String userId) {
+//     final board = boards1[boardId];
+//     if (board == null) return;
+
+//     final card = board.cards[cardId];
+//     if (card == null) return;
+
+//     final task = card.tasks[taskId];
+//     if (task == null) return;
+
+//     if (task.assigneeIds.contains(userId)) {
+//       final updatedAssignees = List<String>.from(task.assigneeIds)..remove(userId);
+//       final updatedTask = task.copyWith(assigneeIds: updatedAssignees);
+//       card.tasks[taskId] = updatedTask;
+//       notifyListeners();
+//     }
+//   }
+
+//   // Метод: Очистить недействительных участников из всех задач доски
+//   void cleanInvalidAssigneesFromBoard(String boardId) {
+//     final board = boards1[boardId];
+//     if (board == null) return;
+
+//     final validUserIds = {
+//       ...board.sharedWith.keys,
+//       ...board.sharedWith.keys,
+//       board.ownerId,
+//     };
+
+//     board.cards.forEach((cardId, card) {
+//       card.tasks.forEach((taskId, task) {
+//         final filteredAssignees = task.assigneeIds
+//             .where((id) => validUserIds.contains(id))
+//             .toList();
+//         card.tasks[taskId] = task.copyWith(assigneeIds: filteredAssignees);
+//       });
+//     });
+
+//     notifyListeners();
+//   }
+
+//   // Метод: Обновить доску с проверкой удаления пользователей
+//   Future<void> updateBoardWithCleanup(BoardModel board) async {
+//     boards1[board.id] = board;
+//     cleanInvalidAssigneesFromBoard(board.id);
+//     notifyListeners();
+//     await updateBoard(board); // Предполагается, что этот метод сохраняет в БД
+//   }
+
+  // Обновлённый метод добавления пользователя в доску
+  // Future<void> addUserToBoard(
+  //   BoardModel board,
+  //   String newUserId,
+  //   String role,
+  //   AppUser sender,
+  //   NotificationProvider notificationProvider,
+  // ) async {
+  //   final updatedSharedWith =
+  //       Map<String, Map<String, dynamic>>.from(board.sharedWith);
+
+  //   final isNewUser = !updatedSharedWith.containsKey(newUserId);
+
+  //   updatedSharedWith[newUserId] = {
+  //     'role': role,
+  //     'status': isNewUser
+  //         ? 'pending'
+  //         : updatedSharedWith[newUserId]?['status'] ?? 'accepted',
+  //   };
+
+  //   final updatedBoard = board.copyWith(sharedWith: updatedSharedWith);
+  //   await updateBoardWithCleanup(updatedBoard);
+
+  //   if (isNewUser) {
+  //     await notificationProvider.sendInvitationNotification(
+  //       recipientId: newUserId,
+  //       sender: sender,
+  //       board: updatedBoard,
+  //     );
+  //   }
+  // }
 }

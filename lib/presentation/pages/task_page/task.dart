@@ -1,4 +1,9 @@
+import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/data/models/board_model.dart';
+import 'package:flow/data/models/role_model.dart';
+import 'package:flow/data/models/user_models.dart';
 import 'package:flow/generated/l10n.dart';
+import 'package:flow/presentation/widgets/assigne_bottom_widget.dart';
 import 'package:flow/presentation/widgets/date_time_picker.dart';
 import 'package:flow/presentation/widgets/rounded_container.dart';
 import 'package:flutter/material.dart';
@@ -138,6 +143,32 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       if (mounted) Navigator.pop(context); // Закрыть после удаления
     }
   }
+void showAssigneeBottomSheet({
+  required BuildContext context,
+  required BoardModel board,
+  required String cardId,
+  required TaskModel task,
+}) {
+  final boardProvider = Provider.of<BoardProvider>(context, listen: false);
+  final auth = Provider.of<AuthProvider>(context, listen: false);
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return AssigneeBottomSheetContent(
+        board: board,
+        cardId: cardId,
+        task: task,
+        boardProvider: boardProvider,
+        auth: auth,
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +200,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(S.of(context).editTask(task.title)),
+            // title: Text(S.of(context).editTask(task.title)),
+            title: Text(task.title),
             actions: [
               IconButton(
                 icon: const Icon(Icons.save),
@@ -293,7 +325,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                                       dueDate: dueDate,
                                       order: task.order,
                                     );
-                                
+
                                     await provider.updateTask(
                                       widget.boardId,
                                       widget.cardId,
@@ -415,7 +447,37 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                       ),
                     ),
 
-                    const SizedBox(height: 270), // отступ перед кнопкой
+                    const SizedBox(height: 15),
+                    IconButton(
+                      onPressed: () {
+                        showAssigneeBottomSheet(
+                          context: context,
+                          board: board, // актуальная доска
+                          cardId: widget.cardId,
+                          task: task,
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.abc,
+                        color: Colors.red,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // provider.watchTaskById(widget.boardId, widget.cardId, widget.taskId);
+                      },
+                      child: RoundedContainerCustom(
+                          isDark: isDark,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0,
+                          ),
+                          width: 320,
+                          height: 100,
+                          childWidget: const Column(
+                            children: [Text('123')],
+                          )),
+                    ),
+                    const SizedBox(height: 200), // отступ перед кнопкой
                     SizedBox(
                       width: 320,
                       height: 45,
