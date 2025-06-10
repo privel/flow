@@ -115,6 +115,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "en_ru": MessageLookupByLibrary.simpleMessage("en"),
     "enterEmail": MessageLookupByLibrary.simpleMessage("Enter Email"),
     "enterTheName": MessageLookupByLibrary.simpleMessage("Enter the name"),
+    "enterYourEmailAddressOrName": MessageLookupByLibrary.simpleMessage(
+      "Enter your email or name",
+    ),
     "home": MessageLookupByLibrary.simpleMessage("Home"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
@@ -128,6 +131,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "nameTask": MessageLookupByLibrary.simpleMessage("Name task"),
     "newBoard": MessageLookupByLibrary.simpleMessage("New Board"),
     "newColumn": MessageLookupByLibrary.simpleMessage("New column"),
+    "noOneHasBeenFound": MessageLookupByLibrary.simpleMessage(
+      "No one has been found",
+    ),
+    "notEnoughRights": MessageLookupByLibrary.simpleMessage(
+      "Not enough rights",
+    ),
     "notSelected": MessageLookupByLibrary.simpleMessage("Not selected"),
     "notification": MessageLookupByLibrary.simpleMessage("Notification"),
     "notificationHistory": MessageLookupByLibrary.simpleMessage(
@@ -148,6 +157,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "resend": MessageLookupByLibrary.simpleMessage("Resend"),
     "resendtext": m1,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Reset password"),
+    "responsiblePersons": MessageLookupByLibrary.simpleMessage(
+      "Responsible persons",
+    ),
     "save": MessageLookupByLibrary.simpleMessage("Save"),
     "saved": MessageLookupByLibrary.simpleMessage("Saved"),
     "searchYourTask": MessageLookupByLibrary.simpleMessage(
@@ -167,6 +179,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "The email has been sent! Check your email.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Theme"),
+    "thereAreNoDesignatedParticipants": MessageLookupByLibrary.simpleMessage(
+      "There are no designated participants",
+    ),
+    "thereAreNoResponsiblePeople": MessageLookupByLibrary.simpleMessage(
+      "There are no responsible people",
+    ),
     "thisActionCannotBeUndoneContinue": MessageLookupByLibrary.simpleMessage(
       "This action cannot be undone. Continue?",
     ),

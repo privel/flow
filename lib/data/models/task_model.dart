@@ -83,8 +83,8 @@ class TaskModel {
   final bool isDone;
   final DateTime? startDate;
   final DateTime? dueDate;
-  final List<String> assigneeIds;
-  final int order; // <-- Новое поле
+  final Map<String, DateTime> assignees;
+  final int order;
 
   TaskModel({
     required this.id,
@@ -93,7 +93,7 @@ class TaskModel {
     required this.isDone,
     this.startDate,
     this.dueDate,
-    this.assigneeIds = const [],
+    required this.assignees,
     required this.order,
   });
 
@@ -104,7 +104,7 @@ class TaskModel {
     bool? isDone,
     DateTime? startDate,
     DateTime? dueDate,
-    List<String>? assigneeIds,
+    Map<String, DateTime>? assignees,
     int? order,
   }) {
     return TaskModel(
@@ -114,7 +114,7 @@ class TaskModel {
       isDone: isDone ?? this.isDone,
       startDate: startDate ?? this.startDate,
       dueDate: dueDate ?? this.dueDate,
-      assigneeIds: assigneeIds ?? this.assigneeIds,
+      assignees: assignees ?? this.assignees,
       order: order ?? this.order,
     );
   }
@@ -131,8 +131,18 @@ class TaskModel {
       dueDate: map['dueDate'] != null
           ? (map['dueDate'] as Timestamp).toDate()
           : null,
+      assignees: map['assignees'] != null && map['assignees'] is Map
+          ? (map['assignees'] as Map<String, dynamic>).map(
+              (key, value) {
+                try {
+                  return MapEntry(key, (value as Timestamp).toDate());
+                } catch (_) {
+                  return MapEntry(key, DateTime.now());
+                }
+              },
+            )
+          : {},
       order: map['order'] ?? 0,
-      assigneeIds: List<String>.from(map['assigneeIds'] ?? []),
     );
   }
 
@@ -143,7 +153,8 @@ class TaskModel {
       'isDone': isDone,
       'startDate': startDate,
       'dueDate': dueDate,
-      'assigneeIds': assigneeIds,
+      'assignees': assignees
+          .map((key, value) => MapEntry(key, Timestamp.fromDate(value))),
       'order': order,
     };
   }

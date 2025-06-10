@@ -353,6 +353,7 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
         description: "",
         isDone: false,
         order: newOrder,
+        assignees: {},
       );
       await boardProvider.addTaskToCard(widget.boardModel.id, cardId, newTask);
     }
@@ -1058,7 +1059,9 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
             ),
           );
         }
-        return Container();
+        return const SizedBox(
+          height: 10,
+        );
       },
     );
   }

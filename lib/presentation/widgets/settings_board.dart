@@ -164,15 +164,15 @@ class _SettingsBoardState extends State<SettingsBoard> {
               ),
 
               const SizedBox(height: 4),
-               Text(
-                      user.displayName.isNotEmpty ? user.displayName: 'No name',
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                        fontFamily: 'SFProText',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                      ),
-                    ),
+              Text(
+                user.displayName.isNotEmpty ? user.displayName : 'No name',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontFamily: 'SFProText',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                ),
+              ),
               Text(
                 user.email,
                 style: TextStyle(
@@ -656,7 +656,9 @@ class _ManageMembersContentState extends State<_ManageMembersContent> {
         child: Container(
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF161616) : const Color(0xFFD3D3D3),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(

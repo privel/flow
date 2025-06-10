@@ -794,6 +794,66 @@ class S {
   String get account {
     return Intl.message('Account', name: 'account', desc: '', args: []);
   }
+
+  /// `Responsible persons`
+  String get responsiblePersons {
+    return Intl.message(
+      'Responsible persons',
+      name: 'responsiblePersons',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `There are no designated participants`
+  String get thereAreNoDesignatedParticipants {
+    return Intl.message(
+      'There are no designated participants',
+      name: 'thereAreNoDesignatedParticipants',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No one has been found`
+  String get noOneHasBeenFound {
+    return Intl.message(
+      'No one has been found',
+      name: 'noOneHasBeenFound',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter your email or name`
+  String get enterYourEmailAddressOrName {
+    return Intl.message(
+      'Enter your email or name',
+      name: 'enterYourEmailAddressOrName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not enough rights`
+  String get notEnoughRights {
+    return Intl.message(
+      'Not enough rights',
+      name: 'notEnoughRights',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `There are no responsible people`
+  String get thereAreNoResponsiblePeople {
+    return Intl.message(
+      'There are no responsible people',
+      name: 'thereAreNoResponsiblePeople',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

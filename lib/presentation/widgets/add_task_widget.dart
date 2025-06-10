@@ -251,7 +251,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                       isDone: false,
                       startDate: startDate,
                       dueDate: dueDate,
-                      order: taskCount + 1,
+                      order: taskCount + 1, assignees: {},
                     );
 
                     await boardProvider.addTaskToCard(

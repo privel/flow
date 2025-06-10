@@ -6,7 +6,9 @@ import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/widgets/assigne_bottom_widget.dart';
 import 'package:flow/presentation/widgets/date_time_picker.dart';
 import 'package:flow/presentation/widgets/rounded_container.dart';
+import 'package:flow/presentation/widgets/snackbar_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flow/core/utils/provider/board_provider.dart';
 import 'package:flow/data/models/task_model.dart';
@@ -30,10 +32,12 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   ScrollController scrollController = ScrollController();
+  String? UserRole;
   DateTime? startDate;
   DateTime? dueDate;
   bool _isDone = false;
   bool _isInitialized = false;
+  late Future<List<BoardMember>> futureMembers;
 
   @override
   void dispose() {
@@ -69,7 +73,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   //   );
   // }
 
-  Future<void> _saveTask(BoardProvider provider, int order) async {
+  Future<void> _saveTask(
+      BoardProvider provider, int order, TaskModel task) async {
     final updatedTask = TaskModel(
       id: widget.taskId,
       title: _titleController.text.trim(),
@@ -77,6 +82,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       isDone: _isDone,
       startDate: startDate,
       dueDate: dueDate,
+      assignees: task.assignees,
       order: order,
     );
 
@@ -88,9 +94,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
     if (!mounted) return;
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(S.of(context).changesSaved)),
-    );
+    SnackBarHelper.show(context, S.of(context).changesSaved,
+        type: SnackType.success);
   }
 
   Future<void> _deleteTask(String cardId, String taskId, bool isDark) async {
@@ -143,36 +148,123 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       if (mounted) Navigator.pop(context); // Закрыть после удаления
     }
   }
-void showAssigneeBottomSheet({
-  required BuildContext context,
-  required BoardModel board,
-  required String cardId,
-  required TaskModel task,
-}) {
-  final boardProvider = Provider.of<BoardProvider>(context, listen: false);
-  final auth = Provider.of<AuthProvider>(context, listen: false);
 
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) {
-      return AssigneeBottomSheetContent(
-        board: board,
-        cardId: cardId,
-        task: task,
-        boardProvider: boardProvider,
-        auth: auth,
-      );
-    },
-  );
-}
+  void showAssigneeBottomSheet({
+    required BuildContext context,
+    required BoardModel board,
+    required String cardId,
+    required TaskModel task,
+    required bool isDark,
+  }) {
+    final boardProvider = Provider.of<BoardProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF161616) : const Color(0xFFD3D3D3),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.8,
+              minChildSize: 0.4,
+              maxChildSize: 0.9,
+              builder: (context, scrollController) {
+                return AssigneeBottomSheetContent(
+                  board: board,
+                  cardId: cardId,
+                  task: task,
+                  boardProvider: boardProvider,
+                  auth: auth,
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  List<BoardMember> getAssignees(
+      List<BoardMember> members, Map<String, DateTime> assigneesMap) {
+    return members
+        .where((member) => assigneesMap.containsKey(member.user.id))
+        .toList();
+  }
+
+  Widget buildUserList(List<BoardMember> members, bool isDark) {
+    return Row(
+      children: members.map((member) {
+        final user = member.user;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 6,
+          ),
+          child: Column(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.grey,
+                radius: 25,
+                backgroundImage:
+                    (user.photoUrl != null && user.photoUrl!.trim().isNotEmpty)
+                        ? NetworkImage(user.photoUrl!)
+                        : null,
+                child: (user.photoUrl == null || user.photoUrl!.trim().isEmpty)
+                    ? (user.displayName != null &&
+                            user.displayName.trim().isNotEmpty)
+                        ? Text(
+                            user.displayName[0].toUpperCase(),
+                            style: const TextStyle(
+                              fontFamily: 'SFProText',
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        : Icon(Icons.person)
+                    : null,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                user.displayName.isNotEmpty ? user.displayName : 'No name',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontFamily: 'SFProText',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                ),
+              ),
+              Text(
+                user.email,
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  fontFamily: 'SFProText',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BoardProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return StreamBuilder(
@@ -187,6 +279,8 @@ void showAssigneeBottomSheet({
         final card = board.cards[widget.cardId];
         final task = card?.tasks[widget.taskId];
 
+        UserRole = provider.getUserRole(board, auth.user?.uid ?? '');
+
         if (task == null) {
           return const Scaffold(body: Center(child: Text('Задача не найдена')));
         }
@@ -195,6 +289,8 @@ void showAssigneeBottomSheet({
           startDate = task.startDate;
           dueDate = task.dueDate;
           _loadTaskData(task);
+          futureMembers = provider.loadBoardUsers(
+              board, Provider.of<AuthProvider>(context, listen: false));
           _isInitialized = true;
         }
 
@@ -202,16 +298,27 @@ void showAssigneeBottomSheet({
           appBar: AppBar(
             // title: Text(S.of(context).editTask(task.title)),
             title: Text(task.title),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.save),
-                onPressed: () async {
-                  await _saveTask(provider, task.order);
-                },
-              ),
-            ],
+            leading: IconButton(
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+          icon: const Icon(Icons.arrow_back_ios, size: 22),
+        ),
+            actions: UserRole != 'viewer'
+                ? [
+                    IconButton(
+                      icon: const Icon(Icons.save),
+                      onPressed: () async {
+                        await _saveTask(provider, task.order, task);
+                      },
+                    ),
+                  ]
+                : null,
           ),
-
           body: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             behavior: HitTestBehavior.opaque,
@@ -225,61 +332,6 @@ void showAssigneeBottomSheet({
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Container(
-                        //   width: 320,
-                        //   decoration: BoxDecoration(
-                        //     color: isDark
-                        //         ? const Color(0xFF333333)
-                        //         : const Color(0xFFF0F0F0),
-                        //     borderRadius: BorderRadius.circular(25),
-                        //   ),
-                        //   child: Theme(
-                        //     data: Theme.of(context).copyWith(
-                        //       unselectedWidgetColor:
-                        //           isDark ? Colors.white54 : Colors.black54,
-                        //     ),
-                        //     child: CheckboxListTile(
-                        //       value: _isDone,
-                        //       onChanged: (bool? value) async {
-                        //         setState(() {
-                        //           _isDone = value ?? false;
-                        //         });
-                        //         final updatedTask = TaskModel(
-                        //           id: widget.taskId,
-                        //           title: _titleController.text.trim(),
-                        //           description:
-                        //               _descriptionController.text.trim(),
-                        //           isDone: _isDone,
-                        //           startDate: startDate,
-                        //           dueDate: dueDate,
-                        //           order: task.order,
-                        //         );
-
-                        //         await provider.updateTask(
-                        //           widget.boardId,
-                        //           widget.cardId,
-                        //           updatedTask,
-                        //         );
-                        //       },
-                        //       title: Text(
-                        //         S.of(context).complete,
-                        //         style: TextStyle(
-                        //           color: isDark ? Colors.white : Colors.black,
-                        //           fontWeight: FontWeight.w600,
-                        //         ),
-                        //       ),
-                        //       activeColor:
-                        //           Theme.of(context).colorScheme.primary,
-                        //       checkColor: Colors.white,
-                        //       controlAffinity: ListTileControlAffinity.leading,
-                        //       contentPadding:
-                        //           const EdgeInsets.symmetric(horizontal: 16),
-                        //       shape: RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.circular(25),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         const SizedBox(
                           height: 15,
                         ),
@@ -323,6 +375,7 @@ void showAssigneeBottomSheet({
                                       isDone: _isDone,
                                       startDate: startDate,
                                       dueDate: dueDate,
+                                      assignees: task.assignees,
                                       order: task.order,
                                     );
 
@@ -399,26 +452,6 @@ void showAssigneeBottomSheet({
                         ),
                       ],
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.symmetric(vertical: 12),
-                    //   child: RoundedContainerCustom(
-                    //     isDark: isDark,
-                    //     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    //     childWidget: SingleChildScrollView(
-                    //   scrollDirection: Axis.horizontal,
-                    //   child: Align(
-                    //     alignment: Alignment.centerLeft,
-                    //     child: GestureDetector(
-                    //         onTap: () async {
-                    //           // showManageMembersModal(context, widget.board);
-                    //           await provider.getValidTaskAssignees(board.id, card!.id, task.id);
-                    //         },
-                    //         child: Text("123")),
-                    //   ),
-                    // ),
-                    //   ),
-                    // ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12.0,
@@ -446,89 +479,117 @@ void showAssigneeBottomSheet({
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 15),
-                    IconButton(
-                      onPressed: () {
-                        showAssigneeBottomSheet(
-                          context: context,
-                          board: board, // актуальная доска
-                          cardId: widget.cardId,
-                          task: task,
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.abc,
-                        color: Colors.red,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        // provider.watchTaskById(widget.boardId, widget.cardId, widget.taskId);
-                      },
-                      child: RoundedContainerCustom(
-                          isDark: isDark,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                          ),
-                          width: 320,
-                          height: 100,
-                          childWidget: const Column(
-                            children: [Text('123')],
-                          )),
-                    ),
-                    const SizedBox(height: 200), // отступ перед кнопкой
-                    SizedBox(
+                    RoundedContainerCustom(
+                      isDark: isDark,
                       width: 320,
-                      height: 45,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent.shade400,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 15,
+                      ),
+                      childWidget: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.people_alt_rounded,
+                                size: 15.0,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                S.of(context).members,
+                                style: TextStyle(
+                                  fontFamily: 'SFProText',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        onPressed: () =>
-                            _deleteTask(widget.cardId, widget.taskId, isDark),
-                        child: Text(
-                          S.of(context).deleteATask,
-                          style: TextStyle(
-                            fontFamily: 'SFProText',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: isDark ? Colors.white : Colors.black,
+                          Divider(
+                            color: isDark ? Colors.white30 : Colors.black26,
+                            thickness: 1.2,
+                            height: 5,
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          FutureBuilder<List<BoardMember>>(
+                            future: futureMembers,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const CircularProgressIndicator();
+                              }
+
+                              final members = snapshot.data!;
+                              final assigned =
+                                  getAssignees(members, task.assignees);
+
+                              if (assigned.isEmpty) {
+                                return Text(
+                                  S.of(context).thereAreNoResponsiblePeople,
+                                  style: const TextStyle(
+                                    fontFamily: 'SFProText',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                );
+                              }
+
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showAssigneeBottomSheet(
+                                      context: context,
+                                      board: board, // актуальная доска
+                                      cardId: widget.cardId,
+                                      task: task,
+                                      isDark: isDark,
+                                    );
+                                  },
+                                  child: buildUserList(
+                                      assigned,
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
+                    const SizedBox(height: 200),
+                    UserRole != "viewer"
+                        ? SizedBox(
+                            width: 320,
+                            height: 45,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.redAccent.shade400,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              onPressed: () => _deleteTask(
+                                  widget.cardId, widget.taskId, isDark),
+                              child: Text(
+                                S.of(context).deleteATask,
+                                style: TextStyle(
+                                  fontFamily: 'SFProText',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(),
                   ],
                 ),
               ),
             ),
           ),
-          // body: Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Column(
-          //     children: [
-          //       TextField(
-          //         controller: _titleController,
-          //         decoration: const InputDecoration(labelText: 'Название задачи'),
-          //       ),
-          //       const SizedBox(height: 16),
-          //       TextField(
-          //         controller: _descriptionController,
-          //         decoration: const InputDecoration(labelText: 'Описание'),
-          //         maxLines: 4,
-          //       ),
-          //       const SizedBox(height: 16),
-          //       CheckboxListTile(
-          //         title: const Text('Завершена'),
-          //         value: _isDone,
-          //         onChanged: (val) => setState(() => _isDone = val ?? false),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         );
       },
     );

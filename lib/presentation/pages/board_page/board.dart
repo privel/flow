@@ -385,7 +385,7 @@ class _BoardPageState extends State<BoardPage> {
                                                     id: newTaskId,
                                                     title: text,
                                                     description: '',
-                                                    isDone: false, order: board.cards[cardId]!.tasks.length,
+                                                    isDone: false, order: board.cards[cardId]!.tasks.length, assignees: {},
                                                     
                                                   ),
                                                 );

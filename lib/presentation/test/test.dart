@@ -72,7 +72,7 @@ class _BoardPageState extends State<BoardPaget> {
                   title: title,
                   description: '',
                   isDone: false,
-                  order: order,
+                  order: order, assignees: {},
                 );
                 await boardProvider.addTaskToCard(
                     widget.boardId, _selectedCardId!, task);

@@ -524,23 +524,30 @@ class BoardProvider extends ChangeNotifier {
   }
 
   
-
-void addAssigneeToTask(BoardModel board, String cardId, String taskId, String userId) async {
+Future<void> addAssigneeToTask(
+  BoardModel board,
+  String cardId,
+  String taskId,
+  String userId,
+) async {
   final card = board.cards[cardId];
   if (card == null) return;
 
   final task = card.tasks[taskId];
   if (task == null) return;
 
-  if (!task.assigneeIds.contains(userId)) {
-    final updatedAssignees = [...task.assigneeIds, userId];
-    final updatedTask = task.copyWith(assigneeIds: updatedAssignees);
+  if (!task.assignees.containsKey(userId)) {
+    final updatedAssignees = Map<String, DateTime>.from(task.assignees)
+      ..[userId] = DateTime.now();
+
+    final updatedTask = task.copyWith(assignees: updatedAssignees);
     card.tasks[taskId] = updatedTask;
-    
+
     await updateBoard(board);
     notifyListeners();
   }
 }
+
 
 Future<void> removeAssigneeFromTask(
   BoardModel board,
@@ -554,9 +561,11 @@ Future<void> removeAssigneeFromTask(
   final task = card.tasks[taskId];
   if (task == null) return;
 
-  if (task.assigneeIds.contains(userId)) {
-    final updatedAssignees = List<String>.from(task.assigneeIds)..remove(userId);
-    final updatedTask = task.copyWith(assigneeIds: updatedAssignees);
+  if (task.assignees.containsKey(userId)) {
+    final updatedAssignees = Map<String, DateTime>.from(task.assignees)
+      ..remove(userId);
+
+    final updatedTask = task.copyWith(assignees: updatedAssignees);
     card.tasks[taskId] = updatedTask;
 
     await updateBoard(board);

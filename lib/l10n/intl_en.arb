@@ -97,5 +97,11 @@
   "deleteAParticipant": "Delete a participant",
   "doYouReallyWantToDeleteTheParticipant": "Do you really want to delete the participant?",
   "home": "Home",
-  "account": "Account"
+  "account": "Account",
+  "responsiblePersons": "Responsible persons",
+  "thereAreNoDesignatedParticipants": "There are no designated participants",
+  "noOneHasBeenFound": "No one has been found",
+  "enterYourEmailAddressOrName": "Enter your email or name",
+  "notEnoughRights": "Not enough rights",
+  "thereAreNoResponsiblePeople": "There are no responsible people"
 }

@@ -68,7 +68,7 @@
   "dueDate": "Дата конца",
   "couldntAddToFavorite": "Не удалось добавить в избранное",
   "boardMenu": "Параметры доски",
-  "members": "участники",
+  "members": "Участники",
   "thisActionCannotBeUndoneContinue": "Это действие невозможно отменить. Продолжить?",
   "deleteTheBoard": "Удалить доску?",
   "addATask": "Добавить задачу",
@@ -99,5 +99,11 @@
   "deleteAParticipant": "Удалить участника",
   "doYouReallyWantToDeleteTheParticipant": "Вы действительно хотите удалить участника?",
   "home": "Главная",
-  "account": "Аккаунт"
+  "account": "Аккаунт",
+  "responsiblePersons": "Responsible persons",
+  "thereAreNoDesignatedParticipants": "There are no designated participants",
+  "noOneHasBeenFound": "No one has been found",
+  "enterYourEmailAddressOrName": "Enter your email address or name",
+  "notEnoughRights": "Not enough rights",
+  "thereAreNoResponsiblePeople": "There are no responsible people"
 }

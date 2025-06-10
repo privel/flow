@@ -123,6 +123,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "en_ru": MessageLookupByLibrary.simpleMessage("ru"),
     "enterEmail": MessageLookupByLibrary.simpleMessage("Введите почту"),
     "enterTheName": MessageLookupByLibrary.simpleMessage("Введите имя"),
+    "enterYourEmailAddressOrName": MessageLookupByLibrary.simpleMessage(
+      "Enter your email address or name",
+    ),
     "home": MessageLookupByLibrary.simpleMessage("Главная"),
     "language": MessageLookupByLibrary.simpleMessage("Язык"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
@@ -132,10 +135,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "markedAllAsRead": MessageLookupByLibrary.simpleMessage(
       "Помечено все как прочитанное",
     ),
-    "members": MessageLookupByLibrary.simpleMessage("участники"),
+    "members": MessageLookupByLibrary.simpleMessage("Участники"),
     "nameTask": MessageLookupByLibrary.simpleMessage("Назовите задачу"),
     "newBoard": MessageLookupByLibrary.simpleMessage("Новая Доска"),
     "newColumn": MessageLookupByLibrary.simpleMessage("Новая колонка"),
+    "noOneHasBeenFound": MessageLookupByLibrary.simpleMessage(
+      "No one has been found",
+    ),
+    "notEnoughRights": MessageLookupByLibrary.simpleMessage(
+      "Not enough rights",
+    ),
     "notSelected": MessageLookupByLibrary.simpleMessage("Не выбрано"),
     "notification": MessageLookupByLibrary.simpleMessage("Уведомления"),
     "notificationHistory": MessageLookupByLibrary.simpleMessage("История"),
@@ -156,6 +165,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "resend": MessageLookupByLibrary.simpleMessage("Отправить повторно"),
     "resendtext": m1,
     "resetPassword": MessageLookupByLibrary.simpleMessage("Сброс пароля"),
+    "responsiblePersons": MessageLookupByLibrary.simpleMessage(
+      "Responsible persons",
+    ),
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
     "saved": MessageLookupByLibrary.simpleMessage("Сохраненный"),
     "searchYourTask": MessageLookupByLibrary.simpleMessage(
@@ -177,6 +189,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Письмо отправлено! Проверьте свой электронный адрес.",
     ),
     "theme": MessageLookupByLibrary.simpleMessage("Тема"),
+    "thereAreNoDesignatedParticipants": MessageLookupByLibrary.simpleMessage(
+      "There are no designated participants",
+    ),
+    "thereAreNoResponsiblePeople": MessageLookupByLibrary.simpleMessage(
+      "There are no responsible people",
+    ),
     "thisActionCannotBeUndoneContinue": MessageLookupByLibrary.simpleMessage(
       "Это действие невозможно отменить. Продолжить?",
     ),

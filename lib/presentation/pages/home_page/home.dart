@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
     final boardProvider = Provider.of<BoardProvider>(context, listen: false);
     final userId = auth.user?.uid;
     boardStream = boardProvider.watchBoards(userId ?? '');
+    
   }
 
   Future<void> _onRefresh() async {
@@ -855,6 +856,8 @@ class _HomePageState extends State<HomePage> {
                   // if (snapshot.connectionState == ConnectionState.waiting) {
                   //   return const Center(child: CircularProgressIndicator());
                   // }
+
+                  debugPrint("${snapshot.data}");
                   if (snapshot.connectionState == ConnectionState.waiting &&
                       !snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
