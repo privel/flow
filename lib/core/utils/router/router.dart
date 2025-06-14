@@ -10,6 +10,7 @@ import 'package:flow/presentation/pages/home_page/home.dart';
 import 'package:flow/presentation/pages/account_page/account.dart';
 import 'package:flow/presentation/pages/invite_join_page/Invite_page.dart';
 import 'package:flow/presentation/pages/notification_page/notification.dart';
+import 'package:flow/presentation/pages/task_page/photo_page.dart';
 import 'package:flow/presentation/pages/task_page/task.dart';
 import 'package:flow/presentation/pages/welcome_page/welcome.dart';
 import 'package:flow/presentation/pages/board_page/new_board_after_test/other_test.dart';
@@ -18,9 +19,7 @@ import 'package:flow/presentation/widgets/header/responsive_layout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
-
 GoRouter appRouter(AuthProvider authProvider) {
- 
   return GoRouter(
     initialLocation: '/',
     refreshListenable: authProvider,
@@ -96,14 +95,15 @@ GoRouter appRouter(AuthProvider authProvider) {
           return BoardPage(boardId: boardId);
         },
       ),
-      GoRoute(
-        path: '/board/:boardId/card/:cardId/task/:taskId',
-        builder: (context, state) => TaskDetailPage(
-          boardId: state.pathParameters['boardId']!,
-          cardId: state.pathParameters['cardId']!,
-          taskId: state.pathParameters['taskId']!,
-        ),
-      ),
+      //Убрал для теста просмотра картинок
+      // GoRoute(
+      //   path: '/board/:boardId/card/:cardId/task/:taskId',
+      //   builder: (context, state) => TaskDetailPage(
+      //     boardId: state.pathParameters['boardId']!,
+      //     cardId: state.pathParameters['cardId']!,
+      //     taskId: state.pathParameters['taskId']!,
+      //   ),
+      // ),
 
       GoRoute(
         path: '/boardtest/:id',
@@ -124,14 +124,45 @@ GoRouter appRouter(AuthProvider authProvider) {
       ),
 
       GoRoute(
-  path: '/invite/:inviteId',
-  builder: (context, state) {
-    final inviteId = state.pathParameters['inviteId']!;
-    return InviteJoinPage(inviteId: inviteId);
-  },
-),
-      GoRoute(path: "/test/color",
-      builder: (context, state) => const Text("Test"),),
+        path: '/invite/:inviteId',
+        builder: (context, state) {
+          final inviteId = state.pathParameters['inviteId']!;
+          return InviteJoinPage(inviteId: inviteId);
+        },
+      ),
+      GoRoute(
+        path: "/test/color",
+        builder: (context, state) => const Text("Test"),
+      ),
+
+      GoRoute(
+        path: '/board/:boardId/card/:cardId/task/:taskId',
+        builder: (context, state) => TaskDetailPage(
+          boardId: state.pathParameters['boardId']!,
+          cardId: state.pathParameters['cardId']!,
+          taskId: state.pathParameters['taskId']!,
+        ),
+        routes: [
+          // Новый вложенный маршрут для просмотра изображений
+          GoRoute(
+            path:
+                'view-images', // Полный путь будет /board/:boardId/card/:cardId/task/:taskId/view-images
+            builder: (context, state) {
+              final List<Map<String, dynamic>> images =
+                  state.extra as List<Map<String, dynamic>>;
+              final int initialIndex =
+                  state.uri.queryParameters['initialIndex'] != null
+                      ? int.parse(state.uri.queryParameters['initialIndex']!)
+                      : 0;
+
+              return ImageViewerPage(
+                images: images,
+                initialIndex: initialIndex,
+              );
+            },
+          ),
+        ],
+      ),
     ],
   );
 }

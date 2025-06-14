@@ -103,5 +103,8 @@
   "noOneHasBeenFound": "No one has been found",
   "enterYourEmailAddressOrName": "Enter your email or name",
   "notEnoughRights": "Not enough rights",
-  "thereAreNoResponsiblePeople": "There are no responsible people"
+  "thereAreNoResponsiblePeople": "There are no responsible people",
+  "takeAPhoto": "Take a photo",
+  "chooseFromGallery": "Choose from Gallery",
+  "attachments": "Attachments"
 }

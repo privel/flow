@@ -86,37 +86,6 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-//OLD WITHOUT ADD TO FIRESTORE
-// Future<void> updateUserPhoto(Uint8List imageBytes) async {
-//   final userId = _user?.uid;
-//   if (userId == null) return;
-
-//   final fileName = '$userId.jpg';
-
-//   final path = await supa.Supabase.instance.client.storage
-//       .from('avatars')
-//       .uploadBinary(
-//         fileName,
-//         imageBytes,
-//         fileOptions: const supa.FileOptions(
-//           upsert: true,
-//           contentType: 'image/jpeg',
-//         ),
-//       );
-
-//   debugPrint("📤 Загружено в: $path"); // <-- просто путь к файлу
-
-//   final publicUrl = supa.Supabase.instance.client.storage
-//       .from('avatars')
-//       .getPublicUrl(fileName);
-
-//   await _user?.updatePhotoURL(publicUrl);
-//   await _user?.reload();
-
-//   _user = _auth.currentUser;
-//   notifyListeners();
-// }
-
   Future<void> removeUserPhoto() async {
     final userId = _user?.uid;
     if (userId == null) return;

@@ -854,6 +854,26 @@ class S {
       args: [],
     );
   }
+
+  /// `Take a photo`
+  String get takeAPhoto {
+    return Intl.message('Take a photo', name: 'takeAPhoto', desc: '', args: []);
+  }
+
+  /// `Choose from Gallery`
+  String get chooseFromGallery {
+    return Intl.message(
+      'Choose from Gallery',
+      name: 'chooseFromGallery',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Attachments`
+  String get attachments {
+    return Intl.message('Attachments', name: 'attachments', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

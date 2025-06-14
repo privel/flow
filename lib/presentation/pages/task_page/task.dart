@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:flow/core/utils/picker_file_image/picker.dart';
 import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/data/models/board_model.dart';
 import 'package:flow/data/models/role_model.dart';
-import 'package:flow/data/models/user_models.dart';
 import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/widgets/assigne_bottom_widget.dart';
 import 'package:flow/presentation/widgets/date_time_picker.dart';
@@ -9,9 +12,11 @@ import 'package:flow/presentation/widgets/rounded_container.dart';
 import 'package:flow/presentation/widgets/snackbar_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iconly/iconly.dart';
 import 'package:provider/provider.dart';
 import 'package:flow/core/utils/provider/board_provider.dart';
 import 'package:flow/data/models/task_model.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskDetailPage extends StatefulWidget {
   final String boardId;
@@ -29,6 +34,7 @@ class TaskDetailPage extends StatefulWidget {
 }
 
 class _TaskDetailPageState extends State<TaskDetailPage> {
+  final Picker _customPicker = Picker();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   ScrollController scrollController = ScrollController();
@@ -38,40 +44,216 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   bool _isDone = false;
   bool _isInitialized = false;
   late Future<List<BoardMember>> futureMembers;
+  String _initialTitle = '';
+  String _initialDescription = '';
+
+  Timer? _debounceTimer;
+
+  Map<String, Map<String, dynamic>> _initialImages = {};
+  Map<String, Map<String, dynamic>> _currentImages = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.addListener(_onTitleChanged);
+    _descriptionController.addListener(_onDescriptionChanged);
+  }
 
   @override
   void dispose() {
+    _titleController.removeListener(_onTitleChanged);
+    _descriptionController.removeListener(_onDescriptionChanged);
     _titleController.dispose();
     _descriptionController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  void _onInputChanged() {
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer!.cancel();
+    }
+
+    // Запускаем новый таймер на 2-3 секунды
+    _debounceTimer = Timer(const Duration(seconds: 2), () {
+      _performAutoSave();
+    });
+  }
+
+  void _onTitleChanged() {
+    _onInputChanged();
+  }
+
+  void _onDescriptionChanged() {
+    _onInputChanged();
+  }
+
+  Future<void> _performAutoSave() async {
+    final provider = Provider.of<BoardProvider>(context, listen: false);
+
+    final board = await provider.getBoardById(widget.boardId);
+    final card = board?.cards[widget.cardId];
+    final task = card?.tasks[widget.taskId];
+
+    if (task == null) {
+      debugPrint('Ошибка: Задача не найдена для автосохранения.');
+      return;
+    }
+
+    // Проверяем, изменились ли заголовок или описание
+    final bool titleChanged =
+        _titleController.text.trim() != _initialTitle.trim();
+    final bool descriptionChanged =
+        _descriptionController.text.trim() != _initialDescription.trim();
+    final bool imagesChanged = !_areMapsEqual(_currentImages, _initialImages);
+
+    // Если ничего не изменилось, просто выходим
+    if (!titleChanged && !descriptionChanged && !imagesChanged) {
+      // print(
+      //     'Автосохранение: Изменений в заголовке или описании не обнаружено.');
+      return;
+    }
+
+    final updatedTask = TaskModel(
+      id: widget.taskId,
+      title: _titleController.text.trim(),
+      description: _descriptionController.text.trim(),
+      isDone: _isDone,
+      startDate: startDate,
+      dueDate: dueDate,
+      assignees: task.assignees,
+      order: task.order,
+      images: _currentImages,
+    );
+
+    await provider.updateTask(
+      widget.boardId,
+      widget.cardId,
+      updatedTask,
+    );
+
+    if (!mounted) return;
+
+    // После успешного сохранения, обновляем исходные значения
+    _initialTitle = _titleController.text.trim();
+    _initialDescription = _descriptionController.text.trim();
+    _initialImages = Map.from(_currentImages);
+
+    // SnackBarHelper.show(context, S.of(context).changesSaved,
+    //     type: SnackType.success);
+    // print(
+    //     'Автоматическое сохранение данных: Заголовок: ${_titleController.text}, Описание: ${_descriptionController.text}');
+  }
+
+  bool _areMapsEqual(Map<String, Map<String, dynamic>> map1,
+      Map<String, Map<String, dynamic>> map2) {
+    if (map1.length != map2.length) return false;
+    for (final key in map1.keys) {
+      if (!map2.containsKey(key)) return false;
+      final val1 = map1[key]!;
+      final val2 = map2[key]!;
+
+      // Проверяем все поля внутри вложенного Map
+      if (val1['url'] != val2['url'] ||
+          (val1['dateAdded'] as DateTime).millisecondsSinceEpoch !=
+              (val2['dateAdded'] as DateTime).millisecondsSinceEpoch ||
+          val1['order'] != val2['order']) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  List<Map<String, dynamic>> _getSortedImages() {
+    final List<String> sortedKeys = _currentImages.keys.toList()
+      ..sort((a, b) {
+        final DateTime dateA = _currentImages[a]!['dateAdded'] as DateTime;
+        final DateTime dateB = _currentImages[b]!['dateAdded'] as DateTime;
+        return dateB.compareTo(
+            dateA); // Сортируем от новых к старым (убывающий порядок)
+      });
+
+    return sortedKeys
+        .map((key) => {
+              'id': key, // Сохраняем ID, если он нужен в ImageViewerPage
+              'url': _currentImages[key]!['url'],
+              'dateAdded': _currentImages[key]!['dateAdded'],
+              'order': _currentImages[key]!['order'],
+            })
+        .toList();
+  }
+
+  // --- Методы для работы с изображениями ---
+  Future<void> _pickAndUploadImage() async {
+    if (UserRole == 'viewer') return;
+
+    // Используем ваш кастомный Picker
+    final Uint8List? pickedBytes = await _customPicker.pickImageBytes(context);
+
+    if (pickedBytes != null) {
+      final boardProvider = Provider.of<BoardProvider>(context, listen: false);
+      // Загружаем изображение в Supabase Storage через BoardProvider
+      final imageUrl =
+          await boardProvider.uploadTaskImage(widget.taskId, pickedBytes);
+
+      if (imageUrl != null) {
+        final imageId = const Uuid().v4();
+
+        setState(() {
+          _currentImages[imageId] = {
+            'url': imageUrl,
+            'dateAdded': DateTime.now(),
+            'order':
+                _currentImages.length, // Простой порядок по индексу добавления
+          };
+        });
+        _onInputChanged();
+      } else {
+        SnackBarHelper.show(context, 'Ошибка при загрузке изображения.',
+            type: SnackType.error);
+      }
+    }
+  }
+
+  void _removeImage(String imageId) async {
+    if (UserRole == 'viewer') return;
+
+    final boardProvider = Provider.of<BoardProvider>(context, listen: false);
+    final imageData = _currentImages[imageId];
+
+    setState(() {
+      _currentImages.remove(imageId);
+      _reorderImages();
+    });
+
+    // Удаляем изображение из Supabase Storage
+    if (imageData != null) {
+      await boardProvider.deleteTaskImage(widget.taskId, imageId);
+    }
+
+    _onInputChanged();
+  }
+
+  void _reorderImages() {
+    final sortedKeys = _currentImages.keys.toList()
+      ..sort((a, b) => (_currentImages[a]!['order'] as int)
+          .compareTo(_currentImages[b]!['order'] as int));
+
+    for (int i = 0; i < sortedKeys.length; i++) {
+      _currentImages[sortedKeys[i]]!['order'] = i;
+    }
   }
 
   void _loadTaskData(TaskModel task) {
     _titleController.text = task.title;
     _descriptionController.text = task.description;
     _isDone = task.isDone;
+
+    _initialTitle = task.title;
+    _initialDescription = task.description;
+    _initialImages = Map.from(task.images);
+    _currentImages = Map.from(task.images);
   }
-
-  // Future<void> _saveTask(BoardProvider provider, int order) async {
-  //   final updatedTask = TaskModel(
-  //     id: widget.taskId,
-  //     title: _titleController.text.trim(),
-  //     description: _descriptionController.text.trim(),
-  //     isDone: _isDone,
-  //   );
-
-  //   await provider.updateTask(
-  //     widget.boardId,
-  //     widget.cardId,
-  //     updatedTask,
-  //   );
-
-  //   if (!mounted) return;
-  //   Navigator.pop(context);
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     const SnackBar(content: Text('Изменения сохранены')),
-  //   );
-  // }
 
   Future<void> _saveTask(
       BoardProvider provider, int order, TaskModel task) async {
@@ -92,10 +274,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       updatedTask,
     );
 
-    if (!mounted) return;
-    Navigator.pop(context);
-    SnackBarHelper.show(context, S.of(context).changesSaved,
-        type: SnackType.success);
+    // if (!mounted) return;
+    // Navigator.pop(context);
+    // SnackBarHelper.show(context, S.of(context).changesSaved,
+    //     type: SnackType.success);
   }
 
   Future<void> _deleteTask(String cardId, String taskId, bool isDark) async {
@@ -232,7 +414,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                               fontWeight: FontWeight.w700,
                             ),
                           )
-                        : Icon(Icons.person)
+                        : const Icon(Icons.person)
                     : null,
               ),
               const SizedBox(height: 4),
@@ -267,7 +449,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return StreamBuilder(
+    return StreamBuilder<BoardModel?>(
       stream: provider.watchBoardById(widget.boardId),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
@@ -281,6 +463,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
         UserRole = provider.getUserRole(board, auth.user?.uid ?? '');
 
+        final List<Map<String, dynamic>> sortedImages = _getSortedImages();
+
         if (task == null) {
           return const Scaffold(body: Center(child: Text('Задача не найдена')));
         }
@@ -289,8 +473,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           startDate = task.startDate;
           dueDate = task.dueDate;
           _loadTaskData(task);
-          futureMembers = provider.loadBoardUsers(
-              board, Provider.of<AuthProvider>(context, listen: false));
+          futureMembers = provider.loadBoardUsers(board, auth);
           _isInitialized = true;
         }
 
@@ -299,15 +482,15 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             // title: Text(S.of(context).editTask(task.title)),
             title: Text(task.title),
             leading: IconButton(
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-          icon: const Icon(Icons.arrow_back_ios, size: 22),
-        ),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/');
+                }
+              },
+              icon: const Icon(Icons.arrow_back_ios, size: 22),
+            ),
             actions: UserRole != 'viewer'
                 ? [
                     IconButton(
@@ -463,17 +646,76 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           DateTimePickerWidget(
                             label: S.of(context).startDate,
                             initialDateTime: startDate,
-                            onDateTimeSelected: (picked) {
+                            onDateTimeSelected: (picked) async {
                               FocusScope.of(context).unfocus();
                               setState(() => startDate = picked);
+                              // _performAutoSave();
+
+                              if (task == null) {
+                                debugPrint(
+                                    'Ошибка: Задача не найдена для автосохранения.');
+                                return;
+                              }
+
+                            
+
+                              final updatedTask = TaskModel(
+                                id: widget.taskId,
+                                title: _titleController.text.trim(),
+                                description: _descriptionController.text.trim(),
+                                isDone: _isDone,
+                                startDate: picked,
+                                dueDate: dueDate,
+                                assignees: task.assignees,
+                                order: task.order,
+                                images: _currentImages,
+                              );
+
+                              await provider.updateTask(
+                                widget.boardId,
+                                widget.cardId,
+                                updatedTask,
+                              );
+
+                              if (!mounted) return;
                             },
                           ),
                           DateTimePickerWidget(
                             label: S.of(context).dueDate,
                             initialDateTime: dueDate,
-                            onDateTimeSelected: (picked) {
+                            onDateTimeSelected: (picked) async{
                               FocusScope.of(context).unfocus();
                               setState(() => dueDate = picked);
+
+
+
+                              if (task == null) {
+                                debugPrint(
+                                    'Ошибка: Задача не найдена для автосохранения.');
+                                return;
+                              }
+
+                            
+
+                              final updatedTask = TaskModel(
+                                id: widget.taskId,
+                                title: _titleController.text.trim(),
+                                description: _descriptionController.text.trim(),
+                                isDone: _isDone,
+                                startDate: startDate,
+                                dueDate: picked,
+                                assignees: task.assignees,
+                                order: task.order,
+                                images: _currentImages,
+                              );
+
+                              await provider.updateTask(
+                                widget.boardId,
+                                widget.cardId,
+                                updatedTask,
+                              );
+
+                              if (!mounted) return;
                             },
                           ),
                         ],
@@ -492,8 +734,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           Row(
                             children: [
                               Icon(
-                                Icons.people_alt_rounded,
-                                size: 15.0,
+                                IconlyLight.user,
+                                size: 18.0,
                                 color: isDark ? Colors.white : Colors.black,
                               ),
                               const SizedBox(width: 10),
@@ -511,7 +753,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           Divider(
                             color: isDark ? Colors.white30 : Colors.black26,
                             thickness: 1.2,
-                            height: 5,
+                            height: 15,
                           ),
                           const SizedBox(height: 10),
                           FutureBuilder<List<BoardMember>>(
@@ -528,9 +770,12 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                               if (assigned.isEmpty) {
                                 return Text(
                                   S.of(context).thereAreNoResponsiblePeople,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'SFProText',
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Colors.black87,
                                     fontSize: 15,
                                   ),
                                 );
@@ -559,6 +804,232 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    RoundedContainerCustom(
+                      isDark: isDark,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 15,
+                      ),
+                      width: 320,
+                      childWidget: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.attach_file_rounded,
+                                size: 18.0,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(
+                                S.of(context).attachments,
+                                style: TextStyle(
+                                  fontFamily: 'SFProText',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              const Spacer(),
+                              if (UserRole != 'viewer')
+                                InkWell(
+                                  onTap: () {
+                                    _pickAndUploadImage();
+                                  },
+                                  // ignore: deprecated_member_use
+                                  splashColor: Colors.black.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Icon(
+                                      Icons.add,
+                                      size: 25.0,
+                                      color: Color(0xFF1EBA55),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          Divider(
+                            color: isDark ? Colors.white30 : Colors.black26,
+                            thickness: 1.2,
+                            height: 20,
+                          ),
+                          if (_currentImages.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            // Отображение списка изображений
+                            SizedBox(
+                              // Оберните ListView.builder в SizedBox с фиксированной высотой
+                              height:
+                                  120, // Задайте желаемую высоту для горизонтального списка
+                              child: ListView.builder(
+                                scrollDirection:
+                                    Axis.horizontal, // Горизонтальная прокрутка
+                                itemCount: sortedImages
+                                    .length, // Используем отсортированный список
+                                itemBuilder: (context, index) {
+                                  final imageData = sortedImages[index];
+                                  final imageUrl = imageData['url'] as String;
+                                  final imageId = imageData['id']
+                                      as String; // Получаем imageId
+                                  final dateAdded =
+                                      imageData['dateAdded'] as DateTime;
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Переход на страницу просмотра изображений
+                                      context.go(
+                                        '/board/${widget.boardId}/card/${widget.cardId}/task/${widget.taskId}/view-images?initialIndex=${index.toString()}',
+                                        extra:
+                                            sortedImages, // Передаем весь отсортированный список
+                                      );
+                                    },
+                                    // !!! ВОТ ЗДЕСЬ ДОБАВЛЯЕМ SizedBox для задания ширины элемента !!!
+                                    child: SizedBox(
+                                      width:
+                                          120, // Установите желаемую ширину для каждой картинки. Например, 120, чтобы она соответствовала высоте.
+                                      child: Card(
+                                        clipBehavior: Clip.antiAlias,
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal:
+                                                5.0), // Отступ между картинками
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            Hero(
+                                              // Добавляем Hero для плавного перехода
+                                              tag:
+                                                  imageUrl, // Уникальный тег для Hero
+                                              child: Image.network(
+                                                imageUrl,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    const Center(
+                                                        child: Icon(Icons
+                                                            .broken_image)),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 5,
+                                              right: 5,
+                                              child: UserRole != 'viewer'
+                                                  ? IconButton(
+                                                      icon: const Icon(
+                                                          Icons.cancel,
+                                                          color: Colors.red),
+                                                      onPressed: () =>
+                                                          _removeImage(imageId),
+                                                    )
+                                                  : Container(),
+                                            ),
+                                            Positioned(
+                                              bottom: 5,
+                                              left: 5,
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(4),
+                                                color: Colors.black54,
+                                                child: Text(
+                                                  '${dateAdded.day}.${dateAdded.month}.${dateAdded.year}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            /*GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 1.0,
+                              ),
+                              itemCount: _currentImages.length,
+                              itemBuilder: (context, index) {
+                                final sortedImageKeys =
+                                    _currentImages.keys.toList()
+                                      ..sort((a, b) {
+                                        // Получаем DateTime объекты для сравнения
+                                        final DateTime dateA =
+                                            _currentImages[a]!['dateAdded']
+                                                as DateTime;
+                                        final DateTime dateB =
+                                            _currentImages[b]!['dateAdded']
+                                                as DateTime;
+                                        // Сортируем от новых к старым (убывающий порядок)
+                                        return dateB.compareTo(dateA);
+                                      });
+                                final imageId = sortedImageKeys[index];
+                                final imageData = _currentImages[imageId]!;
+                                final imageUrl = imageData['url'] as String;
+                                final dateAdded =
+                                    imageData['dateAdded'] as DateTime;
+
+                                return Card(
+                                  clipBehavior: Clip.antiAlias,
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      // Используем Image.network для отображения URL из Supabase
+                                      Image.network(
+                                        imageUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error,
+                                                stackTrace) =>
+                                            const Center(
+                                                child:
+                                                    Icon(Icons.broken_image)),
+                                      ),
+                                      Positioned(
+                                        top: 5,
+                                        right: 5,
+                                        child: UserRole != 'viewer'
+                                            ? IconButton(
+                                                icon: const Icon(Icons.cancel,
+                                                    color: Colors.red),
+                                                onPressed: () =>
+                                                    _removeImage(imageId),
+                                              )
+                                            : Container(),
+                                      ),
+                                      Positioned(
+                                        bottom: 5,
+                                        left: 5,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          color: Colors.black54,
+                                          child: Text(
+                                            '${dateAdded.day}.${dateAdded.month}.${dateAdded.year}',
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                            */
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     const SizedBox(height: 200),
                     UserRole != "viewer"
                         ? SizedBox(

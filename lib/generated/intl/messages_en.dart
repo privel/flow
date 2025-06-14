@@ -77,12 +77,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "areYouSureYouWantToDeleteThisTask": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to delete this task?",
     ),
+    "attachments": MessageLookupByLibrary.simpleMessage("Attachments"),
     "boardMenu": MessageLookupByLibrary.simpleMessage("Board Menu"),
     "build": MessageLookupByLibrary.simpleMessage("Build:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "changesSaved": MessageLookupByLibrary.simpleMessage("Changes saved"),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Check again"),
     "chooseARole": MessageLookupByLibrary.simpleMessage("Choose a role:"),
+    "chooseFromGallery": MessageLookupByLibrary.simpleMessage(
+      "Choose from Gallery",
+    ),
     "clearAll": MessageLookupByLibrary.simpleMessage("Clear all"),
     "complete": MessageLookupByLibrary.simpleMessage("Complete"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
@@ -174,6 +178,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "starredBoards": MessageLookupByLibrary.simpleMessage("Starred Boards"),
     "startDate": MessageLookupByLibrary.simpleMessage("Start date"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Successful exit"),
+    "takeAPhoto": MessageLookupByLibrary.simpleMessage("Take a photo"),
     "taskName": MessageLookupByLibrary.simpleMessage("Task name"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "The email has been sent! Check your email.",

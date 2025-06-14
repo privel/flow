@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flow/core/utils/provider/auth_provider.dart';
 import 'package:flow/core/utils/provider/notification_provider.dart';
 import 'package:flow/data/models/board_model.dart';
@@ -8,6 +10,8 @@ import 'package:flow/data/models/user_models.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supa;
+import 'package:uuid/uuid.dart';
 
 class BoardProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -572,6 +576,64 @@ Future<void> removeAssigneeFromTask(
     notifyListeners();
   }
 }
+
+ Future<String?> uploadTaskImage(String taskId, Uint8List imageBytes) async {
+    try {
+      final String imageId = const Uuid().v4(); // Генерируем уникальный ID для изображения
+      final String fileName = 'tasks/$taskId/$imageId.jpg'; // Путь для хранения: tasks/taskId/imageId.jpg
+
+      // Удалите 'supa.StorageResponse'
+      final response = await supa.Supabase.instance.client.storage
+          .from('task.attached') // Имя бакета изменено на 'task.attached'
+          .uploadBinary(
+            fileName,
+            imageBytes,
+            fileOptions: const supa.FileOptions(
+              upsert: true,
+              contentType: 'image/jpeg',
+            ),
+          );
+
+      // Проверка на ошибку после выполнения операции
+      // Supabase клиент может выбросить исключение при ошибке, или возвращать объект с полем error
+      // Если response - это напрямую путь, то error будет в catch блоке
+      // Если response - это объект с ошибкой, как раньше в StorageResponse, то проверка ниже будет работать.
+      // Если это просто url, а ошибки ловятся try-catch, то этот if может быть лишним.
+      // Для нового Supabase SDK, ошибки обычно выбрасываются, и их ловят в catch.
+      // Поэтому, если response.error больше не существует, просто удалите этот if блок.
+      // Ниже пример как может выглядеть код для более новой версии Supabase (без response.error)
+      // В любом случае, publicUrl будет работать, если загрузка успешна.
+
+      final publicUrl = supa.Supabase.instance.client.storage
+          .from('task.attached') // Имя бакета изменено на 'task.attached'
+          .getPublicUrl(fileName);
+
+      debugPrint("📤 Загружено изображение задачи в Supabase: $publicUrl");
+      return publicUrl;
+    } catch (e) {
+      debugPrint('Exception during task image upload: $e');
+      return null;
+    }
+  }
+
+  // Метод для удаления изображения задачи из Supabase Storage
+  Future<void> deleteTaskImage(String taskId, String imageId) async {
+    try {
+      final String fileName = 'tasks/$taskId/$imageId.jpg'; // Путь к файлу
+
+      // Удалите 'supa.StorageResponse'
+      final result = await supa.Supabase.instance.client.storage
+          .from('task.attached') // Имя бакета изменено на 'task.attached'
+          .remove([fileName]);
+
+      // В зависимости от версии Supabase SDK, result может быть List<FileObject> или чем-то другим.
+      // Ошибки, как правило, будут перехвачены в catch блоке.
+      debugPrint("🗑️ Изображение задачи удалено из Supabase: $result");
+    } catch (e) {
+      debugPrint('Exception during task image deletion: $e');
+    }
+  }
+
 
 
 // // Метод: Получить валидных назначенных участников задачи

@@ -1,79 +1,3 @@
-// class TaskModel {
-//   final String id;
-//   final String title;
-//   final String description;
-//   final bool isDone;
-
-//   TaskModel({
-//     required this.id,
-//     required this.title,
-//     required this.description,
-//     required this.isDone,
-//   });
-
-//   factory TaskModel.fromMap(Map<String, dynamic> map, String taskId) {
-//     return TaskModel(
-//       id: taskId,
-//       title: map['title'] ?? '',
-//       description: map['description'] ?? '',
-//       isDone: map['isDone'] ?? false,
-//     );
-//   }
-
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'title': title,
-//       'description': description,
-//       'isDone': isDone,
-//     };
-//   }
-// }
-
-// class TaskModel {
-//   final String id;
-//   final String title;
-//   final String description;
-//   final bool isDone;
-
-//   TaskModel({
-//     required this.id,
-//     required this.title,
-//     required this.description,
-//     required this.isDone,
-//   });
-
-//   factory TaskModel.fromMap(Map<String, dynamic> map, String taskId) {
-//     return TaskModel(
-//       id: taskId,
-//       title: map['title'] ?? '',
-//       description: map['description'] ?? '',
-//       isDone: map['isDone'] ?? false,
-//     );
-//   }
-
-//   Map<String, dynamic> toMap() {
-//     return {
-//       'title': title,
-//       'description': description,
-//       'isDone': isDone,
-//     };
-//   }
-
-//   TaskModel copyWith({
-//     String? id,
-//     String? title,
-//     String? description,
-//     bool? isDone,
-//   }) {
-//     return TaskModel(
-//       id: id ?? this.id,
-//       title: title ?? this.title,
-//       description: description ?? this.description,
-//       isDone: isDone ?? this.isDone,
-//     );
-//   }
-// }
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TaskModel {
@@ -85,6 +9,7 @@ class TaskModel {
   final DateTime? dueDate;
   final Map<String, DateTime> assignees;
   final int order;
+  final Map<String, Map<String, dynamic>> images;
 
   TaskModel({
     required this.id,
@@ -95,6 +20,7 @@ class TaskModel {
     this.dueDate,
     required this.assignees,
     required this.order,
+    this.images = const {},
   });
 
   TaskModel copyWith({
@@ -106,6 +32,7 @@ class TaskModel {
     DateTime? dueDate,
     Map<String, DateTime>? assignees,
     int? order,
+    Map<String, Map<String, dynamic>>? images,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -116,10 +43,26 @@ class TaskModel {
       dueDate: dueDate ?? this.dueDate,
       assignees: assignees ?? this.assignees,
       order: order ?? this.order,
+      images: images ?? this.images,
     );
   }
 
   factory TaskModel.fromMap(Map<String, dynamic> map, String id) {
+    // Парсинг изображений
+    final Map<String, Map<String, dynamic>> parsedImages = {};
+    if (map['images'] != null && map['images'] is Map) {
+      (map['images'] as Map<String, dynamic>).forEach((imageId, imageData) {
+        if (imageData is Map<String, dynamic>) {
+          parsedImages[imageId] = {
+            'url': imageData['url'] as String? ?? '',
+            'dateAdded': imageData['dateAdded'] != null
+                ? (imageData['dateAdded'] as Timestamp).toDate()
+                : DateTime.now(),
+            'order': imageData['order'] as int? ?? 0,
+          };
+        }
+      });
+    }
     return TaskModel(
       id: id,
       title: map['title'] ?? '',
@@ -143,10 +86,20 @@ class TaskModel {
             )
           : {},
       order: map['order'] ?? 0,
+      images: parsedImages,
     );
   }
 
   Map<String, dynamic> toMap() {
+    final Map<String, Map<String, dynamic>> imagesToMap = {};
+    images.forEach((imageId, imageData) {
+      imagesToMap[imageId] = {
+        'url': imageData['url'],
+        'dateAdded': Timestamp.fromDate(imageData['dateAdded']),
+        'order': imageData['order'],
+      };
+    });
+
     return {
       'title': title,
       'description': description,
@@ -156,6 +109,7 @@ class TaskModel {
       'assignees': assignees
           .map((key, value) => MapEntry(key, Timestamp.fromDate(value))),
       'order': order,
+      'images': imagesToMap,
     };
   }
 }

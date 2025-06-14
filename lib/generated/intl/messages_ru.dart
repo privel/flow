@@ -83,6 +83,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "areYouSureYouWantToDeleteThisTask": MessageLookupByLibrary.simpleMessage(
       "Вы уверены, что хотите удалить это задание?",
     ),
+    "attachments": MessageLookupByLibrary.simpleMessage("Attachments"),
     "boardMenu": MessageLookupByLibrary.simpleMessage("Параметры доски"),
     "build": MessageLookupByLibrary.simpleMessage("Сборка:"),
     "cancel": MessageLookupByLibrary.simpleMessage("Отменить"),
@@ -91,6 +92,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "checkAgain": MessageLookupByLibrary.simpleMessage("Проверить снова"),
     "chooseARole": MessageLookupByLibrary.simpleMessage("Выберите роль:"),
+    "chooseFromGallery": MessageLookupByLibrary.simpleMessage(
+      "Choose from Gallery",
+    ),
     "clearAll": MessageLookupByLibrary.simpleMessage("Очистить все"),
     "complete": MessageLookupByLibrary.simpleMessage("Выполнено"),
     "confirmMessage": MessageLookupByLibrary.simpleMessage(
@@ -184,6 +188,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "starredBoards": MessageLookupByLibrary.simpleMessage("Сохранёные Доски"),
     "startDate": MessageLookupByLibrary.simpleMessage("Дата начала"),
     "successfulExit": MessageLookupByLibrary.simpleMessage("Успешный выход"),
+    "takeAPhoto": MessageLookupByLibrary.simpleMessage("Take a photo"),
     "taskName": MessageLookupByLibrary.simpleMessage("Название задачи"),
     "theEmailHasBeenSentCheckYourEmail": MessageLookupByLibrary.simpleMessage(
       "Письмо отправлено! Проверьте свой электронный адрес.",
