@@ -80,6 +80,9 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Вы уверены, что хотите удалить эту колонку и все ее задачи?",
         ),
+    "areYouSureYouWantToDeleteThisImage": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to delete this image?",
+    ),
     "areYouSureYouWantToDeleteThisTask": MessageLookupByLibrary.simpleMessage(
       "Вы уверены, что хотите удалить это задание?",
     ),
@@ -101,6 +104,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пожалуйста, подтвердите адрес электронной почты.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Подтверждение"),
+    "confirmationOfDeletion": MessageLookupByLibrary.simpleMessage(
+      "Confirmation of deletion",
+    ),
     "couldntAddTask": MessageLookupByLibrary.simpleMessage(
       "Не удалось добавить задачу",
     ),

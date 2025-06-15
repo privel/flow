@@ -106,5 +106,7 @@
   "thereAreNoResponsiblePeople": "There are no responsible people",
   "takeAPhoto": "Take a photo",
   "chooseFromGallery": "Choose from Gallery",
-  "attachments": "Attachments"
+  "attachments": "Attachments",
+  "confirmationOfDeletion": "Confirmation of deletion",
+  "areYouSureYouWantToDeleteThisImage": "Are you sure you want to delete this image?"
 }

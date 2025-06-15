@@ -11,8 +11,8 @@ import 'package:flow/presentation/widgets/date_time_picker.dart';
 import 'package:flow/presentation/widgets/rounded_container.dart';
 import 'package:flow/presentation/widgets/snackbar_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flow/core/utils/provider/board_provider.dart';
 import 'package:flow/data/models/task_model.dart';
@@ -52,11 +52,15 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Map<String, Map<String, dynamic>> _initialImages = {};
   Map<String, Map<String, dynamic>> _currentImages = {};
 
+  late Stream<List<Map<String, dynamic>>> imagesStream;
+
   @override
   void initState() {
     super.initState();
     _titleController.addListener(_onTitleChanged);
     _descriptionController.addListener(_onDescriptionChanged);
+
+    imagesStream = _currentImagesStream();
   }
 
   @override
@@ -67,6 +71,28 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     _descriptionController.dispose();
     _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  Stream<List<Map<String, dynamic>>> _currentImagesStream() async* {
+    // Emit the initial state of images
+    yield _getSortedImages();
+  }
+
+  Stream<List<Map<String, dynamic>>> _loadImages() async* {
+    await Future.delayed(Duration(seconds: 2));
+    yield [
+      {
+        'url': 'https://via.placeholder.com/150',
+        'id': '1',
+        'dateAdded': DateTime.now()
+      },
+      {
+        'url': 'https://via.placeholder.com/150',
+        'id': '2',
+        'dateAdded': DateTime.now()
+      },
+      // Добавьте реальный код загрузки изображений
+    ];
   }
 
   void _onInputChanged() {
@@ -206,6 +232,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             'order':
                 _currentImages.length, // Простой порядок по индексу добавления
           };
+          imagesStream = _currentImagesStream();
         });
         _onInputChanged();
       } else {
@@ -224,6 +251,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     setState(() {
       _currentImages.remove(imageId);
       _reorderImages();
+      imagesStream = _currentImagesStream();
     });
 
     // Удаляем изображение из Supabase Storage
@@ -253,6 +281,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     _initialDescription = task.description;
     _initialImages = Map.from(task.images);
     _currentImages = Map.from(task.images);
+    imagesStream = _currentImagesStream();
   }
 
   Future<void> _saveTask(
@@ -491,16 +520,16 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               },
               icon: const Icon(Icons.arrow_back_ios, size: 22),
             ),
-            actions: UserRole != 'viewer'
-                ? [
-                    IconButton(
-                      icon: const Icon(Icons.save),
-                      onPressed: () async {
-                        await _saveTask(provider, task.order, task);
-                      },
-                    ),
-                  ]
-                : null,
+            // actions: UserRole != 'viewer'
+            //     ? [
+            //         IconButton(
+            //           icon: const Icon(Icons.save),
+            //           onPressed: () async {
+            //             await _saveTask(provider, task.order, task);
+            //           },
+            //         ),
+            //       ]
+            //     : null,
           ),
           body: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
@@ -530,7 +559,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           height: 5,
                         ),
                         Container(
-                          width: 320,
+                          width: MediaQuery.of(context).size.width * 0.85, //320
                           height: 55,
                           decoration: BoxDecoration(
                             color: isDark
@@ -604,7 +633,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         ),
                         const SizedBox(height: 5),
                         Container(
-                          width: 320,
+                          width: MediaQuery.of(context).size.width * 0.85, //320
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF333333)
@@ -651,14 +680,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                               setState(() => startDate = picked);
                               // _performAutoSave();
 
-                              if (task == null) {
-                                debugPrint(
-                                    'Ошибка: Задача не найдена для автосохранения.');
-                                return;
-                              }
-
-                            
-
                               final updatedTask = TaskModel(
                                 id: widget.taskId,
                                 title: _titleController.text.trim(),
@@ -683,19 +704,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           DateTimePickerWidget(
                             label: S.of(context).dueDate,
                             initialDateTime: dueDate,
-                            onDateTimeSelected: (picked) async{
+                            onDateTimeSelected: (picked) async {
                               FocusScope.of(context).unfocus();
                               setState(() => dueDate = picked);
-
-
-
-                              if (task == null) {
-                                debugPrint(
-                                    'Ошибка: Задача не найдена для автосохранения.');
-                                return;
-                              }
-
-                            
 
                               final updatedTask = TaskModel(
                                 id: widget.taskId,
@@ -724,7 +735,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     const SizedBox(height: 15),
                     RoundedContainerCustom(
                       isDark: isDark,
-                      width: 320,
+                      width: MediaQuery.of(context).size.width * 0.85, //320
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 15,
@@ -811,7 +822,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         horizontal: 12,
                         vertical: 15,
                       ),
-                      width: 320,
+                      width: MediaQuery.of(context).size.width * 0.85, //320
+                      
                       childWidget: Column(
                         children: [
                           Row(
@@ -856,176 +868,243 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                             thickness: 1.2,
                             height: 20,
                           ),
-                          if (_currentImages.isNotEmpty) ...[
-                            const SizedBox(height: 10),
-                            // Отображение списка изображений
-                            SizedBox(
-                              // Оберните ListView.builder в SizedBox с фиксированной высотой
-                              height:
-                                  120, // Задайте желаемую высоту для горизонтального списка
-                              child: ListView.builder(
-                                scrollDirection:
-                                    Axis.horizontal, // Горизонтальная прокрутка
-                                itemCount: sortedImages
-                                    .length, // Используем отсортированный список
-                                itemBuilder: (context, index) {
-                                  final imageData = sortedImages[index];
-                                  final imageUrl = imageData['url'] as String;
-                                  final imageId = imageData['id']
-                                      as String; // Получаем imageId
-                                  final dateAdded =
-                                      imageData['dateAdded'] as DateTime;
+                          StreamBuilder<List<Map<String, dynamic>>>(
+                            stream: imagesStream, // Use the stream here
+                            builder: (context, imageSnapshot) {
+                              if (imageSnapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                              if (imageSnapshot.hasError) {
+                                return Center(
+                                    child: Text(
+                                        'Error loading images: ${imageSnapshot.error}'));
+                              }
+                              final List<Map<String, dynamic>> sortedImages =
+                                  imageSnapshot.data ?? [];
 
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // Переход на страницу просмотра изображений
-                                      context.go(
-                                        '/board/${widget.boardId}/card/${widget.cardId}/task/${widget.taskId}/view-images?initialIndex=${index.toString()}',
-                                        extra:
-                                            sortedImages, // Передаем весь отсортированный список
-                                      );
-                                    },
-                                    // !!! ВОТ ЗДЕСЬ ДОБАВЛЯЕМ SizedBox для задания ширины элемента !!!
-                                    child: SizedBox(
-                                      width:
-                                          120, // Установите желаемую ширину для каждой картинки. Например, 120, чтобы она соответствовала высоте.
-                                      child: Card(
-                                        clipBehavior: Clip.antiAlias,
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal:
-                                                5.0), // Отступ между картинками
-                                        child: Stack(
-                                          fit: StackFit.expand,
-                                          children: [
-                                            Hero(
-                                              // Добавляем Hero для плавного перехода
-                                              tag:
-                                                  imageUrl, // Уникальный тег для Hero
-                                              child: Image.network(
-                                                imageUrl,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                        stackTrace) =>
-                                                    const Center(
-                                                        child: Icon(Icons
-                                                            .broken_image)),
+                              if (sortedImages.isEmpty) {
+                                return const SizedBox
+                                    .shrink(); // Or a placeholder text
+                              }
+
+                              return SizedBox(
+                                height: 145,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: sortedImages.length,
+                                  itemBuilder: (context, index) {
+                                    final imageData = sortedImages[index];
+                                    final imageUrl = imageData['url'] as String;
+                                    final imageId = imageData['id'] as String;
+                                    final dateAdded =
+                                        imageData['dateAdded'] as DateTime;
+
+                                    return Builder(
+                                        builder: (BuildContext builderContext) {
+                                      return GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () {
+                                          context.go(
+                                            '/board/${widget.boardId}/card/${widget.cardId}/task/${widget.taskId}/view-images?initialIndex=${index.toString()}',
+                                            extra: sortedImages,
+                                          );
+                                        },
+                                        onLongPress: () async {
+                                          if (UserRole != 'viewer') {
+                                            final RenderBox button =
+                                                builderContext
+                                                        .findRenderObject()
+                                                    as RenderBox;
+                                            final RenderBox overlay =
+                                                Overlay.of(context)
+                                                        .context
+                                                        .findRenderObject()
+                                                    as RenderBox;
+                                            final RelativeRect position =
+                                                RelativeRect.fromRect(
+                                              Rect.fromPoints(
+                                                button.localToGlobal(
+                                                    Offset.zero,
+                                                    ancestor: overlay),
+                                                button.localToGlobal(
+                                                    button.size.bottomRight(
+                                                        Offset.zero),
+                                                    ancestor: overlay),
                                               ),
-                                            ),
-                                            Positioned(
-                                              top: 5,
-                                              right: 5,
-                                              child: UserRole != 'viewer'
-                                                  ? IconButton(
-                                                      icon: const Icon(
-                                                          Icons.cancel,
-                                                          color: Colors.red),
-                                                      onPressed: () =>
-                                                          _removeImage(imageId),
-                                                    )
-                                                  : Container(),
-                                            ),
-                                            Positioned(
-                                              bottom: 5,
-                                              left: 5,
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                color: Colors.black54,
-                                                child: Text(
-                                                  '${dateAdded.day}.${dateAdded.month}.${dateAdded.year}',
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10),
+                                              Offset.zero & overlay.size,
+                                            );
+
+                                            final String? result =
+                                                await showMenu<String>(
+                                              context: context,
+                                              position: position,
+                                              items: <PopupMenuEntry<String>>[
+                                                PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        S.of(context).delete,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'SFProText',
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 14,
+                                                          color: isDark
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                        ),
+                                                      ),
+                                                      const Spacer(),
+                                                      Icon(
+                                                        IconlyLight.delete,
+                                                        color: Colors
+                                                            .redAccent.shade400,
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            /*GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 10,
-                                childAspectRatio: 1.0,
-                              ),
-                              itemCount: _currentImages.length,
-                              itemBuilder: (context, index) {
-                                final sortedImageKeys =
-                                    _currentImages.keys.toList()
-                                      ..sort((a, b) {
-                                        // Получаем DateTime объекты для сравнения
-                                        final DateTime dateA =
-                                            _currentImages[a]!['dateAdded']
-                                                as DateTime;
-                                        final DateTime dateB =
-                                            _currentImages[b]!['dateAdded']
-                                                as DateTime;
-                                        // Сортируем от новых к старым (убывающий порядок)
-                                        return dateB.compareTo(dateA);
-                                      });
-                                final imageId = sortedImageKeys[index];
-                                final imageData = _currentImages[imageId]!;
-                                final imageUrl = imageData['url'] as String;
-                                final dateAdded =
-                                    imageData['dateAdded'] as DateTime;
+                                              ],
+                                            );
 
-                                return Card(
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    children: [
-                                      // Используем Image.network для отображения URL из Supabase
-                                      Image.network(
-                                        imageUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error,
-                                                stackTrace) =>
-                                            const Center(
-                                                child:
-                                                    Icon(Icons.broken_image)),
-                                      ),
-                                      Positioned(
-                                        top: 5,
-                                        right: 5,
-                                        child: UserRole != 'viewer'
-                                            ? IconButton(
-                                                icon: const Icon(Icons.cancel,
-                                                    color: Colors.red),
-                                                onPressed: () =>
-                                                    _removeImage(imageId),
-                                              )
-                                            : Container(),
-                                      ),
-                                      Positioned(
-                                        bottom: 5,
-                                        left: 5,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          color: Colors.black54,
-                                          child: Text(
-                                            '${dateAdded.day}.${dateAdded.month}.${dateAdded.year}',
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 10),
+                                            if (result == 'delete') {
+                                              final bool? confirmDelete =
+                                                  await showDialog<bool>(
+                                                context: context,
+                                                builder: (BuildContext
+                                                    dialogContext) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                      S
+                                                          .of(context)
+                                                          .confirmationOfDeletion,
+                                                      style: TextStyle(
+                                                        fontFamily: 'SFProText',
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        fontSize: 17,
+                                                        color: Colors
+                                                            .greenAccent
+                                                            .shade400,
+                                                      ),
+                                                    ),
+                                                    content: Text(
+                                                      S
+                                                          .of(context)
+                                                          .areYouSureYouWantToDeleteThisImage,
+                                                      style: TextStyle(
+                                                        fontFamily: 'SFProText',
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 15,
+                                                        color: isDark
+                                                            ? Colors.white60
+                                                            : Colors.black54,
+                                                      ),
+                                                    ),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        child: Text(
+                                                          S.of(context).cancel,
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: isDark
+                                                                ? Colors.white
+                                                                : Colors.black,
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop(false);
+                                                        },
+                                                      ),
+                                                      TextButton(
+                                                        child: Text(
+                                                          S.of(context).delete,
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 15,
+                                                            color: Colors
+                                                                .redAccent
+                                                                .shade400,
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          Navigator.of(
+                                                                  dialogContext)
+                                                              .pop(true);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+
+                                              if (confirmDelete == true) {
+                                                _removeImage(imageId);
+                                              }
+                                            }
+                                          }
+                                        },
+                                        child: SizedBox(
+                                          width: 130,
+                                          child: Card(
+                                            clipBehavior: Clip.antiAlias,
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 5.0),
+                                            child: Stack(
+                                              fit: StackFit.expand,
+                                              children: [
+                                                Hero(
+                                                  tag: imageUrl,
+                                                  child: Image.network(
+                                                    imageUrl,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                            error,
+                                                            stackTrace) =>
+                                                        const Center(
+                                                            child: Icon(Icons
+                                                                .broken_image)),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  bottom: 5,
+                                                  left: 5,
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    color: Colors.black54,
+                                                    child: Text(
+                                                      '${dateAdded.day}.${dateAdded.month}.${dateAdded.year}',
+                                                      style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 10),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                            */
-                          ],
+                                      );
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -1033,7 +1112,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     const SizedBox(height: 200),
                     UserRole != "viewer"
                         ? SizedBox(
-                            width: 320,
+                            width:
+                                MediaQuery.of(context).size.width * 0.8, //320
+
                             height: 45,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(

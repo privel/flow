@@ -74,6 +74,9 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage(
           "Are you sure you want to delete this column and all its tasks?",
         ),
+    "areYouSureYouWantToDeleteThisImage": MessageLookupByLibrary.simpleMessage(
+      "Are you sure you want to delete this image?",
+    ),
     "areYouSureYouWantToDeleteThisTask": MessageLookupByLibrary.simpleMessage(
       "Are you sure you want to delete this task?",
     ),
@@ -93,6 +96,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Please confirm your email address.",
     ),
     "confirmTitle": MessageLookupByLibrary.simpleMessage("Confirm"),
+    "confirmationOfDeletion": MessageLookupByLibrary.simpleMessage(
+      "Confirmation of deletion",
+    ),
     "couldntAddTask": MessageLookupByLibrary.simpleMessage(
       "Couldn\'t add task",
     ),

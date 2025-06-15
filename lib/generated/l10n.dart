@@ -874,6 +874,26 @@ class S {
   String get attachments {
     return Intl.message('Attachments', name: 'attachments', desc: '', args: []);
   }
+
+  /// `Confirmation of deletion`
+  String get confirmationOfDeletion {
+    return Intl.message(
+      'Confirmation of deletion',
+      name: 'confirmationOfDeletion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete this image?`
+  String get areYouSureYouWantToDeleteThisImage {
+    return Intl.message(
+      'Are you sure you want to delete this image?',
+      name: 'areYouSureYouWantToDeleteThisImage',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
