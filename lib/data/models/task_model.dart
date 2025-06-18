@@ -10,6 +10,7 @@ class TaskModel {
   final Map<String, DateTime> assignees;
   final int order;
   final Map<String, Map<String, dynamic>> images;
+  final Map<String, bool> lablesColor;
 
   TaskModel({
     required this.id,
@@ -21,6 +22,15 @@ class TaskModel {
     required this.assignees,
     required this.order,
     this.images = const {},
+    this.lablesColor = const {
+      "#b60205": false,
+      "#d93f0b": false,
+      "#fbca04": false,
+      "#0e8a16": false,
+      "#006b75": false,
+      "#1d76db": false,
+      
+    },
   });
 
   TaskModel copyWith({
@@ -33,6 +43,7 @@ class TaskModel {
     Map<String, DateTime>? assignees,
     int? order,
     Map<String, Map<String, dynamic>>? images,
+    Map<String, bool>? lablesColor,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -44,11 +55,11 @@ class TaskModel {
       assignees: assignees ?? this.assignees,
       order: order ?? this.order,
       images: images ?? this.images,
+      lablesColor: lablesColor ?? this.lablesColor,
     );
   }
 
   factory TaskModel.fromMap(Map<String, dynamic> map, String id) {
-    // Парсинг изображений
     final Map<String, Map<String, dynamic>> parsedImages = {};
     if (map['images'] != null && map['images'] is Map) {
       (map['images'] as Map<String, dynamic>).forEach((imageId, imageData) {
@@ -60,6 +71,20 @@ class TaskModel {
                 : DateTime.now(),
             'order': imageData['order'] as int? ?? 0,
           };
+        }
+      });
+    }
+
+    Map<String, bool> parsedLablesColor = {};
+    if (map['lablesColor'] != null && map['lablesColor'] is Map) {
+      (map['lablesColor'] as Map<String, dynamic>).forEach((key, value) {
+        // Ensure the value is indeed a boolean
+        if (value is bool) {
+          parsedLablesColor[key] = value;
+        } else {
+          // Handle cases where the value might be something else (e.g., old data, null)
+          // You can choose to default to false, true, or log an error.
+          parsedLablesColor[key] = false; // Defaulting to false for robustness
         }
       });
     }
@@ -87,6 +112,7 @@ class TaskModel {
           : {},
       order: map['order'] ?? 0,
       images: parsedImages,
+      lablesColor: parsedLablesColor,
     );
   }
 
@@ -110,6 +136,7 @@ class TaskModel {
           .map((key, value) => MapEntry(key, Timestamp.fromDate(value))),
       'order': order,
       'images': imagesToMap,
+      'lablesColor': lablesColor,
     };
   }
 }

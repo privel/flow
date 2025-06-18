@@ -129,6 +129,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Enter your email or name",
     ),
     "home": MessageLookupByLibrary.simpleMessage("Home"),
+    "label": MessageLookupByLibrary.simpleMessage("Label"),
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "languageSetting": MessageLookupByLibrary.simpleMessage(
       "Language Settings",

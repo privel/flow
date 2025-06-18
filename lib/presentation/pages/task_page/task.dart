@@ -7,7 +7,9 @@ import 'package:flow/data/models/board_model.dart';
 import 'package:flow/data/models/role_model.dart';
 import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/widgets/assigne_bottom_widget.dart';
+import 'package:flow/presentation/widgets/color_picker.dart';
 import 'package:flow/presentation/widgets/date_time_picker.dart';
+import 'package:flow/presentation/widgets/drop_down_widget.dart';
 import 'package:flow/presentation/widgets/rounded_container.dart';
 import 'package:flow/presentation/widgets/snackbar_helper.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +56,24 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
   late Stream<List<Map<String, dynamic>>> imagesStream;
 
+  // lable Colors
+  bool showExtraOptions = false;
+  bool showColorPicker = false;
+  String selectedColor = "11998e";
+  List<String> selectedColorList = [];
+  String customColorChoose = "";
+  final List<String> ListColorsHex = [
+    "#b60205",
+    "#d93f0b",
+    "#fbca04",
+    "#0e8a16",
+    "#006b75",
+    "#1d76db",
+  ];
+
+  Map<String, bool> _currentLabelsColor = {};
+  Map<String, bool> _initialLabelsColor = {};
+
   @override
   void initState() {
     super.initState();
@@ -76,23 +96,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Stream<List<Map<String, dynamic>>> _currentImagesStream() async* {
     // Emit the initial state of images
     yield _getSortedImages();
-  }
-
-  Stream<List<Map<String, dynamic>>> _loadImages() async* {
-    await Future.delayed(Duration(seconds: 2));
-    yield [
-      {
-        'url': 'https://via.placeholder.com/150',
-        'id': '1',
-        'dateAdded': DateTime.now()
-      },
-      {
-        'url': 'https://via.placeholder.com/150',
-        'id': '2',
-        'dateAdded': DateTime.now()
-      },
-      // Добавьте реальный код загрузки изображений
-    ];
   }
 
   void _onInputChanged() {
@@ -132,11 +135,13 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     final bool descriptionChanged =
         _descriptionController.text.trim() != _initialDescription.trim();
     final bool imagesChanged = !_areMapsEqual(_currentImages, _initialImages);
+    final bool labelsColorChanged =
+        !_areLabelColorsEqual(_currentLabelsColor, _initialLabelsColor);
 
-    // Если ничего не изменилось, просто выходим
-    if (!titleChanged && !descriptionChanged && !imagesChanged) {
-      // print(
-      //     'Автосохранение: Изменений в заголовке или описании не обнаружено.');
+    if (!titleChanged &&
+        !descriptionChanged &&
+        !imagesChanged &&
+        !labelsColorChanged) {
       return;
     }
 
@@ -150,6 +155,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       assignees: task.assignees,
       order: task.order,
       images: _currentImages,
+      lablesColor: _currentLabelsColor,
     );
 
     await provider.updateTask(
@@ -160,15 +166,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
     if (!mounted) return;
 
-    // После успешного сохранения, обновляем исходные значения
     _initialTitle = _titleController.text.trim();
     _initialDescription = _descriptionController.text.trim();
     _initialImages = Map.from(_currentImages);
-
-    // SnackBarHelper.show(context, S.of(context).changesSaved,
-    //     type: SnackType.success);
-    // print(
-    //     'Автоматическое сохранение данных: Заголовок: ${_titleController.text}, Описание: ${_descriptionController.text}');
+    _initialLabelsColor = Map.from(_currentLabelsColor);
   }
 
   bool _areMapsEqual(Map<String, Map<String, dynamic>> map1,
@@ -186,6 +187,14 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           val1['order'] != val2['order']) {
         return false;
       }
+    }
+    return true;
+  }
+
+  bool _areLabelColorsEqual(Map<String, bool> map1, Map<String, bool> map2) {
+    if (map1.length != map2.length) return false;
+    for (final key in map1.keys) {
+      if (map1[key] != map2[key]) return false;
     }
     return true;
   }
@@ -281,6 +290,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     _initialDescription = task.description;
     _initialImages = Map.from(task.images);
     _currentImages = Map.from(task.images);
+    _initialLabelsColor = Map.from(task.lablesColor);
+    _currentLabelsColor = Map.from(task.lablesColor);
     imagesStream = _currentImagesStream();
   }
 
@@ -472,6 +483,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
+  Color HexToColor(String hexColor) {
+    return Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BoardProvider>(context, listen: false);
@@ -515,32 +530,27 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 if (context.canPop()) {
                   context.pop();
                 } else {
-                  context.go('/');
+                  // context.go('/');
+                  context.goNamed('boardtest2',
+                      pathParameters: {'id': widget.boardId});
                 }
               },
               icon: const Icon(Icons.arrow_back_ios, size: 22),
             ),
-            // actions: UserRole != 'viewer'
-            //     ? [
-            //         IconButton(
-            //           icon: const Icon(Icons.save),
-            //           onPressed: () async {
-            //             await _saveTask(provider, task.order, task);
-            //           },
-            //         ),
-            //       ]
-            //     : null,
           ),
           body: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+              ),
               child: SingleChildScrollView(
                 controller: scrollController,
                 child: Column(
                   children: [
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -815,7 +825,108 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
+                    DropDownWidget(
+                      widthContainer: MediaQuery.of(context).size.width * 0.85,
+                      BackGroundColor: isDark
+                          ? const Color(0xFF333333)
+                          : const Color(0xFFF0F0F0),
+                      isDark: isDark,
+                      header: Row(
+                        children: [
+                          Icon(
+                            IconlyLight.bookmark,
+                            size: 18.0,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            S.of(context).label,
+                            style: TextStyle(
+                              fontFamily: 'SFProText',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Wrap(
+                            spacing: 1.0,
+                            runSpacing: 4.0,
+                            children: _currentLabelsColor.entries
+                                .where((entry) => entry.value == true)
+                                .map((entry) {
+                              final String colorHex = entry.key;
+                              return Container(
+                                width: 25,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(2),
+                                  color: HexToColor(colorHex),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      children: [
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisExtent: 100,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                          ),
+                          itemCount: ListColorsHex
+                              .length, // Iterate through all possible colors
+                          itemBuilder: (context, index) {
+                            final colorHex = ListColorsHex[index];
+
+                            // Check if this color is currently selected based on _currentLabelsColor
+                            final bool isSelected =
+                                _currentLabelsColor[colorHex] ?? false;
+
+                            return InkWell(
+                              onTap: () {
+                                setState(() {
+                                  // Toggle the selection state for this color
+                                  _currentLabelsColor[colorHex] = !isSelected;
+                                });
+                                _onInputChanged(); // Trigger auto-save
+                              },
+                              splashColor: Colors.black.withOpacity(0.2),
+                              highlightColor: Colors.black.withOpacity(0.3),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: HexToColor(
+                                    ListColorsHex[index],
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: isSelected
+                                    ? const Center(
+                                        child: Icon(
+                                          Icons.check,
+                                          size: 30,
+                                          color: Colors
+                                              .white, // Make sure the checkmark is visible
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     RoundedContainerCustom(
                       isDark: isDark,
                       padding: const EdgeInsets.symmetric(
@@ -823,7 +934,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                         vertical: 15,
                       ),
                       width: MediaQuery.of(context).size.width * 0.85, //320
-                      
+
                       childWidget: Column(
                         children: [
                           Row(
@@ -1137,6 +1248,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                             ),
                           )
                         : Container(),
+                    const SizedBox(
+                      height: 10,
+                    ),
                   ],
                 ),
               ),

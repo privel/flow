@@ -57,7 +57,6 @@ class _HomePageState extends State<HomePage> {
     final boardProvider = Provider.of<BoardProvider>(context, listen: false);
     final userId = auth.user?.uid;
     boardStream = boardProvider.watchBoards(userId ?? '');
-    
   }
 
   Future<void> _onRefresh() async {
@@ -254,6 +253,9 @@ class _HomePageState extends State<HomePage> {
 
                                   DropDownWidget(
                                     widthContainer: 320,
+                                    BackGroundColor: isDark
+                                        ? const Color(0xFF494B4D)
+                                        : const Color(0xFFF6F6F6),
                                     isDark: isDark,
                                     header: Row(
                                       children: [

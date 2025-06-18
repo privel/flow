@@ -4,6 +4,7 @@ class DropDownWidget extends StatefulWidget {
   final double widthContainer;
   final bool isDark;
   final Widget header;
+  final Color BackGroundColor; 
   final List<Widget> children;
 
   const DropDownWidget({
@@ -11,6 +12,7 @@ class DropDownWidget extends StatefulWidget {
     required this.widthContainer,
     required this.isDark,
     required this.header,
+    required this.BackGroundColor,
     required this.children,
   });
 
@@ -28,7 +30,7 @@ class _DropDownWidgetState extends State<DropDownWidget>
       width: widget.widthContainer,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: widget.isDark ? const Color(0xFF494B4D) : const Color(0xFFF6F6F6),
+        color: widget.BackGroundColor,
       ),
       padding: const EdgeInsets.all(12),
       child: Column(

@@ -110,5 +110,6 @@
   "chooseFromGallery": "Choose from Gallery",
   "attachments": "Attachments",
   "confirmationOfDeletion": "Confirmation of deletion",
-  "areYouSureYouWantToDeleteThisImage": "Are you sure you want to delete this image?"
+  "areYouSureYouWantToDeleteThisImage": "Are you sure you want to delete this image?",
+  "label": "Label"
 }
