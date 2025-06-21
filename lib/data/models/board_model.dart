@@ -74,7 +74,7 @@ class BoardModel {
   final Map<String, CardModel> cards; // ✅ Map вместо List
   String inviteId;
   final String hexColor;
-  final bool favorite;
+  final bool isFavorite;
 
   Color get color =>
       Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
@@ -86,7 +86,7 @@ class BoardModel {
     required this.sharedWith,
     required this.cards,
     String? inviteId,
-    this.favorite = false,
+    this.isFavorite = false,
     this.hexColor = "11998e",
   }) : inviteId = inviteId ?? const Uuid().v4();
 
@@ -122,7 +122,7 @@ class BoardModel {
       sharedWith: parsedSharedWith,
       cards: cardMap,
       inviteId: map['inviteId'] ?? const Uuid().v4(),
-      favorite: favoriteValue == true,
+      isFavorite: favoriteValue == true,
       hexColor: map['hexColor'] ?? "11998e",
     );
   }
@@ -134,7 +134,7 @@ class BoardModel {
       'sharedWith': sharedWith,
       'cards': cards.map((key, value) => MapEntry(key, value.toMap())),
       'inviteId': inviteId,
-      'favorite': favorite,
+      'isFavorite': isFavorite,
       'hexColor': hexColor,
     };
   }
@@ -146,7 +146,7 @@ class BoardModel {
     Map<String, Map<String, dynamic>>? sharedWith,
     Map<String, CardModel>? cards,
     String? inviteId,
-    bool? favorite,
+    bool? isFavorite,
     String? hexColor,
   }) {
     return BoardModel(
@@ -159,7 +159,7 @@ class BoardModel {
               .map((k, v) => MapEntry(k, Map<String, dynamic>.from(v))),
       cards: cards ?? Map<String, CardModel>.from(this.cards),
       inviteId: inviteId ?? this.inviteId,
-      favorite: favorite ?? this.favorite,
+      isFavorite: isFavorite ?? this.isFavorite,
       hexColor: hexColor ?? this.hexColor,
     );
   }

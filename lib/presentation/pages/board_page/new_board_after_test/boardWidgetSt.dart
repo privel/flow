@@ -1,9 +1,13 @@
 import 'package:flow/core/theme/app_ext.dart';
 import 'package:flow/core/utils/provider/auth_provider.dart';
+import 'package:flow/data/models/role_model.dart';
 import 'package:flow/data/models/task_model.dart';
+import 'package:flow/data/models/user_models.dart';
 import 'package:flow/generated/l10n.dart';
 import 'package:flow/presentation/pages/account_page/account_layout.dart';
 import 'package:flow/presentation/widgets/list_modal_widget.dart';
+import 'package:flow/presentation/widgets/tween_animation.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flow/data/models/board_model.dart';
@@ -11,6 +15,7 @@ import 'package:flow/data/models/card_model.dart' as flow; // Псевдоним
 import 'package:flow/core/utils/provider/board_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconly/iconly.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:uuid/uuid.dart';
@@ -144,7 +149,6 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
   // }
 
 //NEW
-
   AppFlowyBoardController _createBoardController(BoardModel board) {
     final newController = AppFlowyBoardController(
       onMoveGroup: (dynamic p1, dynamic p2, dynamic p3, dynamic p4) {
@@ -215,20 +219,82 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
 
   void _handleMoveGroupItemToGroup(
       String fromGroupId, int fromIndex, String toGroupId, int toIndex) {
-    final targetGroupController = controller.getGroupController(toGroupId);
-    if (targetGroupController == null) return;
+    //WORK BUT BUG
+    // final targetGroupController = controller.getGroupController(toGroupId);
+    // if (targetGroupController == null) return;
 
-    final itemsInTargetGroup = targetGroupController.groupData.items;
-    if (toIndex < 0 || toIndex >= itemsInTargetGroup.length) return;
+    // final itemsInTargetGroup = targetGroupController.groupData.items;
+    // if (toIndex < 0 || toIndex >= itemsInTargetGroup.length) return;
 
-    final movedItemId = itemsInTargetGroup[toIndex].id;
-    final taskToMove = widget.boardModel.cards[fromGroupId]?.tasks[movedItemId];
-    if (taskToMove == null) return;
+    // final movedItemId = itemsInTargetGroup[toIndex].id;
+    // final taskToMove = widget.boardModel.cards[fromGroupId]?.tasks[movedItemId];
+    // if (taskToMove == null) return;
+
+    // final sourceGroupController = controller.getGroupController(fromGroupId);
+    // final orderedTaskIdsInSource =
+    //     sourceGroupController?.groupData.items.map((i) => i.id).toList() ?? [];
+    // final orderedTaskIdsInTarget = itemsInTargetGroup.map((i) => i.id).toList();
+
+    // boardProvider.moveTaskToDifferentCard(
+    //   boardId: widget.boardModel.id,
+    //   sourceCardId: fromGroupId,
+    //   targetCardId: toGroupId,
+    //   taskId: movedItemId,
+    //   taskData: taskToMove,
+    //   orderedTaskIdsInSourceCard: orderedTaskIdsInSource,
+    //   orderedTaskIdsInTargetCard: orderedTaskIdsInTarget,
+    // );
+
+    //Gemini changes
 
     final sourceGroupController = controller.getGroupController(fromGroupId);
-    final orderedTaskIdsInSource =
-        sourceGroupController?.groupData.items.map((i) => i.id).toList() ?? [];
-    final orderedTaskIdsInTarget = itemsInTargetGroup.map((i) => i.id).toList();
+    final targetGroupController = controller.getGroupController(toGroupId);
+
+    if (sourceGroupController == null || targetGroupController == null) {
+      debugPrint("Error: Source or target group controller not found.");
+      return;
+    }
+
+    // Получаем ID перемещенного элемента ИЗ ИСХОДНОЙ ГРУППЫ.
+    if (fromIndex < 0 ||
+        fromIndex >= sourceGroupController.groupData.items.length) {
+      debugPrint(
+          "Error: fromIndex $fromIndex is out of bounds for source group $fromGroupId.");
+      return;
+    }
+    final movedItemFromSource =
+        sourceGroupController.groupData.items[fromIndex];
+
+    // ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА: Убедитесь, что элемент, который мы получаем из исходной группы, является нашим FlowTaskItem
+    if (movedItemFromSource is! FlowTaskItem) {
+      debugPrint(
+          "Error: Moved item from source is not a FlowTaskItem. It's a ${movedItemFromSource.runtimeType}. Aborting move.");
+      return;
+    }
+
+    final String movedItemId = movedItemFromSource.id;
+
+    final taskToMove = widget.boardModel.cards[fromGroupId]?.tasks[movedItemId];
+    if (taskToMove == null) {
+      debugPrint(
+          "Error: Task data not found for moved item $movedItemId in source card $fromGroupId.");
+      return;
+    }
+
+    // Создаем упорядоченные списки ID задач.
+    // Используем .whereType<FlowTaskItem>() для фильтрации любых PhantomGroupItem,
+    // которые могли появиться во внутренних списках контроллера.
+    final List<String> orderedTaskIdsInSource = sourceGroupController
+        .groupData.items
+        .whereType<FlowTaskItem>()
+        .map((item) => item.id)
+        .toList();
+
+    final List<String> orderedTaskIdsInTarget = targetGroupController
+        .groupData.items
+        .whereType<FlowTaskItem>()
+        .map((item) => item.id)
+        .toList();
 
     boardProvider.moveTaskToDifferentCard(
       boardId: widget.boardModel.id,
@@ -711,6 +777,17 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
 //     );
 //   }
 
+  Color HexToColor(String hexColor) {
+    return Color(int.parse('FF${hexColor.replaceAll("#", "")}', radix: 16));
+  }
+
+  List<BoardMember> getAssignees(
+      List<BoardMember> members, Map<String, DateTime> assigneesMap) {
+    return members
+        .where((member) => assigneesMap.containsKey(member.user.id))
+        .toList();
+  }
+
   void _showCardActionsPopupMenu(BuildContext anchorContext, String cardId,
       String cardTitle, bool isDark) {
     final RenderBox renderBox = anchorContext.findRenderObject() as RenderBox;
@@ -812,6 +889,16 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
     });
   }
 
+  Future<List<AppUser>> _fetchAssigneeUsers(Set<String> assigneeIds) async {
+    if (assigneeIds.isEmpty) {
+      return [];
+    }
+    final List<Future<AppUser?>> futures =
+        assigneeIds.map((id) => auth.fetchUserById(id)).toList();
+    final List<AppUser?> users = await Future.wait(futures);
+    return users.whereType<AppUser>().toList(); // Отфильтровываем null
+  }
+
   String _getGroupname(groupData) {
     String groupTitle;
     try {
@@ -874,78 +961,396 @@ class _AppFlowyBoardWidgetState extends State<AppFlowyBoardWidget> {
             ),
       cardBuilder: (context, groupData, groupItemObject) {
         String groupTitle = _getGroupname(groupData);
+
+        if (groupItemObject is! FlowTaskItem) {
+          return const SizedBox.shrink();
+        }
+
         final currentItem = groupItemObject as FlowTaskItem;
 
+        final labelWidgets = currentItem.task.lablesColor.entries
+            .where((entry) => entry.value == true)
+            .map((entry) => Container(
+                  width: 24,
+                  height: 10,
+                  margin: const EdgeInsets.only(right: 6),
+                  decoration: BoxDecoration(
+                    color: HexToColor(entry.key),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ))
+            .toList();
+
         return Padding(
-          key: ValueKey('item_${currentItem.id}'),
-          padding: const EdgeInsets.only(
-            top: 5,
-          ), // Уменьшаем отступы для визуальной отладки
-          child: Card(
-            color: isDark ? const Color(0xFF3A3A3D) : Colors.white,
-            elevation: 10,
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-              title: Text(
-                currentItem.title,
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-              subtitle: Text(
-                currentItem.description,
-                style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.black54,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-              leading: IconButton(
-                icon: Icon(
-                  currentItem.isDone
-                      ? Icons.check_box
-                      : Icons.check_box_outline_blank_outlined,
-                  color: currentItem.isDone ? Colors.green : Colors.grey,
-                ),
-                onPressed: () async {
-                  final boardProvider = context.read<BoardProvider>();
-                  if (userRole != "viewer") {
-                    final updatedTask = currentItem.task.copyWith(
-                      isDone: !currentItem.isDone, // инвертируем состояние
-                    );
+            key: ValueKey('item_${currentItem.id}'),
+            padding: const EdgeInsets.only(
+              top: 0,
+            ), // Уменьшаем отступы для визуальной отладки
 
-                    await boardProvider.updateTask(
-                      widget.boardModel.id, // boardId
-                      groupData.id, // cardId
-                      updatedTask,
-                    );
-                  }
+            child: Card(
+              color: isDark ? const Color(0xFF3A3A3D) : Colors.white,
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  context.push(
+                    '/board/${widget.boardModel.id}/card/${groupData.id}/task/${currentItem.id}',
+                  );
                 },
-              ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Цветовые метки
 
-              // trailing: (userRole != "viewer")
-              //     ? IconButton(
-              //         onPressed: () async {
-              //           await _deleteTask(groupData.id, currentItem.id, isDark);
-              //         },
-              //         icon: Icon(
-              //           IconlyLight.delete,
-              //           color: Colors.redAccent.shade400,
-              //         ))
-              //     : null,
-              onTap: () {
-                // debugPrint("CUrretn ITEM ${currentItem}");
-                // debugPrint("SAMPEL ${groupData}");
-                context.push(
-                  '/board/${widget.boardModel.id}/card/${groupData.id}/task/${currentItem.id}',
-                );
-              },
-            ),
-          ),
-        );
+                      if (labelWidgets.isNotEmpty) ...[
+                        Row(children: labelWidgets),
+                        const SizedBox(height: 12),
+                      ] else
+                        const SizedBox(height: 8),
+                      // Чекбокс + заголовок
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              final boardProvider =
+                                  context.read<BoardProvider>();
+                              if (userRole != "viewer") {
+                                final updatedTask = currentItem.task.copyWith(
+                                  isDone: !currentItem.isDone,
+                                );
+                                await boardProvider.updateTask(
+                                  widget.boardModel.id,
+                                  groupData.id,
+                                  updatedTask,
+                                );
+                              }
+                            },
+                            child: Container(
+                              width: 20,
+                              height: 20,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: currentItem.isDone
+                                    ? Colors.green
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: currentItem.isDone
+                                      ? Colors.green
+                                      : Colors.grey,
+                                  width: 2,
+                                ),
+                              ),
+                              child: currentItem.isDone
+                                  ? const Icon(Icons.check,
+                                      size: 14, color: Colors.white)
+                                  : null,
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              currentItem.title,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      // Информация внизу
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              // const Icon(Icons.remove_red_eye,
+                              //     size: 16, color: Colors.grey),
+
+                              if (currentItem.task.startDate != null) ...[
+                                const SizedBox(width: 4),
+                                const Icon(Icons.access_time,
+                                    size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Started: ${DateFormat("d MMMM", S.of(context).en_ru).format(currentItem.task.startDate!)}",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontFamily: 'SFProText',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(width: 4),
+                              if (currentItem.description.isNotEmpty) ...[
+                                const Icon(
+                                    FluentIcons.text_description_16_filled,
+                                    size: 14,
+                                    color: Colors.grey),
+                                const SizedBox(width: 6),
+                              ],
+                              if (currentItem.task.images.isNotEmpty) ...[
+                                const Icon(FluentIcons.attach_16_filled,
+                                    size: 14, color: Colors.grey),
+                                const SizedBox(width: 1),
+                                Text(
+                                  "${currentItem.task.images.length}",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade400,
+                                    fontFamily: 'SFProText',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          if (currentItem.task.assignees.isNotEmpty) ...[
+                            // CircleAvatar(
+                            //   backgroundColor: Colors.grey,
+                            //   radius: 16,
+                            //   backgroundImage: (user.photoUrl != null &&
+                            //           user.photoUrl!.trim().isNotEmpty)
+                            //       ? NetworkImage(user.photoUrl!)
+                            //       : null,
+                            //   child: (user.photoUrl == null ||
+                            //           user.photoUrl!.trim().isEmpty)
+                            //       ? (user.displayName != null &&
+                            //               user.displayName.trim().isNotEmpty)
+                            //           ? Text(
+                            //               user.displayName[0].toUpperCase(),
+                            //               style: const TextStyle(
+                            //                 fontFamily: 'SFProText',
+                            //                 fontWeight: FontWeight.w700,
+                            //               ),
+                            //             )
+                            //           : const Icon(Icons.person)
+                            //       : null,
+                            // ),
+
+                            FutureBuilder<List<AppUser>>(
+                              future: _fetchAssigneeUsers(currentItem
+                                  .task.assignees.keys
+                                  .toSet()), // Передаем Set<String> ID пользователей
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 4.0),
+                                    child: CircularProgressIndicator.adaptive(
+                                        strokeWidth:
+                                            2), // Легкий индикатор загрузки
+                                  );
+                                }
+                                if (snapshot.hasError) {
+                                  print(
+                                      "Ошибка при загрузке ответственных: ${snapshot.error}");
+                                  // Можно отобразить иконку ошибки или пустоту
+                                  return const SizedBox.shrink();
+                                }
+                                if (!snapshot.hasData ||
+                                    snapshot.data!.isEmpty) {
+                                  return const SizedBox
+                                      .shrink(); // Если нет ответственных
+                                }
+
+                                final List<AppUser> assignees = snapshot.data!;
+                                const int maxVisibleAvatars =
+                                    3; 
+                                final int remainingAssignees =
+                                    assignees.length - maxVisibleAvatars;
+
+                                return Align(
+                                  // Выравниваем Row вправо
+                                  alignment: Alignment
+                                      .bottomRight, // или MainAxisAlignment.end в Row
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top:
+                                            4.0), // Отступ сверху от других элементов карточки
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Чтобы Row занимал только необходимое пространство
+                                      children: [
+                                        // Отображаем видимые аватары
+                                        ...assignees
+                                            .take(maxVisibleAvatars)
+                                            .map((user) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                left:
+                                                    4.0), // Отступ между аватарами
+                                            child: CircleAvatar(
+                                              backgroundColor: isDark
+                                                  ? Colors.grey.shade800
+                                                  : Colors.grey
+                                                      .shade300, // Фон аватара
+                                              radius: 16, // Радиус аватара
+                                              backgroundImage: (user.photoUrl !=
+                                                          null &&
+                                                      user.photoUrl!
+                                                          .trim()
+                                                          .isNotEmpty)
+                                                  ? NetworkImage(user
+                                                      .photoUrl!) // Если есть фото, загружаем
+                                                  : null, // Иначе нет фонового изображения
+                                              child: (user.photoUrl == null ||
+                                                      user.photoUrl!
+                                                          .trim()
+                                                          .isEmpty)
+                                                  ? (user.displayName
+                                                          .isNotEmpty)
+                                                      ? Text(
+                                                          user.displayName[0]
+                                                              .toUpperCase(), // Первая буква имени
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            fontSize:
+                                                                12, // Размер шрифта
+                                                            color: isDark
+                                                                ? Colors.white
+                                                                : Colors
+                                                                    .black87,
+                                                          ),
+                                                        )
+                                                      : Icon(
+                                                          Icons.person,
+                                                          size: 16,
+                                                          color: isDark
+                                                              ? Colors.white70
+                                                              : Colors.black54,
+                                                        ) // Иконка, если нет имени
+                                                  : null,
+                                            ),
+                                          );
+                                        }).toList(),
+
+                                        // Отображаем "+N" если есть скрытые аватары
+                                        if (remainingAssignees > 0)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 4.0), // Отступ перед "+N"
+                                            child: CircleAvatar(
+                                              backgroundColor: isDark
+                                                  ? Colors.green
+                                                  : Colors
+                                                      .green, // Цвет фона "+N"
+                                              radius: 14, // Радиус "+N"
+                                              child: Text(
+                                                '+${remainingAssignees}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                          // Аватар
+                          // const CircleAvatar(
+                          //   radius: 16,
+                          //   backgroundImage: NetworkImage(
+                          //     'https://your-avatar-url.png', // Заменить на свою ссылку
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )
+
+            // child: Card(
+            //   color: isDark ? const Color(0xFF3A3A3D) : Colors.white,
+            //   elevation: 10,
+            //   margin: const EdgeInsets.symmetric(vertical: 4),
+            //   shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.circular(10),
+            //   ),
+
+            //   child: ListTile(
+            //     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+
+            //     title: Text(
+            //       currentItem.title,
+            //       style: TextStyle(
+            //         color: isDark ? Colors.white : Colors.black87,
+            //       ),
+            //     ),
+            //     subtitle: Text(
+            //       currentItem.description,
+            //       style: TextStyle(
+            //         color: isDark ? Colors.white70 : Colors.black54,
+            //       ),
+            //       overflow: TextOverflow.ellipsis,
+            //     ),
+            //     leading: IconButton(
+            //       icon: Icon(
+            //         currentItem.isDone
+            //             ? Icons.check_box
+            //             : Icons.check_box_outline_blank_outlined,
+            //         color: currentItem.isDone ? Colors.green : Colors.grey,
+            //       ),
+            //       onPressed: () async {
+            //         final boardProvider = context.read<BoardProvider>();
+            //         if (userRole != "viewer") {
+            //           final updatedTask = currentItem.task.copyWith(
+            //             isDone: !currentItem.isDone, // инвертируем состояние
+            //           );
+
+            //           await boardProvider.updateTask(
+            //             widget.boardModel.id, // boardId
+            //             groupData.id, // cardId
+            //             updatedTask,
+            //           );
+            //         }
+            //       },
+            //     ),
+
+            //     // trailing: (userRole != "viewer")
+            //     //     ? IconButton(
+            //     //         onPressed: () async {
+            //     //           await _deleteTask(groupData.id, currentItem.id, isDark);
+            //     //         },
+            //     //         icon: Icon(
+            //     //           IconlyLight.delete,
+            //     //           color: Colors.redAccent.shade400,
+            //     //         ))
+            //     //     : null,
+            //     onTap: () {
+            //       // debugPrint("CUrretn ITEM ${currentItem}");
+            //       // debugPrint("SAMPEL ${groupData}");
+            //       context.push(
+            //         '/board/${widget.boardModel.id}/card/${groupData.id}/task/${currentItem.id}',
+            //       );
+            //     },
+            //   ),
+            // ),
+            );
       },
       headerBuilder: (context, groupData) {
         String groupTitle = _getGroupname(groupData);

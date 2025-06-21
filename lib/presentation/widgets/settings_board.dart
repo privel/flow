@@ -77,7 +77,7 @@ class _SettingsBoardState extends State<SettingsBoard> {
             setState(() {
               boardUsers = users;
               _titleController.text = updatedBoard.title;
-              _isFavoritel = updatedBoard.favorite;
+              _isFavoritel = updatedBoard.isFavorite;
             });
           }
         }

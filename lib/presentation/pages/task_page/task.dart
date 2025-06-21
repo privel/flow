@@ -49,6 +49,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   String _initialTitle = '';
   String _initialDescription = '';
 
+  bool _isDescriptionExpanded = false;
+  final GlobalKey _descriptionTextKey = GlobalKey();
+  double? _descriptionHeight;
+
   Timer? _debounceTimer;
 
   Map<String, Map<String, dynamic>> _initialImages = {};
@@ -81,6 +85,33 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     _descriptionController.addListener(_onDescriptionChanged);
 
     imagesStream = _currentImagesStream();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _descriptionTextKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox;
+        setState(() {
+          _descriptionHeight = box.size.height;
+        });
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _descriptionTextKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox;
+        final height = box.size.height;
+        if (_descriptionHeight != height) {
+          setState(() {
+            _descriptionHeight = height;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -115,6 +146,19 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
   void _onDescriptionChanged() {
     _onInputChanged();
+    _measureDescriptionHeight();
+  }
+
+  void _measureDescriptionHeight() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_descriptionTextKey.currentContext != null) {
+        final RenderBox renderBox =
+            _descriptionTextKey.currentContext!.findRenderObject() as RenderBox;
+        setState(() {
+          _descriptionHeight = renderBox.size.height;
+        });
+      }
+    });
   }
 
   Future<void> _performAutoSave() async {
@@ -519,6 +563,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           _loadTaskData(task);
           futureMembers = provider.loadBoardUsers(board, auth);
           _isInitialized = true;
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _measureDescriptionHeight();
+          });
         }
 
         return Scaffold(
@@ -631,8 +679,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 15),
-                        //Descriptions
+                        const SizedBox(
+                          height: 20,
+                        ),
                         Text(
                           S.of(context).description,
                           style: const TextStyle(
@@ -642,8 +691,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           ),
                         ),
                         const SizedBox(height: 5),
+                        // ЭТОТ КОНТЕЙНЕР ДОЛЖЕН БЫТЬ ОДИН
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.85, //320
+                          width: MediaQuery.of(context).size.width * 0.85,
                           decoration: BoxDecoration(
                             color: isDark
                                 ? const Color(0xFF333333)
@@ -652,24 +702,74 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           ),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 10),
-                          child: TextField(
-                            controller: _descriptionController,
-                            style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black,
-                            ),
-                            cursorWidth: 1.5,
-                            keyboardType: TextInputType.multiline,
-                            minLines: 4,
-                            maxLines: null,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: S.of(context).someDescription,
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              isDense: true,
-                              fillColor: isDark
-                                  ? const Color(0xFF333333)
-                                  : const Color(0xFFF0F0F0),
-                            ),
+                          child: Column(
+                            children: [
+                              ConstrainedBox(
+                                constraints: _isDescriptionExpanded
+                                    ? const BoxConstraints() 
+                                    : const BoxConstraints(
+                                        maxHeight:
+                                            350.0), 
+                                child: Opacity(
+                                  opacity: 1.0, 
+                                  child: TextField(
+                                    key:
+                                        _descriptionTextKey, 
+                                    controller: _descriptionController,
+                                    style: TextStyle(
+                                      color:
+                                          isDark ? Colors.white : Colors.black,
+                                    ),
+                                    cursorWidth: 1.5,
+                                    keyboardType: TextInputType.multiline,
+                                    minLines: null, // Разрешаем несколько строк
+                                    maxLines: _isDescriptionExpanded
+                                        ? null
+                                        : 8,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: S.of(context).someDescription,
+                                      hintStyle:
+                                          const TextStyle(color: Colors.grey),
+                                      isDense: true,
+                                      fillColor: isDark
+                                          ? const Color(0xFF333333)
+                                          : const Color(0xFFF0F0F0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if(_descriptionController.text.trim().length > 100)
+                              Center(
+                                child: SizedBox(
+                                  height: 28,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _isDescriptionExpanded =
+                                            !_isDescriptionExpanded;
+                                      });
+                                      if (!_isDescriptionExpanded) {
+                                        // Прокручиваем к началу описания при сворачивании
+                                        scrollController.animateTo(
+                                          scrollController
+                                              .position.minScrollExtent,
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          curve: Curves.easeOut,
+                                        );
+                                      }
+                                    },
+                                    icon: Icon(
+                                      _isDescriptionExpanded
+                                          ? IconlyLight.arrow_up_2
+                                          : IconlyLight.arrow_down_2,
+                                      color: Colors.greenAccent.shade400,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -789,15 +889,26 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                                   getAssignees(members, task.assignees);
 
                               if (assigned.isEmpty) {
-                                return Text(
-                                  S.of(context).thereAreNoResponsiblePeople,
-                                  style: TextStyle(
-                                    fontFamily: 'SFProText',
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? Colors.white70
-                                        : Colors.black87,
-                                    fontSize: 15,
+                                return GestureDetector(
+                                  onTap: () {
+                                    showAssigneeBottomSheet(
+                                      context: context,
+                                      board: board, // актуальная доска
+                                      cardId: widget.cardId,
+                                      task: task,
+                                      isDark: isDark,
+                                    );
+                                  },
+                                  child: Text(
+                                    S.of(context).thereAreNoResponsiblePeople,
+                                    style: TextStyle(
+                                      fontFamily: 'SFProText',
+                                      fontWeight: FontWeight.w500,
+                                      color: isDark
+                                          ? Colors.white70
+                                          : Colors.black87,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 );
                               }

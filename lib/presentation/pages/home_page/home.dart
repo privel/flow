@@ -734,7 +734,7 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   final favoriteBoards = snapshot.data!
-                      .where((board) => board.favorite == true)
+                      .where((board) => board.isFavorite == true)
                       .toList();
 
                   final filteredFavorites = _searchText.isEmpty

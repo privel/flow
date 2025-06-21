@@ -77,7 +77,7 @@ class _ListModalWidgetState extends State<ListModalWidget> {
             setState(() {
               boardUsers = users;
               _titleController.text = updatedBoard.title;
-              _isFavoritel = updatedBoard.favorite;
+              _isFavoritel = updatedBoard.isFavorite;
             });
           }
         }
